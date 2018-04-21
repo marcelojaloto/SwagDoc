@@ -99,6 +99,10 @@ begin
 
     if Assigned(OpObj.Values['operationId']) then
       Op.OperationId := OpObj.Values['operationId'].Value;
+
+    if Assigned(OpObj.Values['deprecated']) then
+      Op.Deprecated := (OpObj.Values['deprecated'] as TJSONBool).AsBoolean;
+
     LoadTags(Op, OpObj.Values['tags'] as TJSONArray);
     LoadParameters(Op, OpObj.Values['parameters'] as TJSONArray);
     LoadResponse(Op, OpObj.Values['responses'] as TJSONObject);

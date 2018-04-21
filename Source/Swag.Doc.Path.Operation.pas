@@ -44,6 +44,7 @@ type
     fSecurity: TList<TSwagSecuritySchemaName>;
     fTags: TList<string>;
     fOperationId: string;
+    fDeprecated: Boolean;
     function GetOperationToString: string;
   protected
     function GenerateTagsJsonArray(pTagList: TList<string>): TJSONArray;
@@ -65,6 +66,7 @@ type
     property Tags: TList<string> read fTags;
     property Consumes: TList<TSwagMimeType> read fConsumes;
     property Produces: TList<TSwagMimeType> read fProduces;
+    property Deprecated: Boolean read fDeprecated write fDeprecated;
     property Parameters: TObjectList<TSwagRequestParameter> read fParameters;
     property Responses: TObjectDictionary<TSwagStatusCode, TSwagResponse> read fResponses;
     property Security: TList<TSwagSecuritySchemaName> read fSecurity;
@@ -80,6 +82,7 @@ const
   c_SwagPathOperationDescription = 'description';
   c_SwagPathOperationTags = 'tags';
   c_SwagPathOperationOperationId = 'operationId';
+  c_SwagPathOperationDeprecated = 'deprecated';
   c_SwagPathOperationProduces = 'produces';
   c_SwagPathOperationConsumes = 'consumes';
   c_SwagPathOperationParameters = 'parameters';
@@ -183,6 +186,9 @@ var
 begin
   vJsonObject := TJsonObject.Create;
   vJsonObject.AddPair(c_SwagPathOperationDescription, fDescription);
+  if fDeprecated then
+    vJsonObject.AddPair(c_SwagPathOperationDeprecated, TJSONBool.Create(FDeprecated));
+
   if not fOperationId.IsEmpty then
     vJsonObject.AddPair(c_SwagPathOperationOperationId, fOperationId);
   if (fTags.Count > 0) then
