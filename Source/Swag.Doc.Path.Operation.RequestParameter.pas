@@ -130,8 +130,6 @@ begin
 end;
 
 function TSwagRequestParameter.GetInLocation(inJson: TJSONObject):TSwagRequestParameterInLocation;
-var
-  i: Integer;
 begin
   Result := rpiNotDefined;
 
