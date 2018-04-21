@@ -38,6 +38,8 @@ type
     fSchema: TSwagDefinition;
     fDescription: string;
     fTypeParameter: string;
+    fPattern: string;
+    function GetInLocation(inJson: TJSONObject): TSwagRequestParameterInLocation;
   protected
     function ReturnInLocationToString: string;
   public
@@ -45,11 +47,13 @@ type
     destructor Destroy; override;
 
     function GenerateJsonObject: TJSONObject;
+    procedure Load(inJson: TJSONObject);
 
     property InLocation: TSwagRequestParameterInLocation read fInLocation write fInLocation;
     property Name: string read fName write fName;
     property Description: string read fDescription write fDescription;
     property Required: Boolean read fRequired write fRequired;
+    property Pattern: string read fPattern write fPattern;
     property Schema: TSwagDefinition read fSchema;
     property TypeParameter: string read fTypeParameter write fTypeParameter;
   end;
@@ -92,6 +96,9 @@ begin
   vJsonObject.AddPair(c_SwagRequestParameterName, fName);
   if not fDescription.IsEmpty then
     vJsonObject.AddPair(c_SwagRequestParameterDescription, fDescription);
+  if not fPattern.IsEmpty then
+    vJsonObject.AddPair('pattern', fPattern);
+
   vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONBool.Create(fRequired));
 
   if Assigned(fSchema.JsonSchema) then
@@ -100,6 +107,58 @@ begin
     vJsonObject.AddPair(c_SwagRequestParameterType, fTypeParameter);
 
   Result := vJsonObject;
+end;
+
+procedure TSwagRequestParameter.Load(inJson: TJSONObject);
+begin
+  if Assigned(inJson.Values[c_SwagRequestParameterRequired]) then
+    fRequired := (inJson.Values[c_SwagRequestParameterRequired] as TJSONBool).AsBoolean
+  else
+    fRequired := False;
+
+  if Assigned(inJson.Values['pattern']) then
+    fPattern := inJson.Values['pattern'].Value;
+
+  if Assigned(inJson.Values[c_SwagRequestParameterName]) then
+    fName := inJson.Values[c_SwagRequestParameterName].Value;
+  fInLocation := GetInLocation(inJson);
+
+  fTypeParameter := inJson.Values[c_SwagRequestParameterType].Value;
+
+
+
+end;
+
+function TSwagRequestParameter.GetInLocation(inJson: TJSONObject):TSwagRequestParameterInLocation;
+var
+  i: Integer;
+begin
+  Result := rpiNotDefined;
+
+  if not Assigned(inJson.Values['in']) then
+    Exit;
+
+
+  if inJson.Values['in'].Value = 'body' then
+  begin
+    Result := rpiBody;
+  end
+  else if inJson.Values['in'].Value = 'query' then
+  begin
+    Result := rpiQuery;
+  end
+  else if inJson.Values['in'].Value = 'header' then
+  begin
+    Result := rpiHeader;
+  end
+  else if inJson.Values['in'].Value = 'path' then
+  begin
+    Result := rpiPath;
+  end
+  else if inJson.Values['in'].Value = 'formData' then
+  begin
+    Result := rpiFormData;
+  end
 end;
 
 function TSwagRequestParameter.ReturnInLocationToString: string;
