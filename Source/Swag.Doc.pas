@@ -30,6 +30,7 @@ uses
   System.JSON,
   Swag.Common.Types,
   Swag.Doc.Info,
+  Swag.Doc.Info.License,
   Swag.Doc.SecurityDefinition,
   Swag.Doc.Path,
   Swag.Doc.Definition;
@@ -38,6 +39,7 @@ type
   TSwagDoc = class(TObject)
   private
     fInfo: TSwagInfo;
+    fLicense : TSwagInfoLicense;
     fConsumes: TList<TSwagMimeType>;
     fProduces: TList<TSwagMimeType>;
     fBasePath: string;
@@ -74,6 +76,7 @@ type
 
     property SwaggerVersion: string read GetSwaggerVersion;
     property Info: TSwagInfo read fInfo;
+    property License : TSwagInfoLicense read fLicense;
     property Host: string read fHost write fHost;
     property BasePath: string read fBasePath write fBasePath;
     property Schemes: TSwagTransferProtocolSchemes read fSchemes write fSchemes;
@@ -95,6 +98,7 @@ uses
 const
   c_Swagger = 'swagger';
   c_SwagInfo = 'info';
+  c_SwagLicense = 'license';
   c_SwagHost = 'host';
   c_SwagBasePath = 'basePath';
   c_SwagSchemes = 'schemes';
@@ -111,6 +115,7 @@ begin
   inherited Create;
 
   fInfo := TSwagInfo.Create;
+  fLicense := TSwagInfoLicense.Create;
   fSecurityDefinitions := TObjectList<TSwagSecurityDefinition>.Create;
   fConsumes := TList<string>.Create;
   fProduces := TList<string>.Create;
@@ -126,6 +131,7 @@ begin
   FreeAndNil(fPaths);
   FreeAndNil(fInfo);
   FreeAndNil(fSecurityDefinitions);
+  FreeAndNil(fLicense);
 
   if Assigned(fSwaggerJson) then
     FreeAndNil(fSwaggerJson);
@@ -217,6 +223,10 @@ begin
 
   vJsonObject.AddPair(c_Swagger, GetSwaggerVersion);
   vJsonObject.AddPair(c_SwagInfo, fInfo.GenerateJsonObject);
+
+  if not fLicense.isEmpty then
+    vJsonObject.AddPair(c_SwagLicense,fLicense.GenerateJsonObject);
+
   if not fHost.IsEmpty then
     vJsonObject.AddPair(c_SwagHost, fHost);
   vJsonObject.AddPair(c_SwagBasePath, fBasePath);
@@ -261,6 +271,9 @@ var
 begin
   fSwaggerJson := TJSONObject.ParseJSONValue(TFile.ReadAllText(infilename));
   fInfo.Load((fSwaggerJson as TJSONObject).Values[c_SwagInfo] as TJSONObject);
+
+  fLicense.Load((fSwaggerJson as TJSONObject).Values[c_SwagLicense] as TJSONObject);
+
 
   jsonObj := (fSwaggerJson as TJSONObject).Values[c_SwagPaths] as TJSONObject;
   jsonSchemesArray := (fSwaggerJson as TJSONObject).Values[c_SwagSchemes] as TJSONArray;
