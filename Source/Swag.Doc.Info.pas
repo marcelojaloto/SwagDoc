@@ -35,6 +35,7 @@ type
     fTitle: string;
     fDescription: string;
     fContact: TSwagInfoContact;
+    FTermsOfService: string;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -44,6 +45,7 @@ type
 
     property Version: string read fVersion write fVersion;
     property Title: string read fTitle write fTitle;
+    property TermsOfService: string read FTermsOfService write FTermsOfService;
     property Description: string read fDescription write fDescription;
     property Contact: TSwagInfoContact read fContact write fContact;
   end;
@@ -58,6 +60,7 @@ const
   c_SwagInfoTitle = 'title';
   c_SwagInfoDescription = 'description';
   c_SwagInfoContact = 'contact';
+  c_SwagInfoTermsOfService = 'termsOfService';
 
 { TSwagInfo }
 
@@ -75,8 +78,15 @@ begin
   begin
     fDescription := inJSON.Values[c_SwagInfoDescription].Value;
   end;
+  if Assigned(inJSON.Values[c_SwagInfoTermsOfService]) then
+  begin
+    FTermsOfService := inJSON.Values[c_SwagInfoTermsOfService].Value;
+  end;
+  if Assigned(inJSON.Values[c_SwagInfoContact]) then
+  begin
+    fContact.Load(inJSON.Values[c_SwagInfoContact] as TJSONObject);
+  end;
 
-  {TODO: Handle Contact}
 end;
 
 constructor TSwagInfo.Create;
@@ -97,7 +107,13 @@ begin
   Result.AddPair(c_SwagInfoVersion, fVersion);
   Result.AddPair(c_SwagInfoTitle, fTitle);
   Result.AddPair(c_SwagInfoDescription, fDescription);
-  Result.AddPair(c_SwagInfoContact, fContact.GenerateJsonObject);
+  if not FTermsOfService.IsEmpty then
+    Result.AddPair(c_SwagInfoTermsOfService, FTermsOfService);
+  if not fContact.IsEmpty then
+  begin
+    Result.AddPair(c_SwagInfoContact, fContact.GenerateJsonObject);
+  end;
 end;
+
 
 end.
