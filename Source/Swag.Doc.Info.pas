@@ -40,6 +40,7 @@ type
     destructor Destroy; override;
 
     function GenerateJsonObject: TJSONObject;
+    procedure Load(inJSON: TJSONObject);
 
     property Version: string read fVersion write fVersion;
     property Title: string read fTitle write fTitle;
@@ -59,6 +60,24 @@ const
   c_SwagInfoContact = 'contact';
 
 { TSwagInfo }
+
+procedure TSwagInfo.Load(inJSON: TJSONObject);
+begin
+  if Assigned(inJSON.Values[c_SwagInfoVersion]) then
+  begin
+    fVersion := inJSON.Values[c_SwagInfoVersion].Value;
+  end;
+  if Assigned(inJSON.Values[c_SwagInfoTitle]) then
+  begin
+    fTitle := inJSON.Values[c_SwagInfoTitle].Value;
+  end;
+  if Assigned(inJSON.Values[c_SwagInfoDescription]) then
+  begin
+    fDescription := inJSON.Values[c_SwagInfoDescription].Value;
+  end;
+
+  {TODO: Handle Contact}
+end;
 
 constructor TSwagInfo.Create;
 begin
