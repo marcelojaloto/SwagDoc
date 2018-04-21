@@ -43,6 +43,7 @@ type
     fResponses: TObjectDictionary<TSwagStatusCode, TSwagResponse>;
     fSecurity: TList<TSwagSecuritySchemaName>;
     fTags: TList<string>;
+    fOperationId: string;
     function GetOperationToString: string;
   protected
     function GenerateTagsJsonArray(pTagList: TList<string>): TJSONArray;
@@ -58,6 +59,7 @@ type
 
     property Operation: TSwagPathTypeOperation read fOperation write fOperation;
     property OperationToString: string read GetOperationToString;
+    property OperationId : string read fOperationId write fOperationId;
 
     property Description: string read fDescription write fDescription;
     property Tags: TList<string> read fTags;
@@ -77,6 +79,7 @@ uses
 const
   c_SwagPathOperationDescription = 'description';
   c_SwagPathOperationTags = 'tags';
+  c_SwagPathOperationOperationId = 'operationId';
   c_SwagPathOperationProduces = 'produces';
   c_SwagPathOperationConsumes = 'consumes';
   c_SwagPathOperationParameters = 'parameters';
@@ -180,6 +183,8 @@ var
 begin
   vJsonObject := TJsonObject.Create;
   vJsonObject.AddPair(c_SwagPathOperationDescription, fDescription);
+  if not fOperationId.IsEmpty then
+    vJsonObject.AddPair(c_SwagPathOperationOperationId, fOperationId);
   if (fTags.Count > 0) then
     vJsonObject.AddPair(c_SwagPathOperationTags, GenerateTagsJsonArray(fTags));
   if (fConsumes.Count > 0) then
