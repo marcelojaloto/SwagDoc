@@ -38,7 +38,6 @@ type
   private
     fOperations: TObjectList<TSwagPathOperation>;
     fUri: string;
-    function GetPathTypeOperationFromString(const pTypeOperationString: string): TSwagPathTypeOperation;
     procedure LoadResponse(pOperation: TSwagPathOperation; pJsonResponse: TJSONObject);
     procedure LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
     procedure LoadTags(pOperation: TSwagPathOperation; pJsonTags: TJSONArray);
@@ -56,7 +55,8 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  Swag.Common.Types.Helpers;
 
 { TSwagPath }
 
@@ -86,15 +86,13 @@ var
   i: Integer;
   vOperation: TSwagPathOperation;
   vOperationJson: TJSONObject;
-  vOperationValue: string;
 begin
   for i := 0 to pJson.Count - 1 do
   begin
     vOperation := TSwagPathOperation.Create;
     vOperationJson := pJson.Pairs[i].JsonValue as TJSONObject;
     vOperation.Description := vOperationJson.Values['description'].Value;
-    vOperationValue := pJson.Pairs[i].JsonString.Value;
-    vOperation.Operation := GetPathTypeOperationFromString(vOperationValue);
+    vOperation.Operation.ToType(pJson.Pairs[i].JsonString.Value);
 
     if Assigned(vOperationJson.Values['operationId']) then
       vOperation.OperationId := vOperationJson.Values['operationId'].Value;
@@ -155,39 +153,6 @@ begin
       vResponse.Load(pJsonResponse.Pairs[r].JsonValue as TJSONObject);
       pOperation.Responses.Add(vResponse.StatusCode, vResponse);
     end;
-  end;
-end;
-
-function TSwagPath.GetPathTypeOperationFromString(const pTypeOperationString: string): TSwagPathTypeOperation;
-begin
-  Result := TSwagPathTypeOperation.ohvNotDefined;
-  if pTypeOperationString = 'get' then
-  begin
-    Result := TSwagPathTypeOperation.ohvGet;
-  end
-  else if pTypeOperationString = 'post' then
-  begin
-    Result := TSwagPathTypeOperation.ohvPost;
-  end
-  else if pTypeOperationString = 'patch' then
-  begin
-    Result := TSwagPathTypeOperation.ohvPatch;
-  end
-  else if pTypeOperationString = 'put' then
-  begin
-    Result := TSwagPathTypeOperation.ohvPut;
-  end
-  else if pTypeOperationString = 'head' then
-  begin
-    Result := TSwagPathTypeOperation.ohvHead;
-  end
-  else if pTypeOperationString = 'delete' then
-  begin
-    Result := TSwagPathTypeOperation.ohvDelete;
-  end
-  else if pTypeOperationString = 'options' then
-  begin
-    Result := TSwagPathTypeOperation.ohvOptions;
   end;
 end;
 

@@ -39,7 +39,6 @@ type
     fDescription: string;
     fTypeParameter: string;
     fPattern: string;
-    function GetInLocation(pJson: TJSONObject): TSwagRequestParameterInLocation;
   protected
     function ReturnInLocationToString: string;
   public
@@ -63,7 +62,8 @@ implementation
 uses
   System.SysUtils,
   System.StrUtils,
-  Swag.Common.Consts;
+  Swag.Common.Consts,
+  Swag.Common.Types.Helpers;
 
 const
   c_SwagRequestParameterIn = 'in';
@@ -122,37 +122,10 @@ begin
   if Assigned(pJson.Values[c_SwagRequestParameterName]) then
     fName := pJson.Values[c_SwagRequestParameterName].Value;
 
-  fInLocation := GetInLocation(pJson);
+  if Assigned(pJson.Values['in']) then
+    fInLocation.ToType(pJson.Values['in'].Value);
+
   fTypeParameter := pJson.Values[c_SwagRequestParameterType].Value;
-end;
-
-function TSwagRequestParameter.GetInLocation(pJson: TJSONObject):TSwagRequestParameterInLocation;
-begin
-  Result := rpiNotDefined;
-
-  if not Assigned(pJson.Values['in']) then
-    Exit;
-
-  if pJson.Values['in'].Value = 'body' then
-  begin
-    Result := rpiBody;
-  end
-  else if pJson.Values['in'].Value = 'query' then
-  begin
-    Result := rpiQuery;
-  end
-  else if pJson.Values['in'].Value = 'header' then
-  begin
-    Result := rpiHeader;
-  end
-  else if pJson.Values['in'].Value = 'path' then
-  begin
-    Result := rpiPath;
-  end
-  else if pJson.Values['in'].Value = 'formData' then
-  begin
-    Result := rpiFormData;
-  end;
 end;
 
 function TSwagRequestParameter.ReturnInLocationToString: string;
