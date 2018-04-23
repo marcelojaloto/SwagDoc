@@ -69,7 +69,7 @@ type
     procedure GenerateSwaggerJson;
     procedure SaveSwaggerJsonToFile;
 
-    procedure LoadFromFile(const inFilename: string);
+    procedure LoadFromFile(const pFilename: string);
 
     property SwaggerFilesFolder: string read fSwaggerFilesFolder write SetSwaggerFilesFolder;
     property SwaggerJson: TJSONValue read fSwaggerJson;
@@ -91,8 +91,8 @@ implementation
 
 uses
   System.SysUtils,
-  REST.Json,
   System.IOUtils,
+  REST.Json,
   Swag.Common.Consts;
 
 const
@@ -259,54 +259,53 @@ begin
   Result := c_SwaggerVersion;
 end;
 
-procedure TSwagDoc.LoadFromFile(const inFilename: string);
+procedure TSwagDoc.LoadFromFile(const pFilename: string);
 var
-  jsonObj : TJSONObject;
-  Path  : TSwagPath;
-  jsonSchemesArray : TJSONArray;
-  jsonProduces : TJSONArray;
-  jsonConsumes : TJSONArray;
-  i, j : Integer;
-  k, r : Integer;
+  vJsonObj: TJSONObject;
+  vPath: TSwagPath;
+  vJsonSchemesArray: TJSONArray;
+  vJsonProduces: TJSONArray;
+  vJsonConsumes: TJSONArray;
+  i, j: Integer;
+  k, r: Integer;
 begin
-  fSwaggerJson := TJSONObject.ParseJSONValue(TFile.ReadAllText(infilename));
+  fSwaggerJson := TJSONObject.ParseJSONValue(TFile.ReadAllText(pFilename));
   fInfo.Load((fSwaggerJson as TJSONObject).Values[c_SwagInfo] as TJSONObject);
 
   fLicense.Load((fSwaggerJson as TJSONObject).Values[c_SwagLicense] as TJSONObject);
 
+  vJsonObj := (fSwaggerJson as TJSONObject).Values[c_SwagPaths] as TJSONObject;
+  vJsonSchemesArray := (fSwaggerJson as TJSONObject).Values[c_SwagSchemes] as TJSONArray;
 
-  jsonObj := (fSwaggerJson as TJSONObject).Values[c_SwagPaths] as TJSONObject;
-  jsonSchemesArray := (fSwaggerJson as TJSONObject).Values[c_SwagSchemes] as TJSONArray;
-
-  for j := 0 to jsonSchemesArray.Count - 1 do
+  for j := 0 to vJsonSchemesArray.Count - 1 do
   begin
-    if jsonSchemesArray.Items[j].Value='http' then
+    if (vJsonSchemesArray.Items[j].Value = 'http') then
       Schemes := self.Schemes + [tpsHttp]
-    else if jsonSchemesArray.Items[j].Value='https' then
+    else if (vJsonSchemesArray.Items[j].Value = 'https') then
       Schemes := self.Schemes + [tpsHttps];
   end;
 
   fHost := (fSwaggerJson as TJSONObject).Values[c_SwagHost].Value;
   fBasePath := (fSwaggerJson as TJSONObject).Values[c_SwagBasePath].Value;
 
-  for i := 0 to jsonObj.Count-1 do
+  for i := 0 to vJsonObj.Count - 1 do
   begin
-    Path := TSwagPath.Create;
-    Path.Uri := jsonObj.Pairs[i].JSONString.Value;
-    Path.Load((jsonObj.Pairs[i].JsonValue) as TJSONObject);
-    fPaths.Add(Path);
+    vPath := TSwagPath.Create;
+    vPath.Uri := vJsonObj.Pairs[i].JSONString.Value;
+    vPath.Load((vJsonObj.Pairs[i].JsonValue) as TJSONObject);
+    fPaths.Add(vPath);
   end;
 
-  jsonProduces := (fSwaggerJson as TJSONObject).Values[c_SwagProduces] as TJSONArray;
-  for k := 0 to jsonProduces.count - 1 do
+  vJsonProduces := (fSwaggerJson as TJSONObject).Values[c_SwagProduces] as TJSONArray;
+  for k := 0 to vJsonProduces.Count - 1 do
   begin
-    Produces.Add(jsonProduces.Items[k].Value);
+    Produces.Add(vJsonProduces.Items[k].Value);
   end;
 
-  jsonConsumes := (fSwaggerJson as TJSONObject).Values[c_SwagConsumes] as TJSONArray;
-  for r := 0 to jsonConsumes.count - 1 do
+  vJsonConsumes := (fSwaggerJson as TJSONObject).Values[c_SwagConsumes] as TJSONArray;
+  for r := 0 to vJsonConsumes.count - 1 do
   begin
-    Consumes.Add(jsonConsumes.Items[r].Value);
+    Consumes.Add(vJsonConsumes.Items[r].Value);
   end;
 end;
 

@@ -35,8 +35,8 @@ type
     fUrl: string;
   public
     function GenerateJsonObject: TJSONObject;
-    function IsEmpty(): Boolean;
-    procedure Load(inJSON: TJSONObject);
+    function IsEmpty: Boolean;
+    procedure Load(pJson: TJSONObject);
 
     property Name: string read fName write fName;
     property Email: string read fEmail write fEmail;
@@ -67,20 +67,16 @@ begin
   Result := fName.IsEmpty and fEmail.IsEmpty and fUrl.IsEmpty;
 end;
 
-procedure TSwagInfoContact.Load(inJSON: TJSONObject);
+procedure TSwagInfoContact.Load(pJson: TJSONObject);
 begin
-  if Assigned(inJSON.Values[c_SwagInfoContactName]) then
-  begin
-    fName := inJSON.Values[c_SwagInfoContactName].Value;
-  end;
-  if Assigned(inJSON.Values[c_SwagInfoContactEmail]) then
-  begin
-    fEmail := inJSON.Values[c_SwagInfoContactEmail].Value;
-  end;
-  if Assigned(inJSON.Values[c_SwagInfoContactUrl]) then
-  begin
-    fUrl := inJSON.Values[c_SwagInfoContactUrl].Value;
-  end;
+  if Assigned(pJson.Values[c_SwagInfoContactName]) then
+    fName := pJson.Values[c_SwagInfoContactName].Value;
+
+  if Assigned(pJson.Values[c_SwagInfoContactEmail]) then
+    fEmail := pJson.Values[c_SwagInfoContactEmail].Value;
+
+  if Assigned(pJson.Values[c_SwagInfoContactUrl]) then
+    fUrl := pJson.Values[c_SwagInfoContactUrl].Value;
 end;
 
 end.

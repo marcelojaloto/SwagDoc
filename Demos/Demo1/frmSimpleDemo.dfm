@@ -22,6 +22,7 @@ object frmSimpleSwaggerDocDemo: TfrmSimpleSwaggerDocDemo
     Height = 175
     Align = alBottom
     Anchors = [akLeft, akTop, akRight, akBottom]
+    ScrollBars = ssBoth
     TabOrder = 0
   end
   object btnLoadJSON: TButton

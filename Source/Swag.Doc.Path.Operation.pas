@@ -188,7 +188,6 @@ begin
   vJsonObject.AddPair(c_SwagPathOperationDescription, fDescription);
   if fDeprecated then
     vJsonObject.AddPair(c_SwagPathOperationDeprecated, TJSONBool.Create(FDeprecated));
-
   if not fOperationId.IsEmpty then
     vJsonObject.AddPair(c_SwagPathOperationOperationId, fOperationId);
   if (fTags.Count > 0) then

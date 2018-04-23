@@ -16,7 +16,7 @@ type
     procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
-    FSwagDoc : TSwagDoc;
+    fSwagDoc: TSwagDoc;
   public
     { Public declarations }
   end;
@@ -32,19 +32,19 @@ uses REST.Json;
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
 begin
-  FSwagDoc.LoadFromFile('..\..\flickr.json');
-  FSwagDoc.GenerateSwaggerJson;
-  Memo1.Lines.Add(REST.Json.TJson.Format(FSwagDoc.SwaggerJson));
+  fSwagDoc.LoadFromFile('..\..\flickr.json');
+  fSwagDoc.GenerateSwaggerJson;
+  Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
 end;
 
 procedure TfrmSimpleSwaggerDocDemo.FormCreate(Sender: TObject);
 begin
-  FSwagDoc := TSwagDoc.Create;
+  fSwagDoc := TSwagDoc.Create;
 end;
 
 procedure TfrmSimpleSwaggerDocDemo.FormDestroy(Sender: TObject);
 begin
-  FreeAndNil(FSwagDoc);
+  FreeAndNil(fSwagDoc);
 end;
 
 end.
