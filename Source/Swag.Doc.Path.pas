@@ -38,7 +38,6 @@ type
   private
     fOperations: TObjectList<TSwagPathOperation>;
     fUri: string;
-    function GetPathTypeOperationFromString(const pTypeOperationString: string): TSwagPathTypeOperation;
     procedure LoadResponse(pOperation: TSwagPathOperation; pJsonResponse: TJSONObject);
     procedure LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
     procedure LoadTags(pOperation: TSwagPathOperation; pJsonTags: TJSONArray);
@@ -56,7 +55,8 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  Swag.Common.Types.Helpers;
 
 { TSwagPath }
 
@@ -86,15 +86,16 @@ var
   i: Integer;
   vOperation: TSwagPathOperation;
   vOperationJson: TJSONObject;
-  vOperationValue: string;
 begin
+  if not Assigned(pJson) then
+    Exit;
+
   for i := 0 to pJson.Count - 1 do
   begin
     vOperation := TSwagPathOperation.Create;
     vOperationJson := pJson.Pairs[i].JsonValue as TJSONObject;
     vOperation.Description := vOperationJson.Values['description'].Value;
-    vOperationValue := pJson.Pairs[i].JsonString.Value;
-    vOperation.Operation := GetPathTypeOperationFromString(vOperationValue);
+    vOperation.Operation.ToType(pJson.Pairs[i].JsonString.Value);
 
     if Assigned(vOperationJson.Values['operationId']) then
       vOperation.OperationId := vOperationJson.Values['operationId'].Value;
@@ -112,82 +113,49 @@ end;
 
 procedure TSwagPath.LoadTags(pOperation: TSwagPathOperation; pJsonTags: TJSONArray);
 var
-  j: Integer;
+  i: Integer;
   vTag: string;
 begin
-  if Assigned(pJsonTags) then
+  if not Assigned(pJsonTags) then
+    Exit;
+
+  for i := 0 to pJsonTags.Count - 1 do
   begin
-    for j := 0 to pJsonTags.Count - 1 do
-    begin
-      vTag := pJsonTags.Items[j].Value;
-      pOperation.Tags.Add(vTag);
-    end;
+    vTag := pJsonTags.Items[i].Value;
+    pOperation.Tags.Add(vTag);
   end;
 end;
 
 procedure TSwagPath.LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
 var
-  k: Integer;
+  i: Integer;
   vRequestParam: TSwagRequestParameter;
 begin
-  if Assigned(pJsonRequestParams) then
+  if not Assigned(pJsonRequestParams) then
+    Exit;
+
+  for i := 0 to pJsonRequestParams.Count - 1 do
   begin
-    for k := 0 to pJsonRequestParams.Count - 1 do
-    begin
-      vRequestParam := TSwagRequestParameter.Create;
-      vRequestParam.Load(pJsonRequestParams.Items[k] as TJSONObject);
-      pOperation.Parameters.Add(vRequestParam);
-    end;
+    vRequestParam := TSwagRequestParameter.Create;
+    vRequestParam.Load(pJsonRequestParams.Items[i] as TJSONObject);
+    pOperation.Parameters.Add(vRequestParam);
   end;
 end;
 
 procedure TSwagPath.LoadResponse(pOperation: TSwagPathOperation; pJsonResponse: TJSONObject);
 var
-  r: Integer;
+  i: Integer;
   vResponse: TSwagResponse;
 begin
-  if Assigned(pJsonResponse) then
-  begin
-    for r := 0 to pJsonResponse.Count - 1 do
-    begin
-      vResponse := TSwagResponse.Create;
-      vResponse.StatusCode := pJsonResponse.Pairs[r].JsonString.Value;
-      vResponse.Load(pJsonResponse.Pairs[r].JsonValue as TJSONObject);
-      pOperation.Responses.Add(vResponse.StatusCode, vResponse);
-    end;
-  end;
-end;
+  if not Assigned(pJsonResponse) then
+    Exit;
 
-function TSwagPath.GetPathTypeOperationFromString(const pTypeOperationString: string): TSwagPathTypeOperation;
-begin
-  Result := TSwagPathTypeOperation.ohvNotDefined;
-  if pTypeOperationString = 'get' then
+  for i := 0 to pJsonResponse.Count - 1 do
   begin
-    Result := TSwagPathTypeOperation.ohvGet;
-  end
-  else if pTypeOperationString = 'post' then
-  begin
-    Result := TSwagPathTypeOperation.ohvPost;
-  end
-  else if pTypeOperationString = 'patch' then
-  begin
-    Result := TSwagPathTypeOperation.ohvPatch;
-  end
-  else if pTypeOperationString = 'put' then
-  begin
-    Result := TSwagPathTypeOperation.ohvPut;
-  end
-  else if pTypeOperationString = 'head' then
-  begin
-    Result := TSwagPathTypeOperation.ohvHead;
-  end
-  else if pTypeOperationString = 'delete' then
-  begin
-    Result := TSwagPathTypeOperation.ohvDelete;
-  end
-  else if pTypeOperationString = 'options' then
-  begin
-    Result := TSwagPathTypeOperation.ohvOptions;
+    vResponse := TSwagResponse.Create;
+    vResponse.StatusCode := pJsonResponse.Pairs[i].JsonString.Value;
+    vResponse.Load(pJsonResponse.Pairs[i].JsonValue as TJSONObject);
+    pOperation.Responses.Add(vResponse.StatusCode, vResponse);
   end;
 end;
 
