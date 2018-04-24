@@ -279,10 +279,14 @@ begin
 
   for j := 0 to vJsonSchemesArray.Count - 1 do
   begin
-    if (vJsonSchemesArray.Items[j].Value = 'http') then
-      Schemes := self.Schemes + [tpsHttp]
-    else if (vJsonSchemesArray.Items[j].Value = 'https') then
-      Schemes := self.Schemes + [tpsHttps];
+    if vJsonSchemesArray.Items[j].Value = 'http' then
+      fSchemes := fSchemes + [tpsHttp]
+    else if vJsonSchemesArray.Items[j].Value = 'https' then
+      fSchemes := fSchemes + [tpsHttps]
+    else if vJsonSchemesArray.Items[j].Value = 'ws' then
+      fSchemes := fSchemes + [tpsWs]
+    else if vJsonSchemesArray.Items[j].Value = 'wss' then
+      fSchemes := fSchemes + [tpsWss]
   end;
 
   fHost := (fSwaggerJson as TJSONObject).Values[c_SwagHost].Value;
