@@ -269,6 +269,12 @@ var
   i, j: Integer;
   k, r: Integer;
 begin
+
+  if not FileExists(pFilename) then
+  begin
+    raise Exception.Create('File Doesn''t Exist ['+pFilename+']');
+  end;
+
   fSwaggerJson := TJSONObject.ParseJSONValue(TFile.ReadAllText(pFilename));
   fInfo.Load((fSwaggerJson as TJSONObject).Values[c_SwagInfo] as TJSONObject);
 
