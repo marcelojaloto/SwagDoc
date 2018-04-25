@@ -17,6 +17,7 @@ uses
   Swag.Doc.SecurityDefinitionApiKey in '..\..\Source\Swag.Doc.SecurityDefinitionApiKey.pas',
   Swag.Doc.Path.Operation.ResponseHeaders in '..\..\Source\Swag.Doc.Path.Operation.ResponseHeaders.pas',
   Swag.Common.Types.Helpers in '..\..\Source\Swag.Common.Types.Helpers.pas',
+  Swag.Doc.Info.License in '..\..\Source\Swag.Doc.Info.License.pas';
 
 {$R *.res}
 
