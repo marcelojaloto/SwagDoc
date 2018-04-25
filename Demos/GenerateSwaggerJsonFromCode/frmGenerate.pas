@@ -9,8 +9,8 @@ uses
 type
   TForm1 = class(TForm)
     Memo1: TMemo;
-    Button1: TButton;
-    procedure Button1Click(Sender: TObject);
+    btnGenerate: TButton;
+    procedure btnGenerateClick(Sender: TObject);
   private
     { Private declarations }
   public
@@ -34,7 +34,7 @@ uses REST.Json,
   Swag.Doc.Definition,
   Swag.Doc;
 
-procedure TForm1.Button1Click(Sender: TObject);
+procedure TForm1.btnGenerateClick(Sender: TObject);
 var
   vSwagDoc : TSwagDoc;
   vPath : TSwagPath;
@@ -143,15 +143,13 @@ begin
     vParam.Description := 'A param required';
     vParam.Required := True;
     vParam.TypeParameter := 'string';
-    {TODO: need to handle param type/schema}
     vOperation.Parameters.Add(vParam);
 
     vParam := TSwagRequestParameter.Create;
     vParam.Name := 'param2';
     vParam.InLocation := rpiQuery;
     vParam.Description := 'A param that is not required';
-    vParam.Required := False;  
-    {TODO: need to handle param type/schema}
+    vParam.Required := False;
     vParam.TypeParameter := 'string';
     vOperation.Parameters.Add(vParam);
 
@@ -163,32 +161,25 @@ begin
     vDefinition2 := TSwagDefinition.Create; 
     vDefinition2.Name := 'SomeType';
     vParam.Schema.JsonSchema := vDefinition2.NameToJson;
-    {TODO: need to handle param type/schema}
     vOperation.Parameters.Add(vParam);
 
 
     vResponse := TSwagResponse.Create;
     vResponse.StatusCode := '200';
     vResponse.Description := 'Successfully retrieved data';
-    {TODO: need to handle response type/schema}
     vResponse.Schema.JsonSchema := vDefinition2.NameToJson;
     vOperation.Responses.Add('200',vResponse);
     
     vResponse := TSwagResponse.Create;
     vResponse.StatusCode := 'default';
     vResponse.Description := 'Error occured';
-    {TODO: need to handle response type/schema}
 
-
-    
     vOperation.Responses.Add('default',vResponse);
 
     vOperation.Tags.Add('TagName');
         
     vPath.Operations.Add(vOperation);
     vSwagDoc.Paths.Add(vPath);
-
-
 
     vSwagDoc.GenerateSwaggerJson;
     Memo1.Lines.Add(REST.Json.TJson.Format(vSwagDoc.SwaggerJson));

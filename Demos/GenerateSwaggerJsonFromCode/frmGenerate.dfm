@@ -1,7 +1,7 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
+  Caption = 'Swagger JSON From Code'
   ClientHeight = 299
   ClientWidth = 635
   Color = clBtnFace
@@ -23,13 +23,13 @@ object Form1: TForm1
     ScrollBars = ssBoth
     TabOrder = 0
   end
-  object Button1: TButton
+  object btnGenerate: TButton
     Left = 24
     Top = 16
     Width = 75
     Height = 25
     Caption = 'Generate'
     TabOrder = 1
-    OnClick = Button1Click
+    OnClick = btnGenerateClick
   end
 end
