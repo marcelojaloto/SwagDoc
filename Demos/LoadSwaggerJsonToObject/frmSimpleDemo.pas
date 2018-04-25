@@ -32,7 +32,7 @@ uses REST.Json;
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
 begin
-  fSwagDoc.LoadFromFile('..\..\flickr.json');
+  fSwagDoc.LoadFromFile('flickr.json');
   fSwagDoc.GenerateSwaggerJson;
   Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
 end;
