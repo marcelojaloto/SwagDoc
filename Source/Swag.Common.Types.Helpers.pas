@@ -38,6 +38,17 @@ type
     procedure ToType(const pInLocationString: string);
   end;
 
+  TSwagTransferProtocolSchemeHelper = record helper for TSwagTransferProtocolScheme
+  public
+    procedure ToType(const pTransferProtocolSchemeString: string);
+  end;
+
+  TSwagTransferProtocolSchemesHelper = record helper for TSwagTransferProtocolSchemes
+  public
+    procedure Add(const pScheme: TSwagTransferProtocolScheme); overload;
+    procedure Add(const pSchemeString: string); overload;
+  end;
+
 implementation
 
 uses
@@ -72,6 +83,36 @@ begin
       Self := vRequestParameterInLocation;
       Break;
     end;
+end;
+
+{ TSwagTransferProtocolSchemeHelper }
+
+procedure TSwagTransferProtocolSchemeHelper.ToType(const pTransferProtocolSchemeString: string);
+var
+  vTransferProtocolScheme: TSwagTransferProtocolScheme;
+begin
+  Self := tpsNotDefined;
+  for vTransferProtocolScheme := Low(TSwagTransferProtocolScheme) to High(TSwagTransferProtocolScheme) do
+    if (LowerCase(c_SwagTransferProtocolScheme[vTransferProtocolScheme]) = LowerCase(pTransferProtocolSchemeString)) then
+    begin
+      Self := vTransferProtocolScheme;
+      Break;
+    end;
+end;
+
+{ TSwagTransferProtocolSchemesHelper }
+
+procedure TSwagTransferProtocolSchemesHelper.Add(const pScheme: TSwagTransferProtocolScheme);
+begin
+  Self := Self + [pScheme];
+end;
+
+procedure TSwagTransferProtocolSchemesHelper.Add(const pSchemeString: string);
+var
+  vScheme: TSwagTransferProtocolScheme;
+begin
+  vScheme.ToType(pSchemeString);
+  Self.Add(vScheme);
 end;
 
 end.

@@ -83,19 +83,19 @@ end;
 
 procedure TSwagPath.Load(pJson: TJSONObject);
 var
-  i: Integer;
+  vIndex: Integer;
   vOperation: TSwagPathOperation;
   vOperationJson: TJSONObject;
 begin
   if not Assigned(pJson) then
     Exit;
 
-  for i := 0 to pJson.Count - 1 do
+  for vIndex := 0 to pJson.Count - 1 do
   begin
     vOperation := TSwagPathOperation.Create;
-    vOperationJson := pJson.Pairs[i].JsonValue as TJSONObject;
+    vOperationJson := pJson.Pairs[vIndex].JsonValue as TJSONObject;
     vOperation.Description := vOperationJson.Values['description'].Value;
-    vOperation.Operation.ToType(pJson.Pairs[i].JsonString.Value);
+    vOperation.Operation.ToType(pJson.Pairs[vIndex].JsonString.Value);
 
     if Assigned(vOperationJson.Values['operationId']) then
       vOperation.OperationId := vOperationJson.Values['operationId'].Value;
@@ -113,48 +113,48 @@ end;
 
 procedure TSwagPath.LoadTags(pOperation: TSwagPathOperation; pJsonTags: TJSONArray);
 var
-  i: Integer;
+  vIndex: Integer;
   vTag: string;
 begin
   if not Assigned(pJsonTags) then
     Exit;
 
-  for i := 0 to pJsonTags.Count - 1 do
+  for vIndex := 0 to pJsonTags.Count - 1 do
   begin
-    vTag := pJsonTags.Items[i].Value;
+    vTag := pJsonTags.Items[vIndex].Value;
     pOperation.Tags.Add(vTag);
   end;
 end;
 
 procedure TSwagPath.LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
 var
-  i: Integer;
+  vIndex: Integer;
   vRequestParam: TSwagRequestParameter;
 begin
   if not Assigned(pJsonRequestParams) then
     Exit;
 
-  for i := 0 to pJsonRequestParams.Count - 1 do
+  for vIndex := 0 to pJsonRequestParams.Count - 1 do
   begin
     vRequestParam := TSwagRequestParameter.Create;
-    vRequestParam.Load(pJsonRequestParams.Items[i] as TJSONObject);
+    vRequestParam.Load(pJsonRequestParams.Items[vIndex] as TJSONObject);
     pOperation.Parameters.Add(vRequestParam);
   end;
 end;
 
 procedure TSwagPath.LoadResponse(pOperation: TSwagPathOperation; pJsonResponse: TJSONObject);
 var
-  i: Integer;
+  vIndex: Integer;
   vResponse: TSwagResponse;
 begin
   if not Assigned(pJsonResponse) then
     Exit;
 
-  for i := 0 to pJsonResponse.Count - 1 do
+  for vIndex := 0 to pJsonResponse.Count - 1 do
   begin
     vResponse := TSwagResponse.Create;
-    vResponse.StatusCode := pJsonResponse.Pairs[i].JsonString.Value;
-    vResponse.Load(pJsonResponse.Pairs[i].JsonValue as TJSONObject);
+    vResponse.StatusCode := pJsonResponse.Pairs[vIndex].JsonString.Value;
+    vResponse.Load(pJsonResponse.Pairs[vIndex].JsonValue as TJSONObject);
     pOperation.Responses.Add(vResponse.StatusCode, vResponse);
   end;
 end;

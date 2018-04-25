@@ -35,7 +35,7 @@ type
     fTitle: string;
     fDescription: string;
     fContact: TSwagInfoContact;
-    FTermsOfService: string;
+    fTermsOfService: string;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -45,7 +45,7 @@ type
 
     property Version: string read fVersion write fVersion;
     property Title: string read fTitle write fTitle;
-    property TermsOfService: string read FTermsOfService write FTermsOfService;
+    property TermsOfService: string read fTermsOfService write fTermsOfService;
     property Description: string read fDescription write fDescription;
     property Contact: TSwagInfoContact read fContact write fContact;
   end;
