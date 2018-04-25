@@ -44,6 +44,7 @@ type
     destructor Destroy; override;
 
     function GenerateJsonObject: TJSONObject;
+    procedure Load(pJson : TJSONObject);
 
     property StatusCode: TSwagStatusCode read fStatusCode write fStatusCode;
     property Description: string read fDescription write fDescription;
@@ -100,7 +101,14 @@ begin
 
   if (fExamples.Count > 0) then
     vJsonObject.AddPair(c_SwagResponseExamples, GenerateExamplesJsonObject);
+
   Result := vJsonObject;
+end;
+
+procedure TSwagResponse.Load(pJson: TJSONObject);
+begin
+  if Assigned(pJson.Values[c_SwagResponseDescription]) then
+    fDescription := pJson.Values[c_SwagResponseDescription].Value;
 end;
 
 end.

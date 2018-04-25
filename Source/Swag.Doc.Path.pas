@@ -28,6 +28,9 @@ uses
   System.Classes,
   System.Generics.Collections,
   System.JSON,
+  Swag.Common.Types,
+  Swag.Doc.Path.Operation.RequestParameter,
+  Swag.Doc.Path.Operation.Response,
   Swag.Doc.Path.Operation;
 
 type
@@ -35,11 +38,15 @@ type
   private
     fOperations: TObjectList<TSwagPathOperation>;
     fUri: string;
+    procedure LoadResponse(pOperation: TSwagPathOperation; pJsonResponse: TJSONObject);
+    procedure LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
+    procedure LoadTags(pOperation: TSwagPathOperation; pJsonTags: TJSONArray);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
 
     function GenerateJsonObject: TJSONObject;
+    procedure Load(pJson: TJSONObject);
 
     property Uri: string read fUri write fUri;
     property Operations: TObjectList<TSwagPathOperation> read fOperations;
@@ -48,7 +55,8 @@ type
 implementation
 
 uses
-  System.SysUtils;
+  System.SysUtils,
+  Swag.Common.Types.Helpers;
 
 { TSwagPath }
 
@@ -71,6 +79,84 @@ begin
   Result := TJsonObject.Create;
   for vIndex := 0 to fOperations.Count -1 do
     Result.AddPair(fOperations.Items[vIndex].OperationToString, fOperations.Items[vIndex].GenerateJsonObject);
+end;
+
+procedure TSwagPath.Load(pJson: TJSONObject);
+var
+  vIndex: Integer;
+  vOperation: TSwagPathOperation;
+  vOperationJson: TJSONObject;
+begin
+  if not Assigned(pJson) then
+    Exit;
+
+  for vIndex := 0 to pJson.Count - 1 do
+  begin
+    vOperation := TSwagPathOperation.Create;
+    vOperationJson := pJson.Pairs[vIndex].JsonValue as TJSONObject;
+    vOperation.Description := vOperationJson.Values['description'].Value;
+    vOperation.Operation.ToType(pJson.Pairs[vIndex].JsonString.Value);
+
+    if Assigned(vOperationJson.Values['operationId']) then
+      vOperation.OperationId := vOperationJson.Values['operationId'].Value;
+
+    if Assigned(vOperationJson.Values['deprecated']) then
+      vOperation.Deprecated := (vOperationJson.Values['deprecated'] as TJSONBool).AsBoolean;
+
+    LoadTags(vOperation, vOperationJson.Values['tags'] as TJSONArray);
+    LoadParameters(vOperation, vOperationJson.Values['parameters'] as TJSONArray);
+    LoadResponse(vOperation, vOperationJson.Values['responses'] as TJSONObject);
+
+    fOperations.Add(vOperation);
+  end;
+end;
+
+procedure TSwagPath.LoadTags(pOperation: TSwagPathOperation; pJsonTags: TJSONArray);
+var
+  vIndex: Integer;
+  vTag: string;
+begin
+  if not Assigned(pJsonTags) then
+    Exit;
+
+  for vIndex := 0 to pJsonTags.Count - 1 do
+  begin
+    vTag := pJsonTags.Items[vIndex].Value;
+    pOperation.Tags.Add(vTag);
+  end;
+end;
+
+procedure TSwagPath.LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
+var
+  vIndex: Integer;
+  vRequestParam: TSwagRequestParameter;
+begin
+  if not Assigned(pJsonRequestParams) then
+    Exit;
+
+  for vIndex := 0 to pJsonRequestParams.Count - 1 do
+  begin
+    vRequestParam := TSwagRequestParameter.Create;
+    vRequestParam.Load(pJsonRequestParams.Items[vIndex] as TJSONObject);
+    pOperation.Parameters.Add(vRequestParam);
+  end;
+end;
+
+procedure TSwagPath.LoadResponse(pOperation: TSwagPathOperation; pJsonResponse: TJSONObject);
+var
+  vIndex: Integer;
+  vResponse: TSwagResponse;
+begin
+  if not Assigned(pJsonResponse) then
+    Exit;
+
+  for vIndex := 0 to pJsonResponse.Count - 1 do
+  begin
+    vResponse := TSwagResponse.Create;
+    vResponse.StatusCode := pJsonResponse.Pairs[vIndex].JsonString.Value;
+    vResponse.Load(pJsonResponse.Pairs[vIndex].JsonValue as TJSONObject);
+    pOperation.Responses.Add(vResponse.StatusCode, vResponse);
+  end;
 end;
 
 end.

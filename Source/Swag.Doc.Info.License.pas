@@ -19,8 +19,7 @@
 {  limitations under the License.                                              }
 {                                                                              }
 {******************************************************************************}
-
-unit Swag.Doc.Info.Contact;
+unit Swag.Doc.Info.License;
 
 interface
 
@@ -28,15 +27,15 @@ uses
   System.JSON;
 
 type
-  TSwagInfoContact = class(TObject)
+  TSwagInfoLicense = class(TObject)
   private
     fName: string;
     fEmail: string;
     fUrl: string;
   public
     function GenerateJsonObject: TJSONObject;
-    function IsEmpty: Boolean;
-    procedure Load(pJson: TJSONObject);
+    procedure Load(pJson : TJSONObject);
+    function isEmpty: Boolean;
 
     property Name: string read fName write fName;
     property Email: string read fEmail write fEmail;
@@ -48,35 +47,33 @@ implementation
 uses System.SysUtils;
 
 const
-  c_SwagInfoContactName = 'name';
-  c_SwagInfoContactEmail = 'email';
-  c_SwagInfoContactUrl = 'url';
+  c_SwagInfoLicenseName = 'name';
+  c_SwagInfoLicenseUrl = 'url';
 
-{ TSwagInfoContact }
+{ TSwagInfoLicense }
 
-function TSwagInfoContact.GenerateJsonObject: TJSONObject;
+function TSwagInfoLicense.GenerateJsonObject: TJSONObject;
 begin
   Result := TJsonObject.Create;
-  Result.AddPair(c_SwagInfoContactName, fName);
-  Result.AddPair(c_SwagInfoContactEmail, fEmail);
-  Result.AddPair(c_SwagInfoContactUrl, fUrl);
+  Result.AddPair(c_SwagInfoLicenseName, fName);
+  Result.AddPair(c_SwagInfoLicenseUrl, fUrl);
 end;
 
-function TSwagInfoContact.IsEmpty: Boolean;
+function TSwagInfoLicense.isEmpty: Boolean;
 begin
-  Result := fName.IsEmpty and fEmail.IsEmpty and fUrl.IsEmpty;
+  Result := fName.IsEmpty and fUrl.IsEmpty;
 end;
 
-procedure TSwagInfoContact.Load(pJson: TJSONObject);
+procedure TSwagInfoLicense.Load(pJson: TJSONObject);
 begin
-  if Assigned(pJson.Values[c_SwagInfoContactName]) then
-    fName := pJson.Values[c_SwagInfoContactName].Value;
+  if not Assigned(pJson) then
+    Exit;
 
-  if Assigned(pJson.Values[c_SwagInfoContactEmail]) then
-    fEmail := pJson.Values[c_SwagInfoContactEmail].Value;
+  if Assigned(pJson.Values[c_SwagInfoLicenseName]) then
+    fName := pJson.Values[c_SwagInfoLicenseName].Value;
 
-  if Assigned(pJson.Values[c_SwagInfoContactUrl]) then
-    fUrl := pJson.Values[c_SwagInfoContactUrl].Value;
+  if Assigned(pJson.Values[c_SwagInfoLicenseUrl]) then
+    fUrl := pJson.Values[c_SwagInfoLicenseUrl].Value;
 end;
 
 end.
