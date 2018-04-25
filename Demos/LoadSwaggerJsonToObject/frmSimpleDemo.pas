@@ -34,8 +34,8 @@ procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
 var
   vFullFilename : String;
 begin
-  vFullFilename := TPath.Combine(GetCurrentDir,'flickr.json');
-  fSwagDoc.LoadFromFile(vFullFilename);
+  fSwagDoc.LoadFromFile('flickr.json');
+
   fSwagDoc.GenerateSwaggerJson;
   Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
 end;
