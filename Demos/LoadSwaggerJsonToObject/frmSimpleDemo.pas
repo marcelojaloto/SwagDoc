@@ -28,11 +28,14 @@ implementation
 
 {$R *.dfm}
 
-uses REST.Json;
+uses REST.Json, System.IOUtils;
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
+var
+  vFullFilename : String;
 begin
-  fSwagDoc.LoadFromFile('..\..\flickr.json');
+  fSwagDoc.LoadFromFile('flickr.json');
+
   fSwagDoc.GenerateSwaggerJson;
   Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
 end;
