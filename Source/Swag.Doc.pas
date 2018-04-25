@@ -39,7 +39,7 @@ type
   TSwagDoc = class(TObject)
   private
     fInfo: TSwagInfo;
-    fLicense : TSwagInfoLicense;
+    fLicense: TSwagInfoLicense;
     fConsumes: TList<TSwagMimeType>;
     fProduces: TList<TSwagMimeType>;
     fBasePath: string;
@@ -76,7 +76,7 @@ type
 
     property SwaggerVersion: string read GetSwaggerVersion;
     property Info: TSwagInfo read fInfo;
-    property License : TSwagInfoLicense read fLicense;
+    property License: TSwagInfoLicense read fLicense;
     property Host: string read fHost write fHost;
     property BasePath: string read fBasePath write fBasePath;
     property Schemes: TSwagTransferProtocolSchemes read fSchemes write fSchemes;
@@ -93,7 +93,8 @@ uses
   System.SysUtils,
   System.IOUtils,
   REST.Json,
-  Swag.Common.Consts;
+  Swag.Common.Consts,
+  Swag.Common.Types.Helpers;
 
 const
   c_Swagger = 'swagger';
@@ -266,8 +267,7 @@ var
   vJsonSchemesArray: TJSONArray;
   vJsonProduces: TJSONArray;
   vJsonConsumes: TJSONArray;
-  i, j: Integer;
-  k, r: Integer;
+  vIndex: Integer;
 begin
   fSwaggerJson := TJSONObject.ParseJSONValue(TFile.ReadAllText(pFilename));
   fInfo.Load((fSwaggerJson as TJSONObject).Values[c_SwagInfo] as TJSONObject);
@@ -277,35 +277,32 @@ begin
   vJsonObj := (fSwaggerJson as TJSONObject).Values[c_SwagPaths] as TJSONObject;
   vJsonSchemesArray := (fSwaggerJson as TJSONObject).Values[c_SwagSchemes] as TJSONArray;
 
-  for j := 0 to vJsonSchemesArray.Count - 1 do
+  for vIndex := 0 to vJsonSchemesArray.Count - 1 do
   begin
-    if (vJsonSchemesArray.Items[j].Value = 'http') then
-      Schemes := self.Schemes + [tpsHttp]
-    else if (vJsonSchemesArray.Items[j].Value = 'https') then
-      Schemes := self.Schemes + [tpsHttps];
+    fSchemes.Add(vJsonSchemesArray.Items[vIndex].Value);
   end;
 
   fHost := (fSwaggerJson as TJSONObject).Values[c_SwagHost].Value;
   fBasePath := (fSwaggerJson as TJSONObject).Values[c_SwagBasePath].Value;
 
-  for i := 0 to vJsonObj.Count - 1 do
+  for vIndex := 0 to vJsonObj.Count - 1 do
   begin
     vPath := TSwagPath.Create;
-    vPath.Uri := vJsonObj.Pairs[i].JSONString.Value;
-    vPath.Load((vJsonObj.Pairs[i].JsonValue) as TJSONObject);
+    vPath.Uri := vJsonObj.Pairs[vIndex].JSONString.Value;
+    vPath.Load((vJsonObj.Pairs[vIndex].JsonValue) as TJSONObject);
     fPaths.Add(vPath);
   end;
 
   vJsonProduces := (fSwaggerJson as TJSONObject).Values[c_SwagProduces] as TJSONArray;
-  for k := 0 to vJsonProduces.Count - 1 do
+  for vIndex := 0 to vJsonProduces.Count - 1 do
   begin
-    Produces.Add(vJsonProduces.Items[k].Value);
+    Produces.Add(vJsonProduces.Items[vIndex].Value);
   end;
 
   vJsonConsumes := (fSwaggerJson as TJSONObject).Values[c_SwagConsumes] as TJSONArray;
-  for r := 0 to vJsonConsumes.count - 1 do
+  for vIndex := 0 to vJsonConsumes.count - 1 do
   begin
-    Consumes.Add(vJsonConsumes.Items[r].Value);
+    Consumes.Add(vJsonConsumes.Items[vIndex].Value);
   end;
 end;
 

@@ -35,7 +35,7 @@ type
     fTitle: string;
     fDescription: string;
     fContact: TSwagInfoContact;
-    FTermsOfService: string;
+    fTermsOfService: string;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -45,7 +45,7 @@ type
 
     property Version: string read fVersion write fVersion;
     property Title: string read fTitle write fTitle;
-    property TermsOfService: string read FTermsOfService write FTermsOfService;
+    property TermsOfService: string read fTermsOfService write fTermsOfService;
     property Description: string read fDescription write fDescription;
     property Contact: TSwagInfoContact read fContact write fContact;
   end;
@@ -100,8 +100,8 @@ begin
   Result.AddPair(c_SwagInfoVersion, fVersion);
   Result.AddPair(c_SwagInfoTitle, fTitle);
   Result.AddPair(c_SwagInfoDescription, fDescription);
-  if not FTermsOfService.IsEmpty then
-    Result.AddPair(c_SwagInfoTermsOfService, FTermsOfService);
+  if not fTermsOfService.IsEmpty then
+    Result.AddPair(c_SwagInfoTermsOfService, fTermsOfService);
   if not fContact.IsEmpty then
     Result.AddPair(c_SwagInfoContact, fContact.GenerateJsonObject);
 end;
