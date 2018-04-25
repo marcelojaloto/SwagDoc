@@ -100,8 +100,8 @@ begin
   Result.AddPair(c_SwagInfoVersion, fVersion);
   Result.AddPair(c_SwagInfoTitle, fTitle);
   Result.AddPair(c_SwagInfoDescription, fDescription);
-  if not FTermsOfService.IsEmpty then
-    Result.AddPair(c_SwagInfoTermsOfService, FTermsOfService);
+  if not fTermsOfService.IsEmpty then
+    Result.AddPair(c_SwagInfoTermsOfService, fTermsOfService);
   if not fContact.IsEmpty then
     Result.AddPair(c_SwagInfoContact, fContact.GenerateJsonObject);
 end;
