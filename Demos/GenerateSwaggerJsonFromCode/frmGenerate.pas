@@ -31,6 +31,7 @@ uses REST.Json,
   Swag.Doc.Path.Operation,
   Swag.Doc.Path.Operation.RequestParameter,
   Swag.Doc.Path.Operation.Response,
+  Swag.Doc.Path.Operation.ResponseHeaders,
   Swag.Doc.Definition,
   Swag.Doc;
 
@@ -41,11 +42,12 @@ var
   vOperation : TSwagPathOperation;
   vParam : TSwagRequestParameter;
   vResponse : TSwagResponse;
+  vResponseHeader : TSwagHeaders;
   vDefinition, vDefinition2, vDefinition3 : TSwagDefinition;
   vJSONProperities : TJSONObject;
   vJSONSchema : TJSONObject;
   vJSONSubProp : TJSONPair;
-  vJSONType : TJsonObject;
+  vJSONType : TJSONObject;
 begin
   vSwagDoc := TSwagDoc.Create;
   try
@@ -77,7 +79,6 @@ begin
 
     vJSONType := TJSONObject.Create;
     vJsonType.AddPair('type','string');
-    
     vJSONProperities := TJSONObject.Create;
     vJSONProperities.AddPair('id',vJSONType);
 
@@ -85,11 +86,8 @@ begin
 
 
     vDefinition3.JsonSchema := vJSONSchema;
-    
     vSwagDoc.Definitions.Add(vDefinition3);
 
-    
-    
     vDefinition := TSwagDefinition.Create;
     vDefinition.Name := 'SomeType';
 
@@ -102,14 +100,13 @@ begin
 
     vJSONProperities := TJSONObject.Create;
     vJSONProperities.AddPair('id',vJSONType);
-    
 
     vJSONType := TJSONObject.Create;
     vJSONType.AddPair('type','object');
     vJSONProperities.AddPair('subType',vDefinition3.NameToJson);
 
 
-    vJSONType := TJSONObject.Create;    
+    vJSONType := TJSONObject.Create;
     vJsonType.AddPair('type','string');
     vJsonType.AddPair('format','decimel');
     vJSONType.AddPair('multipleOf',TJSONNumber.Create(0.01));
@@ -119,14 +116,10 @@ begin
     vJSONType.AddPair('description','Total Cost');
     vJSONType.AddPair('example',TJSONNumber.Create(9999999999.99));
     vJSONProperities.AddPair('cost',vJSONType);
-    
     vJSONSchema.AddPair('properties',vJSONProperities);
-    
     vDefinition.JsonSchema := vJSONSchema;
-    
     vSwagDoc.Definitions.Add(vDefinition);
 
-    
     vPath := TSwagPath.Create;
     vPath.Uri := '/path/request/{param1}';
 
@@ -154,9 +147,9 @@ begin
     vParam := TSwagRequestParameter.Create;
     vParam.Name := 'param3';
     vParam.InLocation := rpiBody;
-    vParam.Required := True; 
+    vParam.Required := True;
 
-    vDefinition2 := TSwagDefinition.Create; 
+    vDefinition2 := TSwagDefinition.Create;
     vDefinition2.Name := 'SomeType';
     vParam.Schema.JsonSchema := vDefinition2.NameToJson;
     vOperation.Parameters.Add(vParam);
@@ -166,8 +159,14 @@ begin
     vResponse.StatusCode := '200';
     vResponse.Description := 'Successfully retrieved data';
     vResponse.Schema.JsonSchema := vDefinition2.NameToJson;
+
+    vResponseHeader := TSwagHeaders.Create;
+    vResponseHeader.Name := 'X-Rate-Limit-Limit';
+    vResponseHeader.Description := 'The number of allowed requests in the current period';
+    vResponseHeader.ValueType := 'integer';
+    vResponse.Headers.Add(vResponseHeader);
     vOperation.Responses.Add('200',vResponse);
-    
+
     vResponse := TSwagResponse.Create;
     vResponse.StatusCode := 'default';
     vResponse.Description := 'Error occured';
