@@ -26,6 +26,7 @@ interface
 
 uses
   System.JSON,
+  Swag.Doc.Info.License,
   Swag.Doc.Info.Contact;
 
 type
@@ -36,6 +37,7 @@ type
     fDescription: string;
     fContact: TSwagInfoContact;
     fTermsOfService: string;
+    fLicense: TSwagInfoLicense;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -48,6 +50,7 @@ type
     property TermsOfService: string read fTermsOfService write fTermsOfService;
     property Description: string read fDescription write fDescription;
     property Contact: TSwagInfoContact read fContact write fContact;
+    property License: TSwagInfoLicense read fLicense;
   end;
 
 implementation
@@ -61,6 +64,7 @@ const
   c_SwagInfoDescription = 'description';
   c_SwagInfoContact = 'contact';
   c_SwagInfoTermsOfService = 'termsOfService';
+  c_SwagLicense = 'license';
 
 { TSwagInfo }
 
@@ -80,17 +84,21 @@ begin
 
   if Assigned(pJson.Values[c_SwagInfoContact]) then
     fContact.Load(pJson.Values[c_SwagInfoContact] as TJSONObject);
+
+  fLicense.Load((pJson as TJSONObject).Values[c_SwagLicense] as TJSONObject);
 end;
 
 constructor TSwagInfo.Create;
 begin
   inherited Create;
   fContact := TSwagInfoContact.Create;
+  fLicense := TSwagInfoLicense.Create;
 end;
 
 destructor TSwagInfo.Destroy;
 begin
   FreeAndNil(fContact);
+  FreeAndNil(fLicense);
   inherited Destroy;
 end;
 
@@ -104,6 +112,8 @@ begin
     Result.AddPair(c_SwagInfoTermsOfService, fTermsOfService);
   if not fContact.IsEmpty then
     Result.AddPair(c_SwagInfoContact, fContact.GenerateJsonObject);
+  if not fLicense.isEmpty then
+    Result.AddPair(c_SwagLicense,fLicense.GenerateJsonObject);
 end;
 
 

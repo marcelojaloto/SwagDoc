@@ -56,10 +56,8 @@ begin
     vSwagDoc.Info.Contact.Name := 'John Smith';
     vSwagDoc.Info.Contact.Email := 'jsmith@example.com';
     vSwagDoc.Info.Contact.Url := 'https://example.com/contact';
-
-    vSwagDoc.License.Name := 'Some License';
-    vSwagDoc.License.Url := 'https://example.com/license';
-    vSwagDoc.License.Email := 'license@example.com';
+    vSwagDoc.Info.License.Name := 'Some License';
+    vSwagDoc.Info.License.Url := 'https://example.com/license';
 
     vSwagDoc.Host := 'example.com';
     vSwagDoc.BasePath := '/basepath';

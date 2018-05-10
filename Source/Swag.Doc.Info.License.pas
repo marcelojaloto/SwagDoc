@@ -30,7 +30,6 @@ type
   TSwagInfoLicense = class(TObject)
   private
     fName: string;
-    fEmail: string;
     fUrl: string;
   public
     function GenerateJsonObject: TJSONObject;
@@ -38,7 +37,6 @@ type
     function isEmpty: Boolean;
 
     property Name: string read fName write fName;
-    property Email: string read fEmail write fEmail;
     property Url: string read fUrl write fUrl;
   end;
 
