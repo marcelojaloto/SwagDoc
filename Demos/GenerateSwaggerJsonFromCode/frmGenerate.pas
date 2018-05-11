@@ -3,8 +3,17 @@ unit frmGenerate;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Vcl.StdCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  System.Json,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls;
 
 type
   TForm1 = class(TForm)
@@ -12,7 +21,8 @@ type
     btnGenerate: TButton;
     procedure btnGenerateClick(Sender: TObject);
   private
-    { Private declarations }
+    function CreateJsonSomeSubType: TJsonObject;
+    function CreateJsonSomeType(pJsonObjectSubType: TJsonObject): TJsonObject;
   public
     { Public declarations }
   end;
@@ -24,8 +34,8 @@ implementation
 
 {$R *.dfm}
 
-uses REST.Json, 
-  System.Json,
+uses
+  REST.Json,
   Swag.Common.Types,
   Swag.Doc.Path,
   Swag.Doc.Path.Operation,
@@ -37,17 +47,15 @@ uses REST.Json,
 
 procedure TForm1.btnGenerateClick(Sender: TObject);
 var
-  vSwagDoc : TSwagDoc;
-  vPath : TSwagPath;
-  vOperation : TSwagPathOperation;
-  vParam : TSwagRequestParameter;
-  vResponse : TSwagResponse;
-  vResponseHeader : TSwagHeaders;
-  vDefinition, vDefinition2, vDefinition3 : TSwagDefinition;
-  vJSONProperities : TJSONObject;
-  vJSONSchema : TJSONObject;
-  vJSONSubProp : TJSONPair;
-  vJSONType : TJSONObject;
+  vSwagDoc: TSwagDoc;
+  vPath: TSwagPath;
+  vOperation: TSwagPathOperation;
+  vParam: TSwagRequestParameter;
+  vResponse: TSwagResponse;
+  vDefinitionSomeType: TSwagDefinition;
+  vDefinitionResponseSomeType: TSwagDefinition;
+  vDefinitionSomeSubType: TSwagDefinition;
+  vResponseHeader: TSwagHeaders;
 begin
   vSwagDoc := TSwagDoc.Create;
   try
@@ -71,54 +79,15 @@ begin
 
     vSwagDoc.Schemes := [tpsHttps];
 
-    vDefinition3 := TSwagDefinition.Create;
-    vDefinition3.Name := 'SomeSubType';
+    vDefinitionSomeSubType := TSwagDefinition.Create;
+    vDefinitionSomeSubType.Name := 'SomeSubType';
+    vDefinitionSomeSubType.JsonSchema := CreateJsonSomeSubType;
+    vSwagDoc.Definitions.Add(vDefinitionSomeSubType);
 
-    vJSONSchema := TJSONObject.Create;
-    vJSONSchema.AddPair('type','object');
-
-    vJSONType := TJSONObject.Create;
-    vJsonType.AddPair('type','string');
-    vJSONProperities := TJSONObject.Create;
-    vJSONProperities.AddPair('id',vJSONType);
-
-    vJSONSchema.AddPair('properties',vJSONProperities);
-
-
-    vDefinition3.JsonSchema := vJSONSchema;
-    vSwagDoc.Definitions.Add(vDefinition3);
-
-    vDefinition := TSwagDefinition.Create;
-    vDefinition.Name := 'SomeType';
-
-    vJSONSchema := TJSONObject.Create;
-    vJSONSchema.AddPair('type','object');
-
-    vJSONType := TJSONObject.Create;
-    vJSONType.AddPair('type','integer');
-    vJSONType.AddPair('format','int64');
-
-    vJSONProperities := TJSONObject.Create;
-    vJSONProperities.AddPair('id',vJSONType);
-
-    vJSONType := TJSONObject.Create;
-    vJSONType.AddPair('type','object');
-    vJSONProperities.AddPair('subType',vDefinition3.NameToJson);
-
-
-    vJSONType := TJSONObject.Create;
-    vJsonType.AddPair('type','string');
-    vJsonType.AddPair('format','decimel');
-    vJSONType.AddPair('multipleOf',TJSONNumber.Create(0.01));
-    vJSONType.AddPair('minimum',TJSONNumber.Create(-9999999999.99));
-    vJSONType.AddPair('maximum',TJSONNumber.Create(9999999999.99));
-    vJSONType.AddPair('title','Total Cost');
-    vJSONType.AddPair('description','Total Cost');
-    vJSONType.AddPair('example',TJSONNumber.Create(9999999999.99));
-    vJSONProperities.AddPair('cost',vJSONType);
-    vJSONSchema.AddPair('properties',vJSONProperities);
-    vDefinition.JsonSchema := vJSONSchema;
-    vSwagDoc.Definitions.Add(vDefinition);
+    vDefinitionSomeType := TSwagDefinition.Create;
+    vDefinitionSomeType.Name := 'SomeType';
+    vDefinitionSomeType.JsonSchema := CreateJsonSomeType(vDefinitionSomeSubType.GenerateJsonRefDefinition);
+    vSwagDoc.Definitions.Add(vDefinitionSomeType);
 
     vPath := TSwagPath.Create;
     vPath.Uri := '/path/request/{param1}';
@@ -148,25 +117,20 @@ begin
     vParam.Name := 'param3';
     vParam.InLocation := rpiBody;
     vParam.Required := True;
-
-    vDefinition2 := TSwagDefinition.Create;
-    vDefinition2.Name := 'SomeType';
-    vParam.Schema.JsonSchema := vDefinition2.NameToJson;
+    vParam.Schema.Name := 'SomeType';
     vOperation.Parameters.Add(vParam);
-
 
     vResponse := TSwagResponse.Create;
     vResponse.StatusCode := '200';
     vResponse.Description := 'Successfully retrieved data';
-    vResponse.Schema.JsonSchema := vDefinition2.NameToJson;
-
+    vResponse.Schema.Name := 'SomeType';
+    vOperation.Responses.Add('200', vResponse);
     vResponseHeader := TSwagHeaders.Create;
     vResponseHeader.Name := 'X-Rate-Limit-Limit';
     vResponseHeader.Description := 'The number of allowed requests in the current period';
     vResponseHeader.ValueType := 'integer';
     vResponse.Headers.Add(vResponseHeader);
-    vOperation.Responses.Add('200',vResponse);
-
+    
     vResponse := TSwagResponse.Create;
     vResponse.StatusCode := 'default';
     vResponse.Description := 'Error occured';
@@ -183,6 +147,56 @@ begin
   finally
     FreeAndNil(vSwagDoc);
   end;
+end;
+
+function TForm1.CreateJsonSomeSubType: TJsonObject;
+var
+  vJsonType: TJsonObject;
+  vJsonProperities: TJsonObject;
+begin
+  Result := TJsonObject.Create;
+
+  Result.AddPair('type','object');
+
+  vJsonType := TJsonObject.Create;
+  vJsonType.AddPair('type', 'string');
+
+  vJsonProperities := TJsonObject.Create;
+  vJsonProperities.AddPair('id', vJsonType);
+
+  Result.AddPair('properties', vJsonProperities);
+end;
+
+function TForm1.CreateJsonSomeType(pJsonObjectSubType: TJsonObject): TJsonObject;
+var
+  vJsonId: TJsonObject;
+  vJsonCost: TJsonObject;
+  vJsonProperities: TJsonObject;
+begin
+  Result := TJsonObject.Create;
+  Result.AddPair('type', 'object');
+
+  vJsonId := TJsonObject.Create;
+  vJsonId.AddPair('type', 'integer');
+  vJsonId.AddPair('format', 'int64');
+
+  vJsonProperities := TJsonObject.Create;
+  vJsonProperities.AddPair('id', vJsonId);
+
+  vJsonProperities.AddPair('subType', pJsonObjectSubType);
+
+  vJsonCost := TJsonObject.Create;
+  vJsonCost.AddPair('type', 'string');
+  vJsonCost.AddPair('format', 'decimel');
+  vJsonCost.AddPair('multipleOf', TJsonNumber.Create(0.01));
+  vJsonCost.AddPair('minimum', TJsonNumber.Create(-9999999999.99));
+  vJsonCost.AddPair('maximum', TJsonNumber.Create(9999999999.99));
+  vJsonCost.AddPair('title', 'Total Cost');
+  vJsonCost.AddPair('description', 'Total Cost');
+  vJsonCost.AddPair('example', TJsonNumber.Create(9999999999.99));
+  vJsonProperities.AddPair('cost', vJsonCost);
+
+  Result.AddPair('properties', vJsonProperities);
 end;
 
 end.

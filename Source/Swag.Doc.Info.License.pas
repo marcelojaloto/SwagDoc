@@ -19,6 +19,7 @@
 {  limitations under the License.                                              }
 {                                                                              }
 {******************************************************************************}
+
 unit Swag.Doc.Info.License;
 
 interface
@@ -32,8 +33,8 @@ type
     fName: string;
     fUrl: string;
   public
-    function GenerateJsonObject: TJSONObject;
-    procedure Load(pJson : TJSONObject);
+    function GenerateJsonObject: TJsonObject;
+    procedure Load(pJson: TJsonObject);
     function isEmpty: Boolean;
 
     property Name: string read fName write fName;
@@ -50,7 +51,7 @@ const
 
 { TSwagInfoLicense }
 
-function TSwagInfoLicense.GenerateJsonObject: TJSONObject;
+function TSwagInfoLicense.GenerateJsonObject: TJsonObject;
 begin
   Result := TJsonObject.Create;
   Result.AddPair(c_SwagInfoLicenseName, fName);
@@ -62,7 +63,7 @@ begin
   Result := fName.IsEmpty and fUrl.IsEmpty;
 end;
 
-procedure TSwagInfoLicense.Load(pJson: TJSONObject);
+procedure TSwagInfoLicense.Load(pJson: TJsonObject);
 begin
   if not Assigned(pJson) then
     Exit;

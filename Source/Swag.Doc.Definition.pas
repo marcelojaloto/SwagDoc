@@ -34,10 +34,8 @@ type
     fJsonSchema: TJsonObject;
     procedure SetName(const Value: string);
     procedure SetJsonSchema(const Value: TJsonObject);
-  protected
-    function GetNameToJson: TJsonObject;
   public
-    property NameToJson: TJsonObject read GetNameToJson;
+    function GenerateJsonRefDefinition: TJsonObject;
 
     property Name: string read fName write SetName;
     property JsonSchema: TJsonObject read fJsonSchema write SetJsonSchema; // http://json-schema.org
@@ -62,7 +60,7 @@ end;
 
 { TSwagDefinition }
 
-function TSwagDefinition.GetNameToJson: TJsonObject;
+function TSwagDefinition.GenerateJsonRefDefinition: TJsonObject;
 const
   c_SchemaRef = '$ref';
   c_PrefixDefinitionName = '#/definitions/';
