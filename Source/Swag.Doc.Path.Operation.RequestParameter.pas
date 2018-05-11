@@ -101,7 +101,9 @@ begin
 
   vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONBool.Create(fRequired));
 
-  if Assigned(fSchema.JsonSchema) then
+  if (not fSchema.Name.IsEmpty) then
+    vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.GenerateJsonRefDefinition)
+  else if Assigned(fSchema.JsonSchema) then
     vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.JsonSchema)
   else if not fTypeParameter.IsEmpty then
     vJsonObject.AddPair(c_SwagRequestParameterType, fTypeParameter);
