@@ -24,7 +24,9 @@ unit Swag.Doc.Path.Operation.ResponseHeaders;
 
 interface
 
-uses System.SysUtils, system.json;
+uses
+  System.SysUtils,
+  System.Json;
 
 type
 

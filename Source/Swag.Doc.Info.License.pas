@@ -43,7 +43,8 @@ type
 
 implementation
 
-uses System.SysUtils;
+uses
+  System.SysUtils;
 
 const
   c_SwagInfoLicenseName = 'name';
