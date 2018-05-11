@@ -3,6 +3,8 @@ SwagDoc is a Delphi library to generate swagger.json file for Swagger Spec versi
 
 ## Swagger - version 2.0
 
+SwagDoc follows the specification 2.0 because it is more popular in the market and also because it is considered a more stable version to exist the longest. SwagDoc does not yet support the Swagger 3.0 version, but depending on the demand and contributions to the project it may evolve to support spec 3.0.
+
 The main prerequisite for working with SwagDoc is to know the Swagger 2.0 specification that can be viewed in the link below.
 
 https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
