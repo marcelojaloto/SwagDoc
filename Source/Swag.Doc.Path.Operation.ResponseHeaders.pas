@@ -52,9 +52,9 @@ var
 begin
   vJsonObject := TJSONObject.Create;
   if fDescription.Length > 0 then
-    vJsonObject.AddPair('description',fDescription);
+    vJsonObject.AddPair('description', fDescription);
   if fType.Length > 0 then
-    vJsonObject.AddPair('type',fType);
+    vJsonObject.AddPair('type', fType);
   Result := vJsonObject;
 end;
 

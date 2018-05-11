@@ -125,6 +125,7 @@ begin
     vResponse.Description := 'Successfully retrieved data';
     vResponse.Schema.Name := 'SomeType';
     vOperation.Responses.Add('200', vResponse);
+
     vResponseHeader := TSwagHeaders.Create;
     vResponseHeader.Name := 'X-Rate-Limit-Limit';
     vResponseHeader.Description := 'The number of allowed requests in the current period';
