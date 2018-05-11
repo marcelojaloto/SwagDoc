@@ -96,14 +96,14 @@ end;
 function TSwagResponse.GenerateJsonObject: TJSONObject;
 var
   vJsonObject: TJsonObject;
-  i: Integer;
-  vJsonHeaders : TJSONObject;
+  vIndex: Integer;
+  vJsonHeaders: TJSONObject;
 begin
   vJsonObject := TJsonObject.Create;
   vJsonObject.AddPair(c_SwagResponseDescription, fDescription);
 
   if (not fSchema.Name.IsEmpty) then
-    vJsonObject.AddPair(c_SwagResponseSchema, fSchema.NameToJson)
+    vJsonObject.AddPair(c_SwagResponseSchema, fSchema.GenerateJsonRefDefinition)
   else if Assigned(fSchema.JsonSchema) then
     vJsonObject.AddPair(c_SwagResponseSchema, fSchema.JsonSchema);
 
@@ -113,11 +113,11 @@ begin
   if fHeaders.Count > 0 then
   begin
     vJsonHeaders := TJSONObject.Create;
-    for i := 0 to fHeaders.Count - 1 do
+    for vIndex := 0 to fHeaders.Count - 1 do
     begin
-      vJsonHeaders.AddPair(fHeaders[i].Name,fHeaders[i].GenerateJsonObject);
+      vJsonHeaders.AddPair(fHeaders[vIndex].Name, fHeaders[vIndex].GenerateJsonObject);
     end;
-    vJsonObject.AddPair(c_SwagResponseHeaders,vJsonHeaders);
+    vJsonObject.AddPair(c_SwagResponseHeaders, vJsonHeaders);
   end;
 
   Result := vJsonObject;
@@ -125,9 +125,9 @@ end;
 
 procedure TSwagResponse.Load(pJson: TJSONObject);
 var
-  vJSONHeaders : TJSONObject;
-  i: Integer;
-  vheader : TSwagHeaders;
+  vJSONHeaders: TJSONObject;
+  vIndex: Integer;
+  vHeader: TSwagHeaders;
 begin
   if Assigned(pJson.Values[c_SwagResponseDescription]) then
     fDescription := pJson.Values[c_SwagResponseDescription].Value;
@@ -135,15 +135,14 @@ begin
   if Assigned(pJson.Values[c_SwagResponseHeaders]) then
   begin
     vJSONHeaders := pJson.Values[c_SwagResponseHeaders] as TJSONObject;
-    for i := 0 to vJSONHeaders.Count - 1 do
+    for vIndex := 0 to vJSONHeaders.Count - 1 do
     begin
-      vheader := TSwagHeaders.Create;
-      vheader.Load(vJSONHeaders.Pairs[i].JsonValue as TJSONObject);
-      vheader.Name := vJSONHeaders.Pairs[i].JsonString.Value;
+      vHeader := TSwagHeaders.Create;
+      vHeader.Load(vJSONHeaders.Pairs[vIndex].JsonValue as TJSONObject);
+      vHeader.Name := vJSONHeaders.Pairs[vIndex].JsonString.Value;
       fHeaders.Add(vheader);
     end;
   end;
-
 end;
 
 end.
