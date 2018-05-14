@@ -28,6 +28,7 @@ uses
   System.Generics.Collections,
   System.JSON,
   Swag.Common.Types,
+  Swag.Doc.Path.Operation.ResponseHeaders,
   Swag.Doc.Definition;
 
 type
@@ -35,6 +36,7 @@ type
   private
     fStatusCode: TSwagStatusCode;
     fSchema: TSwagDefinition;
+    fHeaders: TObjectList<TSwagHeaders>;
     fDescription: string;
     fExamples: TDictionary<TSwagJsonExampleDescription, TJSONObject>;
   protected
@@ -49,6 +51,7 @@ type
     property StatusCode: TSwagStatusCode read fStatusCode write fStatusCode;
     property Description: string read fDescription write fDescription;
     property Schema: TSwagDefinition read fSchema;
+    property Headers : TObjectList<TSwagHeaders> read fHeaders;
     property Examples: TDictionary<TSwagJsonExampleDescription, TJSONObject> read fExamples;
   end;
 
@@ -61,6 +64,7 @@ const
   c_SwagResponseDescription = 'description';
   c_SwagResponseSchema = 'schema';
   c_SwagResponseExamples = 'examples';
+  c_SwagResponseHeaders = 'headers';
 
 { TSwagResponse }
 
@@ -69,12 +73,14 @@ begin
   inherited Create;
   fExamples := TDictionary<TSwagJsonExampleDescription, TJSONObject>.Create;
   fSchema := TSwagDefinition.Create;
+  fHeaders := TObjectList<TSwagHeaders>.Create;
 end;
 
 destructor TSwagResponse.Destroy;
 begin
   FreeAndNil(fExamples);
   FreeAndNil(fSchema);
+  FreeAndNil(fHeaders);
   inherited Destroy;
 end;
 
@@ -90,25 +96,53 @@ end;
 function TSwagResponse.GenerateJsonObject: TJSONObject;
 var
   vJsonObject: TJsonObject;
+  vIndex: Integer;
+  vJsonHeaders: TJSONObject;
 begin
   vJsonObject := TJsonObject.Create;
   vJsonObject.AddPair(c_SwagResponseDescription, fDescription);
 
   if (not fSchema.Name.IsEmpty) then
-    vJsonObject.AddPair(c_SwagResponseSchema, fSchema.NameToJson)
+    vJsonObject.AddPair(c_SwagResponseSchema, fSchema.GenerateJsonRefDefinition)
   else if Assigned(fSchema.JsonSchema) then
     vJsonObject.AddPair(c_SwagResponseSchema, fSchema.JsonSchema);
 
   if (fExamples.Count > 0) then
     vJsonObject.AddPair(c_SwagResponseExamples, GenerateExamplesJsonObject);
 
+  if fHeaders.Count > 0 then
+  begin
+    vJsonHeaders := TJSONObject.Create;
+    for vIndex := 0 to fHeaders.Count - 1 do
+    begin
+      vJsonHeaders.AddPair(fHeaders[vIndex].Name, fHeaders[vIndex].GenerateJsonObject);
+    end;
+    vJsonObject.AddPair(c_SwagResponseHeaders, vJsonHeaders);
+  end;
+
   Result := vJsonObject;
 end;
 
 procedure TSwagResponse.Load(pJson: TJSONObject);
+var
+  vJSONHeaders: TJSONObject;
+  vIndex: Integer;
+  vHeader: TSwagHeaders;
 begin
   if Assigned(pJson.Values[c_SwagResponseDescription]) then
     fDescription := pJson.Values[c_SwagResponseDescription].Value;
+
+  if Assigned(pJson.Values[c_SwagResponseHeaders]) then
+  begin
+    vJSONHeaders := pJson.Values[c_SwagResponseHeaders] as TJSONObject;
+    for vIndex := 0 to vJSONHeaders.Count - 1 do
+    begin
+      vHeader := TSwagHeaders.Create;
+      vHeader.Load(vJSONHeaders.Pairs[vIndex].JsonValue as TJSONObject);
+      vHeader.Name := vJSONHeaders.Pairs[vIndex].JsonString.Value;
+      fHeaders.Add(vheader);
+    end;
+  end;
 end;
 
 end.

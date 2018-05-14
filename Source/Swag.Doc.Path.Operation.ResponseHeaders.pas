@@ -20,60 +20,52 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Doc.Info.License;
+unit Swag.Doc.Path.Operation.ResponseHeaders;
 
 interface
 
 uses
-  System.JSON;
+  System.SysUtils,
+  System.Json;
 
 type
-  TSwagInfoLicense = class(TObject)
+
+  TSwagHeaders = class(TObject)
   private
     fName: string;
-    fUrl: string;
+    fDescription: string;
+    fType: string;
   public
-    function GenerateJsonObject: TJsonObject;
-    procedure Load(pJson: TJsonObject);
-    function isEmpty: Boolean;
+    function GenerateJsonObject: TJSONObject;
+    procedure Load(pJson : TJSONObject);
 
     property Name: string read fName write fName;
-    property Url: string read fUrl write fUrl;
+    property Description: string read fDescription write fDescription;
+    property ValueType: string read fType write fType;
   end;
 
 implementation
 
-uses
-  System.SysUtils;
+{ TSwagHeaders }
 
-const
-  c_SwagInfoLicenseName = 'name';
-  c_SwagInfoLicenseUrl = 'url';
-
-{ TSwagInfoLicense }
-
-function TSwagInfoLicense.GenerateJsonObject: TJsonObject;
+function TSwagHeaders.GenerateJsonObject: TJSONObject;
+var
+  vJsonObject: TJsonObject;
 begin
-  Result := TJsonObject.Create;
-  Result.AddPair(c_SwagInfoLicenseName, fName);
-  Result.AddPair(c_SwagInfoLicenseUrl, fUrl);
+  vJsonObject := TJSONObject.Create;
+  if fDescription.Length > 0 then
+    vJsonObject.AddPair('description', fDescription);
+  if fType.Length > 0 then
+    vJsonObject.AddPair('type', fType);
+  Result := vJsonObject;
 end;
 
-function TSwagInfoLicense.isEmpty: Boolean;
+procedure TSwagHeaders.Load(pJson: TJSONObject);
 begin
-  Result := fName.IsEmpty and fUrl.IsEmpty;
-end;
-
-procedure TSwagInfoLicense.Load(pJson: TJsonObject);
-begin
-  if not Assigned(pJson) then
-    Exit;
-
-  if Assigned(pJson.Values[c_SwagInfoLicenseName]) then
-    fName := pJson.Values[c_SwagInfoLicenseName].Value;
-
-  if Assigned(pJson.Values[c_SwagInfoLicenseUrl]) then
-    fUrl := pJson.Values[c_SwagInfoLicenseUrl].Value;
+  if Assigned(pJson.Values['description']) then
+    fDescription := pJson.Values['description'].Value;
+  if Assigned(pJson.Values['type']) then
+    fType := pJson.Values['type'].Value;
 end;
 
 end.

@@ -3,9 +3,21 @@ unit frmSimpleDemo;
 interface
 
 uses
-  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
-  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, Swag.Doc.Definition,
-  Swag.Doc, Swag.Doc.Path, Swag.Doc.Path.Operation, Swag.Common.Types,Vcl.StdCtrls;
+  Winapi.Windows,
+  Winapi.Messages,
+  System.SysUtils,
+  System.Variants,
+  System.Classes,
+  Vcl.Graphics,
+  Vcl.Controls,
+  Vcl.Forms,
+  Vcl.Dialogs,
+  Vcl.StdCtrls,
+  Swag.Common.Types,
+  Swag.Doc,
+  Swag.Doc.Definition,
+  Swag.Doc.Path,
+  Swag.Doc.Path.Operation;
 
 type
   TfrmSimpleSwaggerDocDemo = class(TForm)
@@ -28,11 +40,16 @@ implementation
 
 {$R *.dfm}
 
-uses REST.Json;
+uses
+  REST.Json,
+  System.IOUtils;
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
+var
+  vFullFilename : String;
 begin
-  fSwagDoc.LoadFromFile('..\..\flickr.json');
+  fSwagDoc.LoadFromFile('flickr.json');
+
   fSwagDoc.GenerateSwaggerJson;
   Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
 end;
