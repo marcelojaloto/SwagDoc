@@ -89,9 +89,9 @@ implementation
 uses
   System.SysUtils,
   System.IOUtils,
-  REST.Json,
   Swag.Common.Consts,
-  Swag.Common.Types.Helpers;
+  Swag.Common.Types.Helpers,
+  Swag.Commom.Json.Helpers;
 
 const
   c_Swagger = 'swagger';
@@ -144,7 +144,7 @@ begin
   if not System.SysUtils.DirectoryExists(fSwaggerFilesFolder) then
     System.SysUtils.ForceDirectories(fSwaggerFilesFolder);
 
-  vJsonFile := TStringStream.Create(TJson.Format(fSwaggerJson));
+  vJsonFile := TStringStream.Create(fSwaggerJson.Format);
   try
     vJsonFile.SaveToFile(ReturnSwaggerFileName);
   finally
