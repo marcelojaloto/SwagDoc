@@ -30,6 +30,10 @@ uses
   Swag.Doc.Info.Contact;
 
 type
+  /// <summary>
+  /// The object provides metadata about the API.
+  /// The metadata can be used by the clients if needed, and can be presented in the Swagger-UI for convenience.
+  /// </summary>
   TSwagInfo = class(TObject)
   private
     fVersion: string;
@@ -45,12 +49,35 @@ type
     function GenerateJsonObject: TJSONObject;
     procedure Load(pJson: TJSONObject);
 
-    property Version: string read fVersion write fVersion;
+    /// <summary>
+    /// Required. The title of the application.
+    /// </summary>
     property Title: string read fTitle write fTitle;
-    property TermsOfService: string read fTermsOfService write fTermsOfService;
+
+    /// <summary>
+    /// A short description of the application. GFM syntax can be used for rich text representation.
+    /// </summary>
     property Description: string read fDescription write fDescription;
+
+    /// <summary>
+    /// The Terms of Service for the API.
+    /// </summary>
+    property TermsOfService: string read fTermsOfService write fTermsOfService;
+
+    /// <summary>
+    /// The contact information for the exposed API.
+    /// </summary>
     property Contact: TSwagInfoContact read fContact write fContact;
+
+    /// <summary>
+    /// The license information for the exposed API.
+    /// </summary>
     property License: TSwagInfoLicense read fLicense;
+
+    /// <summary>
+    /// Required Provides the version of the application API (not to be confused with the specification version).
+    /// </summary>
+    property Version: string read fVersion write fVersion;
   end;
 
 implementation

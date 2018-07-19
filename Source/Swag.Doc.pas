@@ -35,6 +35,10 @@ uses
   Swag.Doc.Definition;
 
 type
+  /// <summary>
+  /// This is the root document object for the API specification.
+  /// It combines what previously was the Resource Listing and API Declaration (version 1.2 and earlier) together into one document.
+  /// </summary>
   TSwagDoc = class(TObject)
   private
     fInfo: TSwagInfo;
@@ -72,16 +76,64 @@ type
     property SwaggerFilesFolder: string read fSwaggerFilesFolder write SetSwaggerFilesFolder;
     property SwaggerJson: TJSONValue read fSwaggerJson;
 
+    /// <summary>
+    /// Required. Specifies the Swagger Specification version being used.
+    /// It can be used by the Swagger UI and other clients to interpret the API listing. The value MUST be "2.0".
+    /// </summary>
     property SwaggerVersion: string read GetSwaggerVersion;
+
+    /// <summary>
+    /// Required. Provides metadata about the API. The metadata can be used by the clients if needed.
+    /// </summary>
     property Info: TSwagInfo read fInfo;
+
+    /// <summary>
+    /// The host (name or ip) serving the API. This MUST be the host only and does not include the scheme nor sub-paths.
+    /// It MAY include a port.
+    /// If the host is not included, the host serving the documentation is to be used (including the port).
+    /// The host does not support path templating.
+    /// </summary>
     property Host: string read fHost write fHost;
+
+    /// <summary>
+    /// The base path on which the API is served, which is relative to the host.
+    /// If it is not included, the API is served directly under the host. The value MUST start with a leading slash (/).
+    /// The basePath does not support path templating.
+    /// </summary>
     property BasePath: string read fBasePath write fBasePath;
+
+    /// <summary>
+    /// The transfer protocol of the API. Values MUST be from the list: "http", "https", "ws", "wss".
+    /// If the schemes is not included, the default scheme to be used is the one used to access the Swagger definition itself.
+    /// </summary>
     property Schemes: TSwagTransferProtocolSchemes read fSchemes write fSchemes;
-    property SecurityDefinitions: TObjectList<TSwagSecurityDefinition> read fSecurityDefinitions;
+
+    /// <summary>
+    /// A list of MIME types the APIs can consume. This is global to all APIs but can be overridden on specific API calls.
+    /// Value MUST be as described under Mime Types.
+    /// </summary>
     property Consumes: TList<TSwagMimeType> read fConsumes;
+
+    /// <summary>
+    /// A list of MIME types the APIs can produce. This is global to all APIs but can be overridden on specific API calls.
+    /// Value MUST be as described under Mime Types.
+    /// </summary>
     property Produces: TList<TSwagMimeType> read fProduces;
+
+    /// <summary>
+    /// Required. The available paths and operations for the API.
+    /// </summary>
     property Paths: TObjectList<TSwagPath> read fPaths;
+
+    /// <summary>
+    /// An object to hold data types produced and consumed by operations.
+    /// </summary>
     property Definitions: TObjectList<TSwagDefinition> read fDefinitions;
+
+    /// <summary>
+    /// Security scheme definitions that can be used across the specification.
+    /// </summary>
+    property SecurityDefinitions: TObjectList<TSwagSecurityDefinition> read fSecurityDefinitions;
   end;
 
 implementation

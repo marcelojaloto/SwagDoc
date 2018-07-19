@@ -29,7 +29,9 @@ uses
   System.Json;
 
 type
-
+  /// <summary>
+  /// Lists the headers that can be sent as part of a response.
+  /// </summary>
   TSwagHeaders = class(TObject)
   private
     fName: string;
@@ -39,8 +41,19 @@ type
     function GenerateJsonObject: TJSONObject;
     procedure Load(pJson : TJSONObject);
 
+    /// <summary>
+    /// A header name alias.
+    /// </summary>
     property Name: string read fName write fName;
+
+    /// <summary>
+    /// A short description of the header.
+    /// </summary>
     property Description: string read fDescription write fDescription;
+
+    /// <summary>
+    /// Required. The type of the object. The value MUST be one of "string", "number", "integer", "boolean", or "array".
+    /// </summary>
     property ValueType: string read fType write fType;
   end;
 

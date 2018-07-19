@@ -28,6 +28,9 @@ uses
   System.JSON;
 
 type
+  /// <summary>
+  /// License information for the exposed API.
+  /// </summary>
   TSwagInfoLicense = class(TObject)
   private
     fName: string;
@@ -37,7 +40,14 @@ type
     procedure Load(pJson: TJsonObject);
     function isEmpty: Boolean;
 
+    /// <summary>
+    /// Required. The license name used for the API.
+    /// </summary>
     property Name: string read fName write fName;
+
+    /// <summary>
+    /// A URL to the license used for the API. MUST be in the format of a URL.
+    /// </summary>
     property Url: string read fUrl write fUrl;
   end;
 

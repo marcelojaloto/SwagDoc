@@ -34,6 +34,11 @@ uses
   Swag.Doc.Path.Operation;
 
 type
+  /// <summary>
+  /// Holds the relative paths to the individual endpoints.
+  /// The path is appended to the basePath in order to construct the full URL.
+  /// The Paths may be empty, due to ACL constraints.
+  /// </summary>
   TSwagPath = class(TObject)
   private
     fOperations: TObjectList<TSwagPathOperation>;
@@ -48,7 +53,15 @@ type
     function GenerateJsonObject: TJSONObject;
     procedure Load(pJson: TJSONObject);
 
+    /// <summary>
+    /// A relative path to an individual endpoint. The field name MUST begin with a slash.
+    /// The path is appended to the basePath in order to construct the full URL. Path templating is allowed.
+    /// </summary>
     property Uri: string read fUri write fUri;
+
+    /// <summary>
+    /// Describes a single API operation on a path.
+    /// </summary>
     property Operations: TObjectList<TSwagPathOperation> read fOperations;
   end;
 

@@ -32,7 +32,9 @@ uses
   Swag.Doc.Path.Operation.RequestParameter;
 
 type
-
+  /// <summary>
+  /// Describes a single API operation on a path.
+  /// </summary>
   TSwagPathOperation = class(TObject)
   private
     fOperation: TSwagPathTypeOperation;
@@ -62,13 +64,60 @@ type
     property OperationToString: string read GetOperationToString;
     property OperationId : string read fOperationId write fOperationId;
 
-    property Description: string read fDescription write fDescription;
+    /// <summary>
+    /// A list of tags for API documentation control.
+    /// Tags can be used for logical grouping of operations by resources or any other qualifier.
+    /// </summary>
     property Tags: TList<string> read fTags;
+
+    /// <summary>
+    /// A verbose explanation of the operation behavior. GFM syntax can be used for rich text representation.
+    /// </summary>
+    property Description: string read fDescription write fDescription;
+
+    /// <summary>
+    /// A list of MIME types the operation can consume. This overrides the consumes definition at the Swagger Object.
+    /// An empty value MAY be used to clear the global definition. Value MUST be as described under Mime Types.
+    /// </summary>
     property Consumes: TList<TSwagMimeType> read fConsumes;
+
+    /// <summary>
+    /// A list of MIME types the operation can produce. This overrides the produces definition at the Swagger Object.
+    /// An empty value MAY be used to clear the global definition. Value MUST be as described under Mime Types.
+    /// </summary>
     property Produces: TList<TSwagMimeType> read fProduces;
-    property Deprecated: Boolean read fDeprecated write fDeprecated;
+
+    /// <summary>
+    /// A list of parameters that are applicable for this operation.
+    /// If a parameter is already defined at the Path Item, the new definition will override it, but can never remove it.
+    /// The list MUST NOT include duplicated parameters.
+    /// A unique parameter is defined by a combination of a name and location.
+    /// The list can use the Reference Object to link to parameters that are defined at the Swagger Object's parameters.
+    /// There can be one "body" parameter at most.
+    /// </summary>
     property Parameters: TObjectList<TSwagRequestParameter> read fParameters;
+
+    /// <summary>
+    /// Required. The list of possible responses as they are returned from executing this operation.
+    /// </summary>
     property Responses: TObjectDictionary<TSwagStatusCode, TSwagResponse> read fResponses;
+
+    /// <summary>
+    /// Declares this operation to be deprecated. Usage of the declared operation should be refrained.
+    /// Default value is false.
+    /// </summary>
+    property Deprecated: Boolean read fDeprecated write fDeprecated;
+
+    /// <summary>
+    /// Lists the required security schemes to execute this operation.
+    /// The object can have multiple security schemes declared in it which are all required (that is, there is a logical
+    /// AND between the schemes).
+    /// The name used for each property MUST correspond to a security scheme declared in the Security Definitions.
+    /// A declaration of which security schemes are applied for this operation.
+    /// The list of values describes alternative security schemes that can be used (that is, there is a logical
+    /// OR between the security requirements). This definition overrides any declared top-level security.
+    /// To remove a top-level security declaration, an empty array can be used.
+    /// </summary>
     property Security: TList<TSwagSecuritySchemaName> read fSecurity;
   end;
 
