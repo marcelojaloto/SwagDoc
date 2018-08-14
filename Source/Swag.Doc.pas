@@ -141,9 +141,9 @@ implementation
 uses
   System.SysUtils,
   System.IOUtils,
+  Json.Commom.Helpers,
   Swag.Common.Consts,
-  Swag.Common.Types.Helpers,
-  Swag.Commom.Json.Helpers;
+  Swag.Common.Types.Helpers;
 
 const
   c_Swagger = 'swagger';
