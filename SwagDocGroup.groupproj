@@ -6,6 +6,12 @@
         <Projects Include="Source\SwagDoc.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Demos\GenerateSwaggerJsonFromCode\GenerateSwagger.dproj">
+            <Dependencies/>
+        </Projects>
+        <Projects Include="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -23,14 +29,32 @@
     <Target Name="SwagDoc:Make">
         <MSBuild Projects="Source\SwagDoc.dproj" Targets="Make"/>
     </Target>
+    <Target Name="GenerateSwagger">
+        <MSBuild Projects="Demos\GenerateSwaggerJsonFromCode\GenerateSwagger.dproj"/>
+    </Target>
+    <Target Name="GenerateSwagger:Clean">
+        <MSBuild Projects="Demos\GenerateSwaggerJsonFromCode\GenerateSwagger.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="GenerateSwagger:Make">
+        <MSBuild Projects="Demos\GenerateSwaggerJsonFromCode\GenerateSwagger.dproj" Targets="Make"/>
+    </Target>
+    <Target Name="SwagDocDemo">
+        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj"/>
+    </Target>
+    <Target Name="SwagDocDemo:Clean">
+        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SwagDocDemo:Make">
+        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="SwagDoc"/>
+        <CallTarget Targets="SwagDoc;GenerateSwagger;SwagDocDemo"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="SwagDoc:Clean"/>
+        <CallTarget Targets="SwagDoc:Clean;GenerateSwagger:Clean;SwagDocDemo:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="SwagDoc:Make"/>
+        <CallTarget Targets="SwagDoc:Make;GenerateSwagger:Make;SwagDocDemo:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

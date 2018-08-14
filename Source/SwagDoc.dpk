@@ -33,6 +33,7 @@ requires
   rtl;
 
 contains
+  Json.Commom.Helpers in 'Json.Commom.Helpers.pas',
   Swag.Common.Consts in 'Swag.Common.Consts.pas',
   Swag.Common.Types.Helpers in 'Swag.Common.Types.Helpers.pas',
   Swag.Common.Types in 'Swag.Common.Types.pas',
@@ -47,8 +48,7 @@ contains
   Swag.Doc.Path.Operation.ResponseHeaders in 'Swag.Doc.Path.Operation.ResponseHeaders.pas',
   Swag.Doc.Path in 'Swag.Doc.Path.pas',
   Swag.Doc.SecurityDefinition in 'Swag.Doc.SecurityDefinition.pas',
-  Swag.Doc.SecurityDefinitionApiKey in 'Swag.Doc.SecurityDefinitionApiKey.pas',
-  Swag.Commom.Json.Helpers in 'Swag.Commom.Json.Helpers.pas';
+  Swag.Doc.SecurityDefinitionApiKey in 'Swag.Doc.SecurityDefinitionApiKey.pas';
 
 end.
 
