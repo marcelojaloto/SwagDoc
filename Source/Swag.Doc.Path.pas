@@ -31,7 +31,8 @@ uses
   Swag.Common.Types,
   Swag.Doc.Path.Operation.RequestParameter,
   Swag.Doc.Path.Operation.Response,
-  Swag.Doc.Path.Operation;
+  Swag.Doc.Path.Operation,
+  Json.Commom.Helpers;
 
 type
   /// <summary>
@@ -107,7 +108,7 @@ begin
   begin
     vOperation := TSwagPathOperation.Create;
     vOperationJson := pJson.Pairs[vIndex].JsonValue as TJSONObject;
-    vOperation.Description := vOperationJson.Values['description'].Value;
+    vOperation.Description := vOperationJson.GetValueRelaxed<String>('description');
     vOperation.Operation.ToType(pJson.Pairs[vIndex].JsonString.Value);
 
     if Assigned(vOperationJson.Values['operationId']) then

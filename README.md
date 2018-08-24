@@ -29,3 +29,6 @@ First you need to download the swagger user interface files and generate the swa
 See an example below.
 
 ![image](https://user-images.githubusercontent.com/20048296/39946376-49ad0df0-5544-11e8-8a5c-0980f5e6c257.png)
+
+# SwagGen
+SwagGen is an additional utilty to generate Delphi Objects to manage the creation and consumption of payload json packets.

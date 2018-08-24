@@ -27,8 +27,8 @@ interface
 uses
   System.JSON,
   Swag.Common.Types,
-  Swag.Doc.Definition;
-
+  Swag.Doc.Definition,
+  JSON.Commom.Helpers;
 type
   /// <summary>
   /// Describes a single operation parameter.
@@ -168,7 +168,7 @@ begin
   if Assigned(pJson.Values['in']) then
     fInLocation.ToType(pJson.Values['in'].Value);
 
-  fTypeParameter := pJson.Values[c_SwagRequestParameterType].Value;
+  fTypeParameter := pJson.GetValueRelaxed<String>(c_SwagRequestParameterType);
 end;
 
 function TSwagRequestParameter.ReturnInLocationToString: string;
