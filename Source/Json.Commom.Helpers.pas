@@ -11,6 +11,12 @@ type
     function Format: string;
   end;
 
+  TJSONValueHelper = class helper for TJSONValue
+  public
+    function GetValueRelaxed<T>(path:String):T; overload; // If not found, returns default("",0,false,etc)
+    function GetValueRelaxed<T>(path:String; adefault:T):T; overload; // If value is not available, return the default.
+  end;
+
 implementation
 
 { TJSONAncestorHelper }
@@ -65,6 +71,18 @@ begin
     if not vIsEscape and (vChar = '"') then
       vIsInString := not vIsInString;
   end;
+end;
+
+{ TJSONValueHelper }
+
+function TJSONValueHelper.GetValueRelaxed<T>(path: String): T;
+begin
+  result:=GetValueRelaxed<T>(path,default(T));
+end;
+
+function TJSONValueHelper.GetValueRelaxed<T>(path: String; adefault: T): T;
+begin
+  if not(TryGetValue<T>(path,result)) then result:=adefault;
 end;
 
 end.

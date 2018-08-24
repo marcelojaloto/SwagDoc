@@ -312,7 +312,10 @@ var
   vJsonSchemesArray: TJSONArray;
   vJsonProduces: TJSONArray;
   vJsonConsumes: TJSONArray;
+  vJsonDefinitions: TJSONObject;
   vIndex: Integer;
+  vSwagDef:TSwagDefinition;
+  vJsonPair:TJSONPair;
 begin
 
   if not FileExists(pFilename) then
@@ -325,14 +328,16 @@ begin
 
   vJsonObj := (fSwaggerJson as TJSONObject).Values[c_SwagPaths] as TJSONObject;
   vJsonSchemesArray := (fSwaggerJson as TJSONObject).Values[c_SwagSchemes] as TJSONArray;
-
-  for vIndex := 0 to vJsonSchemesArray.Count - 1 do
+  if assigned(vJsonSchemesArray) then
   begin
-    fSchemes.Add(vJsonSchemesArray.Items[vIndex].Value);
+    for vIndex := 0 to vJsonSchemesArray.Count - 1 do
+    begin
+      fSchemes.Add(vJsonSchemesArray.Items[vIndex].Value);
+    end;
   end;
 
-  fHost := (fSwaggerJson as TJSONObject).Values[c_SwagHost].Value;
-  fBasePath := (fSwaggerJson as TJSONObject).Values[c_SwagBasePath].Value;
+  fHost := (fSwaggerJson as TJSONObject).GetValueRelaxed<String>(c_SwagHost);
+  fBasePath := (fSwaggerJson as TJSONObject).GetValueRelaxed<String>(c_SwagBasePath);
 
   for vIndex := 0 to vJsonObj.Count - 1 do
   begin
@@ -343,15 +348,33 @@ begin
   end;
 
   vJsonProduces := (fSwaggerJson as TJSONObject).Values[c_SwagProduces] as TJSONArray;
-  for vIndex := 0 to vJsonProduces.Count - 1 do
+  if assigned(vJsonProduces) then
   begin
-    Produces.Add(vJsonProduces.Items[vIndex].Value);
+    for vIndex := 0 to vJsonProduces.Count - 1 do
+    begin
+      Produces.Add(vJsonProduces.Items[vIndex].Value);
+    end;
   end;
 
   vJsonConsumes := (fSwaggerJson as TJSONObject).Values[c_SwagConsumes] as TJSONArray;
-  for vIndex := 0 to vJsonConsumes.count - 1 do
+  if assigned(vJsonConsumes) then
   begin
-    Consumes.Add(vJsonConsumes.Items[vIndex].Value);
+    for vIndex := 0 to vJsonConsumes.count - 1 do
+    begin
+      Consumes.Add(vJsonConsumes.Items[vIndex].Value);
+    end;
+  end;
+
+  vJsonDefinitions := (fSwaggerJson as TJSONObject).Values[c_SwagDefinitions] as TJSONObject;
+  if assigned(vJsonDefinitions) then
+  begin
+    for vJsonPair in vJsonDefinitions do
+    begin
+      vSwagDef:=TSwagDefinition.Create;
+      vSwagDef.Name:=vJsonPair.JsonString.value;
+      vSwagDef.JsonSchema:=vJsonPair.JsonValue as TJSONObject;
+      Definitions.Add(vSwagDef);
+    end;
   end;
 end;
 
