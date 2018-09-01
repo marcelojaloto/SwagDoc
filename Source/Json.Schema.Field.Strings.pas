@@ -20,85 +20,66 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Json.Commom.Helpers;
+unit Json.Schema.Field.Strings;
 
 interface
 
 uses
-  System.JSON;
+  System.Json,
+  Json.Schema.Field,
+  Json.Schema.Common.Types;
 
 type
-  TJSONAncestorHelper = class helper for TJSONAncestor
+  [ASchemaType(skString)]
+  TJsonFieldString = class(TJsonField)
+  strict private
+    fMinLength: Integer;
+    fMaxLength: Integer;
   public
-    function Format: string;
+    constructor Create; reintroduce;
+    function ToJsonSchema: TJsonObject; override;
+    function Clone: TJsonField; override;
+
+    property MinLength: Integer read fMinLength write fMinLength;
+    property MaxLength: Integer read fMaxLength write fMaxLength;
   end;
 
-  TJsonObjectHelper = class helper for TJsonObject
-  public
-    procedure AddPair(const pName: string; const pValue: Extended); overload;
-  end;
+  [ASchemaType(skGuid)]
+  TJsonFieldGuid = class(TJsonField);
 
 implementation
 
-{ TJSONAncestorHelper }
+uses
+  System.Classes,
+  Json.Commom.Helpers;
 
-function TJSONAncestorHelper.Format: string;
-var
-  vJsonString: string;
-  vChar: Char;
-  vEOL: string;
-  vIndent: string;
-  vLeftIndent: string;
-  vIsEOL: Boolean;
-  vIsInString: Boolean;
-  vIsEscape: Boolean;
+{ TJsonFieldString }
+
+function TJsonFieldString.Clone: TJsonField;
 begin
-  vEOL := #13#10;
-  vIndent := '  ';
-  vIsEOL := true;
-  vIsInString := false;
-  vIsEscape := false;
-  vJsonString := Self.ToString;
-  for vChar in vJsonString do
-  begin
-    if not vIsInString and ((vChar = '{') or (vChar = '[')) then
-    begin
-      if not vIsEOL then
-        Result := Result + vEOL;
-      Result := Result + vLeftIndent + vChar + vEOL;
-      vLeftIndent := vLeftIndent + vIndent;
-      Result := Result + vLeftIndent;
-      vIsEOL := true;
-    end
-    else if not vIsInString and (vChar = ',') then
-    begin
-      vIsEOL := false;
-      Result := Result + vChar + vEOL + vLeftIndent;
-    end
-    else if not vIsInString and ((vChar = '}') or (vChar = ']')) then
-    begin
-      Delete(vLeftIndent, 1, Length(vIndent));
-      if not vIsEOL then
-        Result := Result + vEOL;
-      Result := Result + vLeftIndent + vChar + vEOL;
-      vIsEOL := true;
-    end
-    else
-    begin
-      vIsEOL := false;
-      Result := Result + vChar;
-    end;
-    vIsEscape := (vChar = '\') and not vIsEscape;
-    if not vIsEscape and (vChar = '"') then
-      vIsInString := not vIsInString;
-  end;
+  Result := inherited Clone;
+  TJsonFieldString(Result).MinLength := Self.fMinLength;
+  TJsonFieldString(Result).MaxLength := Self.fMaxLength;
 end;
 
-{ TJsonObjectHelper }
-
-procedure TJsonObjectHelper.AddPair(const pName: string; const pValue: Extended);
+constructor TJsonFieldString.Create;
 begin
-  Self.AddPair(pName, TJsonNumber.Create(pValue));
+  inherited Create;
+  fMinLength := 0;
+  fMaxLength := 0;
 end;
+
+function TJsonFieldString.ToJsonSchema: TJsonObject;
+begin
+  Result := inherited ToJsonSchema;
+  if (fMinLength > 0) then
+    Result.AddPair('minLength', fMinLength);
+  if (fMaxLength > 0) then
+    Result.AddPair('maxLength', fMaxLength);
+end;
+
+initialization
+  RegisterClass(TJsonFieldString);
+  RegisterClass(TJsonFieldGuid);
 
 end.

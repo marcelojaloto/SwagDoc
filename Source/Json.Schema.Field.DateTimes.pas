@@ -20,85 +20,76 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Json.Commom.Helpers;
+unit Json.Schema.Field.DateTimes;
 
 interface
 
 uses
-  System.JSON;
+  System.Json,
+  Json.Schema.Field,
+  Json.Schema.Common.Types;
 
 type
-  TJSONAncestorHelper = class helper for TJSONAncestor
+  [ASchemaType(skDateTime)]
+  TJsonFieldDateTime = class(TJsonField)
+  strict protected
+    const c_DateFormat = 'yyyy-MM-dd';
+    const c_TimeFormat = 'HH:mm:ss';
+    const c_DateTimeFormat = c_DateFormat + 'T' + c_TimeFormat;
+
+    function GetFormat: string; virtual;
   public
-    function Format: string;
+    function ToJsonSchema: TJsonObject; override;
+    property Format: string read GetFormat;
   end;
 
-  TJsonObjectHelper = class helper for TJsonObject
-  public
-    procedure AddPair(const pName: string; const pValue: Extended); overload;
+  [ASchemaType(skDate)]
+  TJsonFieldDate = class(TJsonFieldDateTime)
+  strict protected
+    function GetFormat: string; override;
+  end;
+
+  [ASchemaType(skTime)]
+  TJsonFieldTime = class(TJsonFieldDateTime)
+  strict protected
+    function GetFormat: string; override;
   end;
 
 implementation
 
-{ TJSONAncestorHelper }
+uses
+  System.Classes;
 
-function TJSONAncestorHelper.Format: string;
-var
-  vJsonString: string;
-  vChar: Char;
-  vEOL: string;
-  vIndent: string;
-  vLeftIndent: string;
-  vIsEOL: Boolean;
-  vIsInString: Boolean;
-  vIsEscape: Boolean;
+{ TJsonFieldDateTime }
+
+function TJsonFieldDateTime.GetFormat: string;
 begin
-  vEOL := #13#10;
-  vIndent := '  ';
-  vIsEOL := true;
-  vIsInString := false;
-  vIsEscape := false;
-  vJsonString := Self.ToString;
-  for vChar in vJsonString do
-  begin
-    if not vIsInString and ((vChar = '{') or (vChar = '[')) then
-    begin
-      if not vIsEOL then
-        Result := Result + vEOL;
-      Result := Result + vLeftIndent + vChar + vEOL;
-      vLeftIndent := vLeftIndent + vIndent;
-      Result := Result + vLeftIndent;
-      vIsEOL := true;
-    end
-    else if not vIsInString and (vChar = ',') then
-    begin
-      vIsEOL := false;
-      Result := Result + vChar + vEOL + vLeftIndent;
-    end
-    else if not vIsInString and ((vChar = '}') or (vChar = ']')) then
-    begin
-      Delete(vLeftIndent, 1, Length(vIndent));
-      if not vIsEOL then
-        Result := Result + vEOL;
-      Result := Result + vLeftIndent + vChar + vEOL;
-      vIsEOL := true;
-    end
-    else
-    begin
-      vIsEOL := false;
-      Result := Result + vChar;
-    end;
-    vIsEscape := (vChar = '\') and not vIsEscape;
-    if not vIsEscape and (vChar = '"') then
-      vIsInString := not vIsInString;
-  end;
+  Result := c_DateTimeFormat;
 end;
 
-{ TJsonObjectHelper }
-
-procedure TJsonObjectHelper.AddPair(const pName: string; const pValue: Extended);
+function TJsonFieldDateTime.ToJsonSchema: TJsonObject;
 begin
-  Self.AddPair(pName, TJsonNumber.Create(pValue));
+  Result := inherited ToJsonSchema;
+  Result.AddPair('format', GetFormat);
 end;
+
+{ TJsonFieldDate }
+
+function TJsonFieldDate.GetFormat: string;
+begin
+  Result := c_DateFormat;
+end;
+
+{ TJsonFieldTime }
+
+function TJsonFieldTime.GetFormat: string;
+begin
+  Result := c_TimeFormat;
+end;
+
+initialization
+  RegisterClass(TJsonFieldDateTime);
+  RegisterClass(TJsonFieldDate);
+  RegisterClass(TJsonFieldTime);
 
 end.

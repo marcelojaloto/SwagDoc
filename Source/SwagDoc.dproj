@@ -122,6 +122,16 @@
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
         <DCCReference Include="Json.Commom.Helpers.pas"/>
+        <DCCReference Include="Json.Schema.Common.Types.pas"/>
+        <DCCReference Include="Json.Schema.Field.pas"/>
+        <DCCReference Include="Json.Schema.Field.Booleans.pas"/>
+        <DCCReference Include="Json.Schema.Field.Numbers.pas"/>
+        <DCCReference Include="Json.Schema.Field.DateTimes.pas"/>
+        <DCCReference Include="Json.Schema.Field.Arrays.pas"/>
+        <DCCReference Include="Json.Schema.Field.Objects.pas"/>
+        <DCCReference Include="Json.Schema.Field.Enums.pas"/>
+        <DCCReference Include="Json.Schema.Field.Strings.pas"/>
+        <DCCReference Include="Json.Schema.pas"/>
         <DCCReference Include="Swag.Common.Consts.pas"/>
         <DCCReference Include="Swag.Common.Types.Helpers.pas"/>
         <DCCReference Include="Swag.Common.Types.pas"/>
@@ -129,7 +139,6 @@
         <DCCReference Include="Swag.Doc.Info.Contact.pas"/>
         <DCCReference Include="Swag.Doc.Info.License.pas"/>
         <DCCReference Include="Swag.Doc.Info.pas"/>
-        <DCCReference Include="Swag.Doc.pas"/>
         <DCCReference Include="Swag.Doc.Path.Operation.pas"/>
         <DCCReference Include="Swag.Doc.Path.Operation.RequestParameter.pas"/>
         <DCCReference Include="Swag.Doc.Path.Operation.Response.pas"/>
@@ -137,6 +146,7 @@
         <DCCReference Include="Swag.Doc.Path.pas"/>
         <DCCReference Include="Swag.Doc.SecurityDefinition.pas"/>
         <DCCReference Include="Swag.Doc.SecurityDefinitionApiKey.pas"/>
+        <DCCReference Include="Swag.Doc.pas"/>
         <BuildConfiguration Include="Release">
             <Key>Cfg_2</Key>
             <CfgParent>Base</CfgParent>

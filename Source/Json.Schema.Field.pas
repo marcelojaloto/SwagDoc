@@ -20,85 +20,87 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Json.Commom.Helpers;
+unit Json.Schema.Field;
 
 interface
 
 uses
-  System.JSON;
+  System.Rtti,
+  System.Classes,
+  System.Json;
 
 type
-  TJSONAncestorHelper = class helper for TJSONAncestor
-  public
-    function Format: string;
-  end;
+  TJsonFieldClass = class of TJsonField;
 
-  TJsonObjectHelper = class helper for TJsonObject
+  TJsonField = class abstract(TPersistent)
+  strict private
+    fTypeName: string;
+    function GetTypeName: string;
+  strict protected
+    fName: string;
+    fDescription: string;
+    fRequired: Boolean;
+    fNullable: Boolean;
+
+    property TypeName: string read GetTypeName;
   public
-    procedure AddPair(const pName: string; const pValue: Extended); overload;
+    function ToJsonSchema: TJsonObject; virtual;
+    function Clone: TJsonField; virtual;
+
+    property Name: string read fName write fName;
+    property Description: string read fDescription write fDescription;
+    property Required: Boolean read fRequired write fRequired;
+    property Nullable: Boolean read fNullable write fNullable;
   end;
 
 implementation
 
-{ TJSONAncestorHelper }
+uses
+  System.SysUtils,
+  Json.Schema.Common.Types;
 
-function TJSONAncestorHelper.Format: string;
+{ TJsonField }
+
+function TJsonField.Clone: TJsonField;
+begin
+  Result := TJsonField(FindClass(Self.ClassName).Create);
+  Result.Name := Self.fName;
+  Result.Description := Self.fDescription;
+  Result.Required := Self.fRequired;
+  Result.Nullable := Self.fNullable;
+end;
+
+function TJsonField.GetTypeName: string;
 var
-  vJsonString: string;
-  vChar: Char;
-  vEOL: string;
-  vIndent: string;
-  vLeftIndent: string;
-  vIsEOL: Boolean;
-  vIsInString: Boolean;
-  vIsEscape: Boolean;
+  vContext: TRttiContext;
+  vType: TRttiType;
+  vAttribute: TCustomAttribute;
 begin
-  vEOL := #13#10;
-  vIndent := '  ';
-  vIsEOL := true;
-  vIsInString := false;
-  vIsEscape := false;
-  vJsonString := Self.ToString;
-  for vChar in vJsonString do
+  if not fTypeName.IsEmpty then
   begin
-    if not vIsInString and ((vChar = '{') or (vChar = '[')) then
-    begin
-      if not vIsEOL then
-        Result := Result + vEOL;
-      Result := Result + vLeftIndent + vChar + vEOL;
-      vLeftIndent := vLeftIndent + vIndent;
-      Result := Result + vLeftIndent;
-      vIsEOL := true;
-    end
-    else if not vIsInString and (vChar = ',') then
-    begin
-      vIsEOL := false;
-      Result := Result + vChar + vEOL + vLeftIndent;
-    end
-    else if not vIsInString and ((vChar = '}') or (vChar = ']')) then
-    begin
-      Delete(vLeftIndent, 1, Length(vIndent));
-      if not vIsEOL then
-        Result := Result + vEOL;
-      Result := Result + vLeftIndent + vChar + vEOL;
-      vIsEOL := true;
-    end
-    else
-    begin
-      vIsEOL := false;
-      Result := Result + vChar;
-    end;
-    vIsEscape := (vChar = '\') and not vIsEscape;
-    if not vIsEscape and (vChar = '"') then
-      vIsInString := not vIsInString;
+    Result := fTypeName;
+    Exit;
   end;
+
+  vContext := TRttiContext.Create;
+  vType := vContext.GetType(Self.ClassType);
+  for vAttribute in vType.GetAttributes do
+    if vAttribute is ASchemaType then
+    begin
+      fTypeName := ASchemaType(vAttribute).Name;
+      Break;
+    end;
+
+  Result := fTypeName;
 end;
 
-{ TJsonObjectHelper }
-
-procedure TJsonObjectHelper.AddPair(const pName: string; const pValue: Extended);
+function TJsonField.ToJsonSchema: TJsonObject;
 begin
-  Self.AddPair(pName, TJsonNumber.Create(pValue));
+  Result := TJsonObject.Create;
+  Result.AddPair('type', GetTypeName);
+  if not fDescription.IsEmpty then
+    Result.AddPair('description', fDescription);
 end;
+
 
 end.
