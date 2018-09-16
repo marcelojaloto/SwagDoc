@@ -20,85 +20,56 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Json.Commom.Helpers;
+unit Json.Schema.Common.Types;
 
 interface
 
-uses
-  System.JSON;
-
 type
-  TJSONAncestorHelper = class helper for TJSONAncestor
-  public
-    function Format: string;
-  end;
+  TSchemaKind = (skUnknown, skInteger, skInt64, skDouble, skDateTime, skDate, skTime, skEnumeration, skBoolean,
+     skObject, skArray, skString, skChar, skGuid);
 
-  TJsonObjectHelper = class helper for TJsonObject
+  ASchemaType = class(TCustomAttribute)
+  strict private
+    fKind: TSchemaKind;
+
+    const c_SchemaTypeBoolean = 'boolean';
+    const c_SchemaTypeInteger = 'integer';
+    const c_SchemaTypeDouble = 'double';
+    const c_SchemaTypeString = 'string';
+    const c_SchemaTypeArray = 'array';
+    const c_SchemaTypeObject = 'object';
+
+    function GetName: string;
   public
-    procedure AddPair(const pName: string; const pValue: Extended); overload;
+    constructor Create(const pKind: TSchemaKind);
+    property Name: string read GetName;
+    property Kind: TSchemaKind read fKind;
   end;
 
 implementation
 
-{ TJSONAncestorHelper }
+uses
+  System.SysUtils;
 
-function TJSONAncestorHelper.Format: string;
-var
-  vJsonString: string;
-  vChar: Char;
-  vEOL: string;
-  vIndent: string;
-  vLeftIndent: string;
-  vIsEOL: Boolean;
-  vIsInString: Boolean;
-  vIsEscape: Boolean;
+{ ASchemaType }
+
+constructor ASchemaType.Create(const pKind: TSchemaKind);
 begin
-  vEOL := #13#10;
-  vIndent := '  ';
-  vIsEOL := true;
-  vIsInString := false;
-  vIsEscape := false;
-  vJsonString := Self.ToString;
-  for vChar in vJsonString do
-  begin
-    if not vIsInString and ((vChar = '{') or (vChar = '[')) then
-    begin
-      if not vIsEOL then
-        Result := Result + vEOL;
-      Result := Result + vLeftIndent + vChar + vEOL;
-      vLeftIndent := vLeftIndent + vIndent;
-      Result := Result + vLeftIndent;
-      vIsEOL := true;
-    end
-    else if not vIsInString and (vChar = ',') then
-    begin
-      vIsEOL := false;
-      Result := Result + vChar + vEOL + vLeftIndent;
-    end
-    else if not vIsInString and ((vChar = '}') or (vChar = ']')) then
-    begin
-      Delete(vLeftIndent, 1, Length(vIndent));
-      if not vIsEOL then
-        Result := Result + vEOL;
-      Result := Result + vLeftIndent + vChar + vEOL;
-      vIsEOL := true;
-    end
-    else
-    begin
-      vIsEOL := false;
-      Result := Result + vChar;
-    end;
-    vIsEscape := (vChar = '\') and not vIsEscape;
-    if not vIsEscape and (vChar = '"') then
-      vIsInString := not vIsInString;
-  end;
+  inherited Create;
+  fKind := pKind;
 end;
 
-{ TJsonObjectHelper }
-
-procedure TJsonObjectHelper.AddPair(const pName: string; const pValue: Extended);
+function ASchemaType.GetName: string;
 begin
-  Self.AddPair(pName, TJsonNumber.Create(pValue));
+  Result := EmptyStr;
+  case fKind of
+    skInteger, skInt64, skEnumeration: Result := c_SchemaTypeInteger;
+    skDouble: Result := c_SchemaTypeDouble;
+    skString, skChar, skGuid, skDateTime, skDate, skTime: Result := c_SchemaTypeString;
+    skBoolean: Result := c_SchemaTypeBoolean;
+    skObject: Result := c_SchemaTypeObject;
+    skArray: Result := c_SchemaTypeArray;
+  end;
 end;
 
 end.
