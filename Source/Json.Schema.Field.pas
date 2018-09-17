@@ -20,65 +20,87 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Doc.Path.Operation.ResponseHeaders;
+unit Json.Schema.Field;
 
 interface
 
 uses
-  System.SysUtils,
+  System.Rtti,
+  System.Classes,
   System.Json;
 
 type
-  /// <summary>
-  /// Lists the headers that can be sent as part of a response.
-  /// </summary>
-  TSwagHeaders = class(TObject)
-  private
+  TJsonFieldClass = class of TJsonField;
+
+  TJsonField = class abstract(TPersistent)
+  strict private
+    fTypeName: string;
+    function GetTypeName: string;
+  strict protected
     fName: string;
     fDescription: string;
-    fType: string;
+    fRequired: Boolean;
+    fNullable: Boolean;
+
+    property TypeName: string read GetTypeName;
   public
-    function GenerateJsonObject: TJSONObject;
-    procedure Load(pJson : TJSONObject);
+    function ToJsonSchema: TJsonObject; virtual;
+    function Clone: TJsonField; virtual;
 
-    /// <summary>
-    /// A header name alias.
-    /// </summary>
     property Name: string read fName write fName;
-
-    /// <summary>
-    /// A short description of the header.
-    /// </summary>
     property Description: string read fDescription write fDescription;
-
-    /// <summary>
-    /// Required. The type of the object. The value MUST be one of "string", "number", "integer", "boolean", or "array".
-    /// </summary>
-    property ValueType: string read fType write fType;
+    property Required: Boolean read fRequired write fRequired;
+    property Nullable: Boolean read fNullable write fNullable;
   end;
 
 implementation
 
-{ TSwagHeaders }
+uses
+  System.SysUtils,
+  Json.Schema.Common.Types;
 
-function TSwagHeaders.GenerateJsonObject: TJSONObject;
+{ TJsonField }
+
+function TJsonField.Clone: TJsonField;
+begin
+  Result := TJsonField(FindClass(Self.ClassName).Create);
+  Result.Name := Self.fName;
+  Result.Description := Self.fDescription;
+  Result.Required := Self.fRequired;
+  Result.Nullable := Self.fNullable;
+end;
+
+function TJsonField.GetTypeName: string;
 var
-  vJsonObject: TJsonObject;
+  vContext: TRttiContext;
+  vType: TRttiType;
+  vAttribute: TCustomAttribute;
 begin
-  vJsonObject := TJSONObject.Create;
-  if fDescription.Length > 0 then
-    vJsonObject.AddPair('description', fDescription);
-  if fType.Length > 0 then
-    vJsonObject.AddPair('type', fType);
-  Result := vJsonObject;
+  if not fTypeName.IsEmpty then
+  begin
+    Result := fTypeName;
+    Exit;
+  end;
+
+  vContext := TRttiContext.Create;
+  vType := vContext.GetType(Self.ClassType);
+  for vAttribute in vType.GetAttributes do
+    if vAttribute is ASchemaType then
+    begin
+      fTypeName := ASchemaType(vAttribute).Name;
+      Break;
+    end;
+
+  Result := fTypeName;
 end;
 
-procedure TSwagHeaders.Load(pJson: TJSONObject);
+function TJsonField.ToJsonSchema: TJsonObject;
 begin
-  if Assigned(pJson.Values['description']) then
-    fDescription := pJson.Values['description'].Value;
-  if Assigned(pJson.Values['type']) then
-    fType := pJson.Values['type'].Value;
+  Result := TJsonObject.Create;
+  Result.AddPair('type', GetTypeName);
+  if not fDescription.IsEmpty then
+    Result.AddPair('description', fDescription);
 end;
+
 
 end.

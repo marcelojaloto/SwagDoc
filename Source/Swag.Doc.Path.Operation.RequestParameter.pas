@@ -30,6 +30,10 @@ uses
   Swag.Doc.Definition;
 
 type
+  /// <summary>
+  /// Describes a single operation parameter.
+  /// A unique parameter is defined by a combination of a name and location.
+  /// </summary>
   TSwagRequestParameter = class(TObject)
   private
     fName: string;
@@ -48,12 +52,49 @@ type
     function GenerateJsonObject: TJSONObject;
     procedure Load(pJson: TJSONObject);
 
+    /// <summary>
+    /// There are five possible parameter types: Query, Header, Path, Form e Body.
+    /// </summary>
     property InLocation: TSwagRequestParameterInLocation read fInLocation write fInLocation;
+
+    /// <summary>
+    /// Required. The name of the parameter. Parameter names are case sensitive.
+    /// If in is "path", the name field MUST correspond to the associated path segment from the path field in the Paths Object.
+    /// See Path Templating for further information.
+    /// For all other cases, the name corresponds to the parameter name used based on the in property.
+    /// </summary>
     property Name: string read fName write fName;
+
+    /// <summary>
+    /// A brief description of the parameter. This could contain examples of use. GFM syntax can be used for rich text representation.
+    /// </summary>
     property Description: string read fDescription write fDescription;
+
+    /// <summary>
+    /// Determines whether this parameter is mandatory. If the parameter is in "path", this property is required and its value MUST be true.
+    /// Otherwise, the property MAY be included and its default value is false.
+    /// </summary>
     property Required: Boolean read fRequired write fRequired;
+
+    /// <summary>
+    /// See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-5.2.3.
+    /// </summary>
     property Pattern: string read fPattern write fPattern;
+
+    /// <summary>
+    /// If in is "body"
+    /// Required. The schema defining the type used for the body parameter.
+    /// </summary>
     property Schema: TSwagDefinition read fSchema;
+
+    /// <summary>
+    /// If in is any value other than "body"
+    /// Required. The type of the parameter. Since the parameter is not located at the request body, it is limited to
+    /// simple types (that is, not an object).
+    /// The value MUST be one of "string", "number", "integer", "boolean", "array" or "file".
+    /// If type is "file", the consumes MUST be either "multipart/form-data", " application/x-www-form-urlencoded" or both
+    /// and the parameter MUST be in "formData".
+    /// </summary>
     property TypeParameter: string read fTypeParameter write fTypeParameter;
   end;
 

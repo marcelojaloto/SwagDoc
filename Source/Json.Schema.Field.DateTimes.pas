@@ -20,65 +20,76 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Doc.Path.Operation.ResponseHeaders;
+unit Json.Schema.Field.DateTimes;
 
 interface
 
 uses
-  System.SysUtils,
-  System.Json;
+  System.Json,
+  Json.Schema.Field,
+  Json.Schema.Common.Types;
 
 type
-  /// <summary>
-  /// Lists the headers that can be sent as part of a response.
-  /// </summary>
-  TSwagHeaders = class(TObject)
-  private
-    fName: string;
-    fDescription: string;
-    fType: string;
+  [ASchemaType(skDateTime)]
+  TJsonFieldDateTime = class(TJsonField)
+  strict protected
+    const c_DateFormat = 'yyyy-MM-dd';
+    const c_TimeFormat = 'HH:mm:ss';
+    const c_DateTimeFormat = c_DateFormat + 'T' + c_TimeFormat;
+
+    function GetFormat: string; virtual;
   public
-    function GenerateJsonObject: TJSONObject;
-    procedure Load(pJson : TJSONObject);
+    function ToJsonSchema: TJsonObject; override;
+    property Format: string read GetFormat;
+  end;
 
-    /// <summary>
-    /// A header name alias.
-    /// </summary>
-    property Name: string read fName write fName;
+  [ASchemaType(skDate)]
+  TJsonFieldDate = class(TJsonFieldDateTime)
+  strict protected
+    function GetFormat: string; override;
+  end;
 
-    /// <summary>
-    /// A short description of the header.
-    /// </summary>
-    property Description: string read fDescription write fDescription;
-
-    /// <summary>
-    /// Required. The type of the object. The value MUST be one of "string", "number", "integer", "boolean", or "array".
-    /// </summary>
-    property ValueType: string read fType write fType;
+  [ASchemaType(skTime)]
+  TJsonFieldTime = class(TJsonFieldDateTime)
+  strict protected
+    function GetFormat: string; override;
   end;
 
 implementation
 
-{ TSwagHeaders }
+uses
+  System.Classes;
 
-function TSwagHeaders.GenerateJsonObject: TJSONObject;
-var
-  vJsonObject: TJsonObject;
+{ TJsonFieldDateTime }
+
+function TJsonFieldDateTime.GetFormat: string;
 begin
-  vJsonObject := TJSONObject.Create;
-  if fDescription.Length > 0 then
-    vJsonObject.AddPair('description', fDescription);
-  if fType.Length > 0 then
-    vJsonObject.AddPair('type', fType);
-  Result := vJsonObject;
+  Result := c_DateTimeFormat;
 end;
 
-procedure TSwagHeaders.Load(pJson: TJSONObject);
+function TJsonFieldDateTime.ToJsonSchema: TJsonObject;
 begin
-  if Assigned(pJson.Values['description']) then
-    fDescription := pJson.Values['description'].Value;
-  if Assigned(pJson.Values['type']) then
-    fType := pJson.Values['type'].Value;
+  Result := inherited ToJsonSchema;
+  Result.AddPair('format', GetFormat);
 end;
+
+{ TJsonFieldDate }
+
+function TJsonFieldDate.GetFormat: string;
+begin
+  Result := c_DateFormat;
+end;
+
+{ TJsonFieldTime }
+
+function TJsonFieldTime.GetFormat: string;
+begin
+  Result := c_TimeFormat;
+end;
+
+initialization
+  RegisterClass(TJsonFieldDateTime);
+  RegisterClass(TJsonFieldDate);
+  RegisterClass(TJsonFieldTime);
 
 end.

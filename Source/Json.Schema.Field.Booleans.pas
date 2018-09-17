@@ -20,65 +20,24 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Doc.Path.Operation.ResponseHeaders;
+unit Json.Schema.Field.Booleans;
 
 interface
 
 uses
-  System.SysUtils,
-  System.Json;
+  Json.Schema.Field,
+  Json.Schema.Common.Types;
 
 type
-  /// <summary>
-  /// Lists the headers that can be sent as part of a response.
-  /// </summary>
-  TSwagHeaders = class(TObject)
-  private
-    fName: string;
-    fDescription: string;
-    fType: string;
-  public
-    function GenerateJsonObject: TJSONObject;
-    procedure Load(pJson : TJSONObject);
-
-    /// <summary>
-    /// A header name alias.
-    /// </summary>
-    property Name: string read fName write fName;
-
-    /// <summary>
-    /// A short description of the header.
-    /// </summary>
-    property Description: string read fDescription write fDescription;
-
-    /// <summary>
-    /// Required. The type of the object. The value MUST be one of "string", "number", "integer", "boolean", or "array".
-    /// </summary>
-    property ValueType: string read fType write fType;
-  end;
+  [ASchemaType(skBoolean)]
+  TJsonFieldBoolean = class(TJsonField);
 
 implementation
 
-{ TSwagHeaders }
+uses
+  System.Classes;
 
-function TSwagHeaders.GenerateJsonObject: TJSONObject;
-var
-  vJsonObject: TJsonObject;
-begin
-  vJsonObject := TJSONObject.Create;
-  if fDescription.Length > 0 then
-    vJsonObject.AddPair('description', fDescription);
-  if fType.Length > 0 then
-    vJsonObject.AddPair('type', fType);
-  Result := vJsonObject;
-end;
-
-procedure TSwagHeaders.Load(pJson: TJSONObject);
-begin
-  if Assigned(pJson.Values['description']) then
-    fDescription := pJson.Values['description'].Value;
-  if Assigned(pJson.Values['type']) then
-    fType := pJson.Values['type'].Value;
-end;
+initialization
+  RegisterClass(TJsonFieldBoolean);
 
 end.

@@ -32,6 +32,15 @@ uses
   Swag.Doc.Definition;
 
 type
+  /// <summary>
+  /// Describes a single response from an API Operation.
+  /// A container for the expected responses of an operation.
+  /// The container maps a HTTP response code to the expected response.
+  /// It is not expected from the documentation to necessarily cover all possible HTTP response codes, since they may not be
+  /// known in advance. However, it is expected from the documentation to cover a successful operation response and any known errors.
+  /// The default can be used as the default response object for all HTTP codes that are not covered individually by the specification.
+  /// The Responses Object MUST contain at least one response code, and it SHOULD be the response for a successful operation call.
+  /// </summary>
   TSwagResponse = class(TObject)
   private
     fStatusCode: TSwagStatusCode;
@@ -48,10 +57,35 @@ type
     function GenerateJsonObject: TJSONObject;
     procedure Load(pJson : TJSONObject);
 
+    /// <summary>
+    /// Any HTTP status code can be used as the property name (one property per HTTP status code).
+    /// Describes the expected response for that HTTP status code.
+    /// Reference Object can be used to link to a response that is defined at the Swagger Object's responses section.
+    /// </summary>
     property StatusCode: TSwagStatusCode read fStatusCode write fStatusCode;
+
+    /// <summary>
+    /// Required. A short description of the response. GFM syntax can be used for rich text representation.
+    /// </summary>
     property Description: string read fDescription write fDescription;
+
+    /// <summary>
+    /// A definition of the response structure.
+    /// It can be a primitive, an array or an object.
+    /// If this field does not exist, it means no content is returned as part of the response.
+    /// As an extension to the Schema Object, its root type value may also be "file".
+    /// This SHOULD be accompanied by a relevant produces mime-type.
+    /// </summary>
     property Schema: TSwagDefinition read fSchema;
+
+    /// <summary>
+    /// A list of headers that are sent with the response.
+    /// </summary>
     property Headers : TObjectList<TSwagHeaders> read fHeaders;
+
+    /// <summary>
+    /// An example list of the json response message.
+    /// </summary>
     property Examples: TDictionary<TSwagJsonExampleDescription, TJSONObject> read fExamples;
   end;
 

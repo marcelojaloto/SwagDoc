@@ -20,65 +20,85 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Doc.Path.Operation.ResponseHeaders;
+unit Json.Commom.Helpers;
 
 interface
 
 uses
-  System.SysUtils,
-  System.Json;
+  System.JSON;
 
 type
-  /// <summary>
-  /// Lists the headers that can be sent as part of a response.
-  /// </summary>
-  TSwagHeaders = class(TObject)
-  private
-    fName: string;
-    fDescription: string;
-    fType: string;
+  TJSONAncestorHelper = class helper for TJSONAncestor
   public
-    function GenerateJsonObject: TJSONObject;
-    procedure Load(pJson : TJSONObject);
+    function Format: string;
+  end;
 
-    /// <summary>
-    /// A header name alias.
-    /// </summary>
-    property Name: string read fName write fName;
-
-    /// <summary>
-    /// A short description of the header.
-    /// </summary>
-    property Description: string read fDescription write fDescription;
-
-    /// <summary>
-    /// Required. The type of the object. The value MUST be one of "string", "number", "integer", "boolean", or "array".
-    /// </summary>
-    property ValueType: string read fType write fType;
+  TJsonObjectHelper = class helper for TJsonObject
+  public
+    procedure AddPair(const pName: string; const pValue: Extended); overload;
   end;
 
 implementation
 
-{ TSwagHeaders }
+{ TJSONAncestorHelper }
 
-function TSwagHeaders.GenerateJsonObject: TJSONObject;
+function TJSONAncestorHelper.Format: string;
 var
-  vJsonObject: TJsonObject;
+  vJsonString: string;
+  vChar: Char;
+  vEOL: string;
+  vIndent: string;
+  vLeftIndent: string;
+  vIsEOL: Boolean;
+  vIsInString: Boolean;
+  vIsEscape: Boolean;
 begin
-  vJsonObject := TJSONObject.Create;
-  if fDescription.Length > 0 then
-    vJsonObject.AddPair('description', fDescription);
-  if fType.Length > 0 then
-    vJsonObject.AddPair('type', fType);
-  Result := vJsonObject;
+  vEOL := #13#10;
+  vIndent := '  ';
+  vIsEOL := true;
+  vIsInString := false;
+  vIsEscape := false;
+  vJsonString := Self.ToString;
+  for vChar in vJsonString do
+  begin
+    if not vIsInString and ((vChar = '{') or (vChar = '[')) then
+    begin
+      if not vIsEOL then
+        Result := Result + vEOL;
+      Result := Result + vLeftIndent + vChar + vEOL;
+      vLeftIndent := vLeftIndent + vIndent;
+      Result := Result + vLeftIndent;
+      vIsEOL := true;
+    end
+    else if not vIsInString and (vChar = ',') then
+    begin
+      vIsEOL := false;
+      Result := Result + vChar + vEOL + vLeftIndent;
+    end
+    else if not vIsInString and ((vChar = '}') or (vChar = ']')) then
+    begin
+      Delete(vLeftIndent, 1, Length(vIndent));
+      if not vIsEOL then
+        Result := Result + vEOL;
+      Result := Result + vLeftIndent + vChar + vEOL;
+      vIsEOL := true;
+    end
+    else
+    begin
+      vIsEOL := false;
+      Result := Result + vChar;
+    end;
+    vIsEscape := (vChar = '\') and not vIsEscape;
+    if not vIsEscape and (vChar = '"') then
+      vIsInString := not vIsInString;
+  end;
 end;
 
-procedure TSwagHeaders.Load(pJson: TJSONObject);
+{ TJsonObjectHelper }
+
+procedure TJsonObjectHelper.AddPair(const pName: string; const pValue: Extended);
 begin
-  if Assigned(pJson.Values['description']) then
-    fDescription := pJson.Values['description'].Value;
-  if Assigned(pJson.Values['type']) then
-    fType := pJson.Values['type'].Value;
+  Self.AddPair(pName, TJsonNumber.Create(pValue));
 end;
 
 end.

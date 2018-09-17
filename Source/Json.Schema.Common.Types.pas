@@ -20,65 +20,56 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Doc.Path.Operation.ResponseHeaders;
+unit Json.Schema.Common.Types;
 
 interface
 
-uses
-  System.SysUtils,
-  System.Json;
-
 type
-  /// <summary>
-  /// Lists the headers that can be sent as part of a response.
-  /// </summary>
-  TSwagHeaders = class(TObject)
-  private
-    fName: string;
-    fDescription: string;
-    fType: string;
+  TSchemaKind = (skUnknown, skInteger, skInt64, skDouble, skDateTime, skDate, skTime, skEnumeration, skBoolean,
+     skObject, skArray, skString, skChar, skGuid);
+
+  ASchemaType = class(TCustomAttribute)
+  strict private
+    fKind: TSchemaKind;
+
+    const c_SchemaTypeBoolean = 'boolean';
+    const c_SchemaTypeInteger = 'integer';
+    const c_SchemaTypeDouble = 'double';
+    const c_SchemaTypeString = 'string';
+    const c_SchemaTypeArray = 'array';
+    const c_SchemaTypeObject = 'object';
+
+    function GetName: string;
   public
-    function GenerateJsonObject: TJSONObject;
-    procedure Load(pJson : TJSONObject);
-
-    /// <summary>
-    /// A header name alias.
-    /// </summary>
-    property Name: string read fName write fName;
-
-    /// <summary>
-    /// A short description of the header.
-    /// </summary>
-    property Description: string read fDescription write fDescription;
-
-    /// <summary>
-    /// Required. The type of the object. The value MUST be one of "string", "number", "integer", "boolean", or "array".
-    /// </summary>
-    property ValueType: string read fType write fType;
+    constructor Create(const pKind: TSchemaKind);
+    property Name: string read GetName;
+    property Kind: TSchemaKind read fKind;
   end;
 
 implementation
 
-{ TSwagHeaders }
+uses
+  System.SysUtils;
 
-function TSwagHeaders.GenerateJsonObject: TJSONObject;
-var
-  vJsonObject: TJsonObject;
+{ ASchemaType }
+
+constructor ASchemaType.Create(const pKind: TSchemaKind);
 begin
-  vJsonObject := TJSONObject.Create;
-  if fDescription.Length > 0 then
-    vJsonObject.AddPair('description', fDescription);
-  if fType.Length > 0 then
-    vJsonObject.AddPair('type', fType);
-  Result := vJsonObject;
+  inherited Create;
+  fKind := pKind;
 end;
 
-procedure TSwagHeaders.Load(pJson: TJSONObject);
+function ASchemaType.GetName: string;
 begin
-  if Assigned(pJson.Values['description']) then
-    fDescription := pJson.Values['description'].Value;
-  if Assigned(pJson.Values['type']) then
-    fType := pJson.Values['type'].Value;
+  Result := EmptyStr;
+  case fKind of
+    skInteger, skInt64, skEnumeration: Result := c_SchemaTypeInteger;
+    skDouble: Result := c_SchemaTypeDouble;
+    skString, skChar, skGuid, skDateTime, skDate, skTime: Result := c_SchemaTypeString;
+    skBoolean: Result := c_SchemaTypeBoolean;
+    skObject: Result := c_SchemaTypeObject;
+    skArray: Result := c_SchemaTypeArray;
+  end;
 end;
 
 end.

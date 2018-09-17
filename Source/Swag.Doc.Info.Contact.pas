@@ -28,6 +28,9 @@ uses
   System.JSON;
 
 type
+  /// <summary>
+  /// Contact information for the exposed API.
+  /// </summary>
   TSwagInfoContact = class(TObject)
   private
     fName: string;
@@ -38,8 +41,19 @@ type
     function IsEmpty: Boolean;
     procedure Load(pJson: TJSONObject);
 
+    /// <summary>
+    /// The identifying name of the contact person/organization.
+    /// </summary>
     property Name: string read fName write fName;
+
+    /// <summary>
+    /// The URL pointing to the contact information. MUST be in the format of a URL.
+    /// </summary>
     property Email: string read fEmail write fEmail;
+
+    /// <summary>
+    /// The email address of the contact person/organization. MUST be in the format of an email address.
+    /// </summary>
     property Url: string read fUrl write fUrl;
   end;
 

@@ -20,65 +20,77 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Doc.Path.Operation.ResponseHeaders;
+unit Json.Schema.Field.Arrays;
 
 interface
 
 uses
-  System.SysUtils,
-  System.Json;
+  System.Json,
+  Json.Schema.Field,
+  Json.Schema.Common.Types;
 
 type
-  /// <summary>
-  /// Lists the headers that can be sent as part of a response.
-  /// </summary>
-  TSwagHeaders = class(TObject)
-  private
-    fName: string;
-    fDescription: string;
-    fType: string;
+  [ASchemaType(skArray)]
+  TJsonFieldArray = class(TJsonField)
+  strict private
+    fItemFieldType: TJsonField;
+    fMinLength: Integer;
+    fMaxLength: Integer;
   public
-    function GenerateJsonObject: TJSONObject;
-    procedure Load(pJson : TJSONObject);
+    constructor Create; reintroduce;
+    destructor Destroy; override;
 
-    /// <summary>
-    /// A header name alias.
-    /// </summary>
-    property Name: string read fName write fName;
+    function Clone: TJsonField; override;
+    function ToJsonSchema: TJsonObject; override;
 
-    /// <summary>
-    /// A short description of the header.
-    /// </summary>
-    property Description: string read fDescription write fDescription;
-
-    /// <summary>
-    /// Required. The type of the object. The value MUST be one of "string", "number", "integer", "boolean", or "array".
-    /// </summary>
-    property ValueType: string read fType write fType;
+    property ItemFieldType: TJsonField read fItemFieldType write fItemFieldType;
+    property MinLength: Integer read fMinLength write fMinLength;
+    property MaxLength: Integer read fMaxLength write fMaxLength;
   end;
 
 implementation
 
-{ TSwagHeaders }
+uses
+  System.Classes,
+  Json.Commom.Helpers;
 
-function TSwagHeaders.GenerateJsonObject: TJSONObject;
-var
-  vJsonObject: TJsonObject;
+{ TJsonFieldArray }
+
+function TJsonFieldArray.Clone: TJsonField;
 begin
-  vJsonObject := TJSONObject.Create;
-  if fDescription.Length > 0 then
-    vJsonObject.AddPair('description', fDescription);
-  if fType.Length > 0 then
-    vJsonObject.AddPair('type', fType);
-  Result := vJsonObject;
+  Result := inherited Clone;
+  TJsonFieldArray(Result).MinLength := Self.MinLength;
+  TJsonFieldArray(Result).MaxLength := Self.MaxLength;
+  TJsonFieldArray(Result).ItemFieldType := Self.ItemFieldType.Clone;
 end;
 
-procedure TSwagHeaders.Load(pJson: TJSONObject);
+constructor TJsonFieldArray.Create;
 begin
-  if Assigned(pJson.Values['description']) then
-    fDescription := pJson.Values['description'].Value;
-  if Assigned(pJson.Values['type']) then
-    fType := pJson.Values['type'].Value;
+  inherited Create;
+  fItemFieldType := nil;
+  fMinLength := 0;
+  fMaxLength := 0;
 end;
+
+destructor TJsonFieldArray.Destroy;
+begin
+  if Assigned(fItemFieldType) then
+    fItemFieldType.Free;
+  inherited Destroy;
+end;
+
+function TJsonFieldArray.ToJsonSchema: TJsonObject;
+begin
+  Result := inherited ToJsonSchema;
+  if Assigned(fItemFieldType) then
+    Result.AddPair('items', fItemFieldType.ToJsonSchema);
+  if (fMinLength > 0) then
+    Result.AddPair('minLength', fMinLength);
+  if (fMaxLength > 0) then
+    Result.AddPair('maxLength', fMaxLength);
+end;
+
+initialization
+  RegisterClass(TJsonFieldArray);
 
 end.

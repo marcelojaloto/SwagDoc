@@ -32,6 +32,9 @@ uses
 type
   TSwagSecurityDefinitionApiKeyInLocation = (kilNotDefined, kilQuery, kilHeader);
 
+  /// <summary>
+  /// The security scheme object API key (either as a header or as a query parameter)
+  /// </summary>
   TSwagSecurityDefinitionApiKey = class(TSwagSecurityDefinition)
   private
     fName: string;
@@ -42,7 +45,14 @@ type
   public
     function GenerateJsonObject: TJSONObject; override;
 
+    /// <summary>
+    /// Required The location of the API key. Valid values are "query" or "header".
+    /// </summary>
     property InLocation: TSwagSecurityDefinitionApiKeyInLocation read fInLocation write fInLocation;
+
+    /// <summary>
+    /// Required. The name of the header or query parameter to be used.
+    /// </summary>
     property Name: string read fName write fName;
   end;
 

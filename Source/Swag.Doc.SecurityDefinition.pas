@@ -29,6 +29,10 @@ uses
   Swag.Common.Types;
 
 type
+  /// <summary>
+  /// A declaration of the security schemes available to be used in the specification.
+  /// This does not enforce the security schemes on the operations and only serves to provide the relevant details for each scheme.
+  /// </summary>
   TSwagSecurityDefinition = class abstract(TObject)
   protected
     fSchemaName: TSwagSecuritySchemaName;
@@ -39,8 +43,19 @@ type
   public
     function GenerateJsonObject: TJSONObject; virtual; abstract;
 
+    /// <summary>
+    /// A single security scheme definition, mapping a "name" to the scheme it defines.
+    /// </summary>
     property SchemaName: TSwagSecuritySchemaName read fSchemaName write fSchemaName;
+
+    /// <summary>
+    /// Required. The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
+    /// </summary>
     property TypeSecurity: TSwagSecurityDefinitionType read GetTypeSecurity;
+
+    /// <summary>
+    /// A short description for security scheme.
+    /// </summary>
     property Description: string read fDescription write fDescription;
   end;
 

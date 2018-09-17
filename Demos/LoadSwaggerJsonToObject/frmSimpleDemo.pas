@@ -45,8 +45,6 @@ uses
   System.IOUtils;
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
-var
-  vFullFilename : String;
 begin
   fSwagDoc.LoadFromFile('flickr.json');
 
