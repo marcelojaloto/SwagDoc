@@ -128,7 +128,7 @@ begin
   case vTypeInfo^.Kind of
     tkClass: Result := skObject;
     tkArray: Result := skArray;
-    tkString, tkChar: Result := skString;
+    tkString, tkUString, tkChar: Result := skString;
     tkRecord:
     begin
       if (LowerCase(string(vTypeInfo^.Name)) = 'tguid') then
