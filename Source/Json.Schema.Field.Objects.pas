@@ -40,7 +40,7 @@ type
     function GetField(const pFieldIndex: Integer): TJsonField;
     function GetFieldByName(const pName: string): TJsonField;
   public
-    constructor Create; reintroduce;
+    constructor Create; override;
     destructor Destroy; override;
 
     procedure AddField(pJsonField: TJsonField);

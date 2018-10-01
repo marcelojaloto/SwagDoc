@@ -36,7 +36,7 @@ type
     fMinLength: Integer;
     fMaxLength: Integer;
   public
-    constructor Create; reintroduce;
+    constructor Create; override;
     function ToJsonSchema: TJsonObject; override;
     function Clone: TJsonField; override;
 

@@ -37,7 +37,7 @@ type
     fMinLength: Integer;
     fMaxLength: Integer;
   public
-    constructor Create; reintroduce;
+    constructor Create; override;
     destructor Destroy; override;
 
     function Clone: TJsonField; override;

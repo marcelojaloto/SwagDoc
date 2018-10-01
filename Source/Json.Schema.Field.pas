@@ -44,6 +44,8 @@ type
 
     property TypeName: string read GetTypeName;
   public
+    constructor Create; reintroduce; virtual;
+
     function ToJsonSchema: TJsonObject; virtual;
     function Clone: TJsonField; virtual;
 
@@ -63,11 +65,16 @@ uses
 
 function TJsonField.Clone: TJsonField;
 begin
-  Result := TJsonField(FindClass(Self.ClassName).Create);
+  Result := TJsonField(TJsonFieldClass(FindClass(Self.ClassName)).Create);
   Result.Name := Self.fName;
   Result.Description := Self.fDescription;
   Result.Required := Self.fRequired;
   Result.Nullable := Self.fNullable;
+end;
+
+constructor TJsonField.Create;
+begin
+  inherited Create;
 end;
 
 function TJsonField.GetTypeName: string;
