@@ -49,7 +49,8 @@ type
     function ToJson: TJsonObject;
     function Clone: TJsonSchema; overload;
     function Clone(pSourceField: TJsonSchema): TJsonSchema; overload;
-    function AddField<T>(const pName: string; const pDescription: string = ''): TJsonField;
+    function AddField<T>(const pName: string; const pDescription: string = ''): TJsonField; overload;
+    function AddField(pSchemaObject: TJsonSchema): TJsonField; overload;
 
     property Root: TJsonFieldObject read fRoot;
   end;
@@ -160,6 +161,12 @@ end;
 function TJsonSchema.Clone: TJsonSchema;
 begin
   Result := Self.Clone(Self);
+end;
+
+function TJsonSchema.AddField(pSchemaObject: TJsonSchema): TJsonField;
+begin
+  Result := pSchemaObject.Root.Clone;
+  Self.Root.AddField(Result);
 end;
 
 function TJsonSchema.AddField<T>(const pName: string; const pDescription: string = ''): TJsonField;
