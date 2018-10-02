@@ -12,6 +12,9 @@
         <Projects Include="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Demos\SampleApi\SampleApi.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -47,14 +50,23 @@
     <Target Name="SwagDocDemo:Make">
         <MSBuild Projects="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj" Targets="Make"/>
     </Target>
+    <Target Name="SampleApi">
+        <MSBuild Projects="Demos\SampleApi\SampleApi.dproj"/>
+    </Target>
+    <Target Name="SampleApi:Clean">
+        <MSBuild Projects="Demos\SampleApi\SampleApi.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SampleApi:Make">
+        <MSBuild Projects="Demos\SampleApi\SampleApi.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="SwagDoc;GenerateSwagger;SwagDocDemo"/>
+        <CallTarget Targets="SwagDoc;GenerateSwagger;SwagDocDemo;SampleApi"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="SwagDoc:Clean;GenerateSwagger:Clean;SwagDocDemo:Clean"/>
+        <CallTarget Targets="SwagDoc:Clean;GenerateSwagger:Clean;SwagDocDemo:Clean;SampleApi:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="SwagDoc:Make;GenerateSwagger:Make;SwagDocDemo:Make"/>
+        <CallTarget Targets="SwagDoc:Make;GenerateSwagger:Make;SwagDocDemo:Make;SampleApi:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
