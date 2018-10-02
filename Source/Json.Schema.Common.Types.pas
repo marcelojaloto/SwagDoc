@@ -25,7 +25,7 @@ unit Json.Schema.Common.Types;
 interface
 
 type
-  TSchemaKind = (skUnknown, skInteger, skInt64, skDouble, skDateTime, skDate, skTime, skEnumeration, skBoolean,
+  TSchemaKind = (skUnknown, skInteger, skInt64, skNumber, skDateTime, skDate, skTime, skEnumeration, skBoolean,
      skObject, skArray, skString, skChar, skGuid);
 
   ASchemaType = class(TCustomAttribute)
@@ -34,7 +34,7 @@ type
 
     const c_SchemaTypeBoolean = 'boolean';
     const c_SchemaTypeInteger = 'integer';
-    const c_SchemaTypeDouble = 'double';
+    const c_SchemaTypeNumber = 'number';
     const c_SchemaTypeString = 'string';
     const c_SchemaTypeArray = 'array';
     const c_SchemaTypeObject = 'object';
@@ -64,7 +64,7 @@ begin
   Result := EmptyStr;
   case fKind of
     skInteger, skInt64, skEnumeration: Result := c_SchemaTypeInteger;
-    skDouble: Result := c_SchemaTypeDouble;
+    skNumber: Result := c_SchemaTypeNumber;
     skString, skChar, skGuid, skDateTime, skDate, skTime: Result := c_SchemaTypeString;
     skBoolean: Result := c_SchemaTypeBoolean;
     skObject: Result := c_SchemaTypeObject;

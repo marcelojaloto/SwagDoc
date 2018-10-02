@@ -102,7 +102,7 @@ begin
     end;
     skInteger: Result := TJsonFieldInteger;
     skInt64: Result := TJsonFieldInt64;
-    skDouble: Result := TJsonFieldDouble;
+    skNumber: Result := TJsonFieldNumber;
     skDateTime: Result := TJsonFieldDateTime;
     skDate: Result := TJsonFieldDate;
     skTime: Result := TJsonFieldTime;
@@ -153,7 +153,7 @@ begin
       else if (LowerCase(string(vTypeInfo^.Name)) = 'ttime') then
         Result := skTime
       else
-        Result := skDouble;
+        Result := skNumber;
     end;
   end;
 end;

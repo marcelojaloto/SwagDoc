@@ -62,8 +62,8 @@ type
   [ASchemaType(skInteger)]
   TJsonFieldInteger = class(TJsonFieldNumber<Integer>);
 
-  [ASchemaType(skDouble)]
-  TJsonFieldDouble = class(TJsonFieldNumber<Double>);
+  [ASchemaType(skNumber)]
+  TJsonFieldNumber = class(TJsonFieldNumber<Double>);
 
 implementation
 
@@ -133,6 +133,6 @@ end;
 initialization
   RegisterClass(TJsonFieldInt64);
   RegisterClass(TJsonFieldInteger);
-  RegisterClass(TJsonFieldDouble);
+  RegisterClass(TJsonFieldNumber);
 
 end.
