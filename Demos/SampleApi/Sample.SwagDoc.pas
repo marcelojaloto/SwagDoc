@@ -88,11 +88,6 @@ begin
   fSwagDoc.Info.License.Url := 'http://www.apache.org/licenses/LICENSE-2.0';
 end;
 
-procedure TSampleApiSwagDocBuilder.PopulateApiRoutes;
-begin
-  DocumentsPostEmployee;
-end;
-
 procedure TSampleApiSwagDocBuilder.PopulateApiSettings;
 begin
   fSwagDoc.Host := 'localhost';
@@ -129,6 +124,11 @@ end;
 procedure TSampleApiSwagDocBuilder.SetDeployFolder(const Value: string);
 begin
   fDeployFolder := Value;
+end;
+
+procedure TSampleApiSwagDocBuilder.PopulateApiRoutes;
+begin
+  DocumentsPostEmployee;
 end;
 
 procedure TSampleApiSwagDocBuilder.DocumentsPostEmployee;

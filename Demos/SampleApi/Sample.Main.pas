@@ -42,9 +42,7 @@ type
   TForm1 = class(TForm)
     Button1: TButton;
     Memo1: TMemo;
-    Button2: TButton;
     procedure Button1Click(Sender: TObject);
-    procedure Button2Click(Sender: TObject);
   private
     { Private declarations }
   public
@@ -72,12 +70,6 @@ begin
   finally
     vSampleDocApi.Free;
   end;
-
-end;
-
-procedure TForm1.Button2Click(Sender: TObject);
-begin
- showmessage(IncludeTrailingPathDelimiter(ExtractFilePath(ParamStr(0))));
 end;
 
 initialization
