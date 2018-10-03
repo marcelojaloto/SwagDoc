@@ -21,7 +21,8 @@ interface
 
 uses
   System.JSON,
-  Json.Schema;
+  Json.Schema,
+  Swag.Doc;
 
 type
   TFakeApiEmployee = class(TObject)
@@ -29,13 +30,18 @@ type
     fRequestSchema: TJsonSchema;
     fResponseSchema: TJsonSchema;
 
+    const c_EmployeeTagName = 'Employee';
+    const c_EmployeeSchemaNameResponse = 'employeeResponse';
+    const c_EmployeeSchemaNameRequest = 'employeeRequest';
+
     procedure DefineRequestSchemaSettings;
     procedure DefineResponseSchemaSettings;
+
+    procedure DocumentPostEmployee(pSwagDoc: TSwagDoc);
+    procedure DocumentSchemas(pSwagDoc: TSwagDoc; const pSchemaName: string; pJsonSchema: TJsonObject);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
-
-    function Lixo: TJsonObject;
 
     {procedure Post;
     procedure GetAll;
@@ -43,14 +49,19 @@ type
     procedure Put(const pId: Int64);
     procedure Delete(const pId: Int64); }
 
-    property RequestSchema: TJsonSchema read fRequestSchema;
-    property ResponseSchema: TJsonSchema read fResponseSchema;
+    procedure DocumentApi(pSwagDoc: TSwagDoc);
   end;
 
 implementation
 
 uses
-  Json.Schema.Field.Strings;
+  Json.Schema.Field.Strings,
+  Swag.Common.Types,
+  Swag.Doc.Definition,
+  Swag.Doc.Path,
+  Swag.Doc.Path.Operation,
+  Swag.Doc.Path.Operation.RequestParameter,
+  Swag.Doc.Path.Operation.Response;
 
 { TApiEmployee }
 
@@ -70,9 +81,59 @@ begin
   inherited Destroy;
 end;
 
-function TFakeApiEmployee.Lixo: TJsonObject;
+procedure TFakeApiEmployee.DocumentApi(pSwagDoc: TSwagDoc);
 begin
-  Result := fResponseSchema.ToJson;
+  DocumentSchemas(pSwagDoc, c_EmployeeSchemaNameRequest, fRequestSchema.ToJson);
+  DocumentSchemas(pSwagDoc, c_EmployeeSchemaNameResponse, fResponseSchema.ToJson);
+
+  DocumentPostEmployee(pSwagDoc);
+end;
+
+procedure TFakeApiEmployee.DocumentPostEmployee(pSwagDoc: TSwagDoc);
+var
+  vRoute: TSwagPath;
+  vPost: TSwagPathOperation;
+  vBody: TSwagRequestParameter;
+  vResponse: TSwagResponse;
+begin
+  vRoute := TSwagPath.Create;
+  vRoute.Uri := '/employees';
+
+  vPost := TSwagPathOperation.Create;
+  vPost.Operation := ohvPost;
+  vPost.OperationId := '{C450E1E0-341D-4947-A156-9C167BE021D5}';
+  vPost.Description := 'Creates a employees.';
+
+  vBody := TSwagRequestParameter.Create;
+  vBody.Name := 'employeeObject';
+  vBody.InLocation := rpiBody;
+  vBody.Required := True;
+  vBody.Schema.Name := c_EmployeeSchemaNameRequest;
+  vPost.Parameters.Add(vBody);
+
+  vResponse := TSwagResponse.Create;
+  vResponse.StatusCode := '201';
+  vResponse.Description := 'Successfully retrieved data';
+  vResponse.Schema.Name := c_EmployeeSchemaNameResponse;
+
+  vPost.Responses.Add('201', vResponse);
+
+  vPost.Tags.Add(c_EmployeeTagName);
+
+  vRoute.Operations.Add(vPost);
+
+  pSwagDoc.Paths.Add(vRoute);
+end;
+
+procedure TFakeApiEmployee.DocumentSchemas(pSwagDoc: TSwagDoc; const pSchemaName: string; pJsonSchema: TJsonObject);
+var
+  vDefinition: TSwagDefinition;
+begin
+  vDefinition := TSwagDefinition.Create;
+  vDefinition.Name := pSchemaName;
+  vDefinition.JsonSchema := pJsonSchema;
+
+  pSwagDoc.Definitions.Add(vDefinition);
 end;
 
 procedure TFakeApiEmployee.DefineRequestSchemaSettings;
@@ -108,12 +169,17 @@ begin
 end;
 
 procedure TFakeApiEmployee.DefineResponseSchemaSettings;
+var
+  vEmployeeSchema: TJsonSchema;
 begin
+  vEmployeeSchema := TJsonSchema.Create;
+  vEmployeeSchema.Root.Name := 'employee';
+  vEmployeeSchema.Root.Description := 'Employee request data';
+  vEmployeeSchema.AddField<Int64>('id', 'The employee identification code.');
+  vEmployeeSchema.Root.CopyFields(fRequestSchema.Root);
+
   fResponseSchema := TJsonSchema.Create;
-  fResponseSchema.Root.Name := 'employee';
-  fResponseSchema.Root.Description := 'Employee request data';
-  fResponseSchema.AddField<Int64>('id', 'The employee identification code.');
-  fResponseSchema.Root.CopyFields(fRequestSchema.Root);
+  fResponseSchema.AddField(vEmployeeSchema);
 end;
 
 end.

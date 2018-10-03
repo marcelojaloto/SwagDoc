@@ -1,9 +1,9 @@
 object Form1: TForm1
   Left = 0
   Top = 0
-  Caption = 'Form1'
-  ClientHeight = 288
-  ClientWidth = 416
+  Caption = 'Sample Api with Documetation Swagger using SwagDoc'
+  ClientHeight = 685
+  ClientWidth = 605
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
@@ -21,11 +21,11 @@ object Form1: TForm1
     Anchors = [akLeft, akTop, akRight, akBottom]
     Position.X = 16.000000000000000000
     Position.Y = 40.000000000000000000
-    Size.Width = 385.000000000000000000
-    Size.Height = 233.000000000000000000
+    Size.Width = 574.000000000000000000
+    Size.Height = 630.000000000000000000
     Size.PlatformDefault = False
     TabOrder = 2
-    Viewport.Width = 381.000000000000000000
-    Viewport.Height = 229.000000000000000000
+    Viewport.Width = 570.000000000000000000
+    Viewport.Height = 626.000000000000000000
   end
 end

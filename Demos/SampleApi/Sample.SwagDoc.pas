@@ -28,13 +28,11 @@ type
     fSwagDoc: TSwagDoc;
     fDeployFolder: string;
 
-    const c_EmployeeSchemaName = 'Employee';
-
     procedure PopulateApiInfo;
     procedure PopulateApiSettings;
-    procedure PopulateSchemaDefinition;
-    procedure PopulateApiRoutes;
-    procedure DocumentsPostEmployee;
+    procedure PopulateApi;
+    procedure PopulateApiEmployee;
+
     procedure SaveSwaggerJson;
   private
     procedure SetDeployFolder(const Value: string);
@@ -46,12 +44,8 @@ type
 implementation
 
 uses
+  Json.Commom.Helpers,
   Swag.Common.Types,
-  Swag.Doc.Definition,
-  Swag.Doc.Path,
-  Swag.Doc.Path.Operation,
-  Swag.Doc.Path.Operation.RequestParameter,
-  Swag.Doc.Path.Operation.Response,
   Sample.Api.Employee;
 
 { TSampleApiSwagDocBuilder }
@@ -62,14 +56,13 @@ begin
   try
     PopulateApiInfo;
     PopulateApiSettings;
-    PopulateSchemaDefinition;
-    PopulateApiRoutes;
+    PopulateApi;
 
     fSwagDoc.GenerateSwaggerJson;
 
     SaveSwaggerJson;
 
-    Result := fSwagDoc.SwaggerJson.ToString;
+    Result := fSwagDoc.SwaggerJson.Format;
   finally
     fSwagDoc.Free;
   end;
@@ -99,17 +92,18 @@ begin
   fSwagDoc.Schemes := [tpsHttp];
 end;
 
-procedure TSampleApiSwagDocBuilder.PopulateSchemaDefinition;
+procedure TSampleApiSwagDocBuilder.PopulateApi;
+begin
+  PopulateApiEmployee;
+end;
+
+procedure TSampleApiSwagDocBuilder.PopulateApiEmployee;
 var
-  vDefEmployee: TSwagDefinition;
   vApiEmployee: TFakeApiEmployee;
 begin
   vApiEmployee := TFakeApiEmployee.Create;
   try
-    vDefEmployee := TSwagDefinition.Create;
-    vDefEmployee.Name := c_EmployeeSchemaName;
-    vDefEmployee.JsonSchema := vApiEmployee.RequestSchema.ToJson;
-    fSwagDoc.Definitions.Add(vDefEmployee);
+    vApiEmployee.DocumentApi(fSwagDoc);
   finally
     vApiEmployee.Free;
   end;
@@ -125,46 +119,5 @@ procedure TSampleApiSwagDocBuilder.SetDeployFolder(const Value: string);
 begin
   fDeployFolder := Value;
 end;
-
-procedure TSampleApiSwagDocBuilder.PopulateApiRoutes;
-begin
-  DocumentsPostEmployee;
-end;
-
-procedure TSampleApiSwagDocBuilder.DocumentsPostEmployee;
-var
-  vRoute: TSwagPath;
-  vPost: TSwagPathOperation;
-  vBody: TSwagRequestParameter;
-  vResponse: TSwagResponse;
-begin
-  vRoute := TSwagPath.Create;
-  vRoute.Uri := '/employees';
-
-  vPost := TSwagPathOperation.Create;
-  vPost.Operation := ohvPost;
-  vPost.OperationId := '{C450E1E0-341D-4947-A156-9C167BE021D5}';
-  vPost.Description := 'Creates a employees.';
-
-  vBody := TSwagRequestParameter.Create;
-  vBody.Name := 'employeeObject';
-  vBody.InLocation := rpiBody;
-  vBody.Required := True;
-  vBody.Schema.Name := c_EmployeeSchemaName;
-  vPost.Parameters.Add(vBody);
-
-  vResponse := TSwagResponse.Create;
-  vResponse.StatusCode := '201';
-  vResponse.Description := 'Successfully retrieved data';
-  vResponse.Schema.Name := c_EmployeeSchemaName;
-  vPost.Responses.Add('201', vResponse);
-
-  vPost.Tags.Add(c_EmployeeSchemaName);
-
-  vRoute.Operations.Add(vPost);
-
-  fSwagDoc.Paths.Add(vRoute);
-end;
-
 
 end.
