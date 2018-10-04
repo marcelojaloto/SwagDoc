@@ -271,8 +271,6 @@ begin
   vJsonObject.AddPair(c_Swagger, GetSwaggerVersion);
   vJsonObject.AddPair(c_SwagInfo, fInfo.GenerateJsonObject);
 
-
-
   if not fHost.IsEmpty then
     vJsonObject.AddPair(c_SwagHost, fHost);
   vJsonObject.AddPair(c_SwagBasePath, fBasePath);
