@@ -33,15 +33,19 @@ type
     const c_EmployeeTagName = 'Employee';
     const c_EmployeeSchemaName = 'employee';
     const c_EmployeeSchemaNameResponse = 'employeeResponse';
+    const c_ParameterEmployeeId = 'employeeId';
 
     procedure DefineEmployeeSchemaSettings;
     procedure DefineResponseSchemaSettings;
 
     procedure DocumentPostEmployee(pSwagDoc: TSwagDoc);
+    procedure DocumentDeleteEmployee(pSwagDoc: TSwagDoc);
+
     procedure DocumentSchemas(pSwagDoc: TSwagDoc; const pSchemaName: string; pJsonSchema: TJsonObject);
 
+    function DefineRequestParameterEmployeeIdSettings: TObject;
     function DefineRequestBodySettings: TObject;
-    function DefineResponseSettings(const pStatusCode, pDescription: string): TObject;
+    function DefineResponseSettings(const pStatusCode, pDescription: string; pJsonSchema: TJsonObject): TObject;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -90,6 +94,32 @@ begin
   ///DocumentSchemas(pSwagDoc, c_EmployeeSchemaNameResponse, fResponseSchema.ToJson);
 
   DocumentPostEmployee(pSwagDoc);
+  DocumentDeleteEmployee(pSwagDoc);
+end;
+
+procedure TFakeApiEmployee.DocumentDeleteEmployee(pSwagDoc: TSwagDoc);
+var
+  vRoute: TSwagPath;
+  vDelete: TSwagPathOperation;
+  vRequest: TSwagRequestParameter;
+  vResponse: TSwagResponse;
+begin
+  vRequest := TSwagRequestParameter(DefineRequestParameterEmployeeIdSettings);
+  vResponse := TSwagResponse(DefineResponseSettings('204', 'Successfully deletes data', nil));
+
+  vDelete := TSwagPathOperation.Create;
+  vDelete.Operation := ohvDelete;
+  vDelete.OperationId := '{F47F38F3-2B99-4481-AFDD-ECD89893FEA0}';
+  vDelete.Description := 'Deletes a employees.';
+  vDelete.Parameters.Add(vRequest);
+  vDelete.Responses.Add('204', vResponse);
+  vDelete.Tags.Add(c_EmployeeTagName);
+
+  vRoute := TSwagPath.Create;
+  vRoute.Uri := '/employees/{' + c_ParameterEmployeeId + '}';
+  vRoute.Operations.Add(vDelete);
+
+  pSwagDoc.Paths.Add(vRoute);
 end;
 
 procedure TFakeApiEmployee.DocumentPostEmployee(pSwagDoc: TSwagDoc);
@@ -100,7 +130,8 @@ var
   vResponse: TSwagResponse;
 begin
   vRequest := TSwagRequestParameter(DefineRequestBodySettings);
-  vResponse := TSwagResponse(DefineResponseSettings('201', 'Successfully creates data'));
+  vResponse := TSwagResponse(
+    DefineResponseSettings('201', 'Successfully creates data', fResponseEmployeeSchema.ToJson));
 
   vPost := TSwagPathOperation.Create;
   vPost.Operation := ohvPost;
@@ -190,7 +221,20 @@ begin
   Result := vBody;
 end;
 
-function TFakeApiEmployee.DefineResponseSettings(const pStatusCode, pDescription: string): TObject;
+function TFakeApiEmployee.DefineRequestParameterEmployeeIdSettings: TObject;
+var
+  vParameter: TSwagRequestParameter;
+begin
+  vParameter := TSwagRequestParameter.Create;
+  vParameter.Name := c_ParameterEmployeeId;
+  vParameter.InLocation := rpiPath;
+  vParameter.Required := True;
+  vParameter.TypeParameter := 'integer';
+  Result := vParameter;
+end;
+
+function TFakeApiEmployee.DefineResponseSettings(const pStatusCode, pDescription: string;
+  pJsonSchema: TJsonObject): TObject;
 var
   vResponse: TSwagResponse;
 begin
@@ -198,7 +242,8 @@ begin
   vResponse.StatusCode := pStatusCode;
   vResponse.Description := pDescription;
   ///vResponse.Schema.Name := c_EmployeeSchemaNameResponse;
-  vResponse.Schema.JsonSchema := fResponseEmployeeSchema.ToJson;
+  if Assigned(pJsonSchema) then
+    vResponse.Schema.JsonSchema := pJsonSchema;
   Result := vResponse;
 end;
 
