@@ -37,6 +37,7 @@ type
     ///const c_EmployeeSchemaNameResponse = 'employeeResponse';
     const c_ParameterEmployeeId = 'employeeId';
 
+    function DocumentGetEmployee: TSwagPathOperation;
     function DocumentPostEmployee: TSwagPathOperation;
     function DocumentPutEmployee: TSwagPathOperation;
     function DocumentDeleteEmployee: TSwagPathOperation;
@@ -122,7 +123,8 @@ begin
   pSwagDoc.Paths.Add(vRoute);
 
   vRoute := CreatePath('/employees/{' + c_ParameterEmployeeId + '}',
-    [DocumentPutEmployee,
+    [DocumentGetEmployee,
+     DocumentPutEmployee,
      DocumentDeleteEmployee]);
   pSwagDoc.Paths.Add(vRoute);
 end;
@@ -165,6 +167,23 @@ begin
   finally
     vSchema.Free;
   end;
+end;
+
+function TFakeApiEmployee.DocumentGetEmployee: TSwagPathOperation;
+var
+  vResponse: TSwagResponse;
+  vResponseJson: TJsonObject;
+begin
+  vResponseJson := ExtractJsonFromSchema(DocumentEmployeeResponseSchema);
+  vResponse := CreateResponse('200', 'Successfully returns data', vResponseJson);
+
+  Result := TSwagPathOperation.Create;
+  Result.Operation := ohvGet;
+  Result.OperationId := '{2DDE05B6-C01A-4EB8-B7CD-2041C51C97C7}';
+  Result.Description := 'Returns a employees.';
+  Result.Parameters.Add(DocumentRequestParameterEmployeeId);
+  Result.Responses.Add('200', vResponse);
+  Result.Tags.Add(c_EmployeeTagName);
 end;
 
 function TFakeApiEmployee.DocumentPostEmployee: TSwagPathOperation;
