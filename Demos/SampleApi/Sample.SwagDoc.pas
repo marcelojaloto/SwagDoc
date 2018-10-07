@@ -28,10 +28,10 @@ type
     fSwagDoc: TSwagDoc;
     fDeployFolder: string;
 
-    procedure DefineApiInfo;
-    procedure DefineApiSettings;
-    procedure DefineApi;
-    procedure DefineApiEmployee;
+    procedure DocumentApiInfo;
+    procedure DocumentApiSettings;
+    procedure DocumentApi;
+    procedure DocumentApiEmployee;
 
     procedure SaveSwaggerJson;
   private
@@ -54,9 +54,9 @@ function TSampleApiSwagDocBuilder.Generate: string;
 begin
   fSwagDoc := TSwagDoc.Create;
   try
-    DefineApiInfo;
-    DefineApiSettings;
-    DefineApi;
+    DocumentApiInfo;
+    DocumentApiSettings;
+    DocumentApi;
     fSwagDoc.GenerateSwaggerJson;
     SaveSwaggerJson;
     Result := fSwagDoc.SwaggerJson.Format;
@@ -65,7 +65,7 @@ begin
   end;
 end;
 
-procedure TSampleApiSwagDocBuilder.DefineApiInfo;
+procedure TSampleApiSwagDocBuilder.DocumentApiInfo;
 begin
   fSwagDoc.Info.Title := 'Sample API';
   fSwagDoc.Info.Version := 'v1.0';
@@ -78,7 +78,7 @@ begin
   fSwagDoc.Info.License.Url := 'http://www.apache.org/licenses/LICENSE-2.0';
 end;
 
-procedure TSampleApiSwagDocBuilder.DefineApiSettings;
+procedure TSampleApiSwagDocBuilder.DocumentApiSettings;
 begin
   fSwagDoc.Host := 'localhost';
   fSwagDoc.BasePath := '/api';
@@ -89,12 +89,12 @@ begin
   fSwagDoc.Schemes := [tpsHttp];
 end;
 
-procedure TSampleApiSwagDocBuilder.DefineApi;
+procedure TSampleApiSwagDocBuilder.DocumentApi;
 begin
-  DefineApiEmployee;
+  DocumentApiEmployee;
 end;
 
-procedure TSampleApiSwagDocBuilder.DefineApiEmployee;
+procedure TSampleApiSwagDocBuilder.DocumentApiEmployee;
 var
   vApiEmployee: TFakeApiEmployee;
 begin
