@@ -129,21 +129,6 @@ begin
   pSwagDoc.Paths.Add(vRoute);
 end;
 
-function TFakeApiEmployee.DocumentDeleteEmployee: TSwagPathOperation;
-var
-  vResponse: TSwagResponse;
-begin
-  vResponse := CreateResponse('204', 'Successfully deletes data', nil);
-
-  Result := TSwagPathOperation.Create;
-  Result.Operation := ohvDelete;
-  Result.OperationId := '{F47F38F3-2B99-4481-AFDD-ECD89893FEA0}';
-  Result.Description := 'Deletes a employees.';
-  Result.Parameters.Add(DocumentRequestParameterEmployeeId);
-  Result.Responses.Add('204', vResponse);
-  Result.Tags.Add(c_EmployeeTagName);
-end;
-
 function TFakeApiEmployee.DocumentEmployeeResponseSchema: TJsonSchema;
 var
   vSchema: TJsonSchema;
@@ -180,7 +165,7 @@ begin
   Result := TSwagPathOperation.Create;
   Result.Operation := ohvGet;
   Result.OperationId := '{2DDE05B6-C01A-4EB8-B7CD-2041C51C97C7}';
-  Result.Description := 'Returns a employees.';
+  Result.Description := 'Returns a employee.';
   Result.Parameters.Add(DocumentRequestParameterEmployeeId);
   Result.Responses.Add('200', vResponse);
   Result.Tags.Add(c_EmployeeTagName);
@@ -197,7 +182,7 @@ begin
   Result := TSwagPathOperation.Create;
   Result.Operation := ohvPost;
   Result.OperationId := '{C450E1E0-341D-4947-A156-9C167BE021D5}';
-  Result.Description := 'Creates a employees.';
+  Result.Description := 'Creates a employee.';
   Result.Parameters.Add(DocumentRequestBodyEmployee);
   Result.Responses.Add('201', vResponse);
   Result.Tags.Add(c_EmployeeTagName);
@@ -214,10 +199,25 @@ begin
   Result := TSwagPathOperation.Create;
   Result.Operation := ohvPut;
   Result.OperationId := '{28E989FB-0225-40BD-A97E-8D1EA80D09AF}';
-  Result.Description := 'Updates a employees.';
+  Result.Description := 'Updates a employee.';
   Result.Parameters.Add(DocumentRequestParameterEmployeeId);
   Result.Parameters.Add(DocumentRequestBodyEmployee);
   Result.Responses.Add('200', vResponse);
+  Result.Tags.Add(c_EmployeeTagName);
+end;
+
+function TFakeApiEmployee.DocumentDeleteEmployee: TSwagPathOperation;
+var
+  vResponse: TSwagResponse;
+begin
+  vResponse := CreateResponse('204', 'Successfully deletes data', nil);
+
+  Result := TSwagPathOperation.Create;
+  Result.Operation := ohvDelete;
+  Result.OperationId := '{F47F38F3-2B99-4481-AFDD-ECD89893FEA0}';
+  Result.Description := 'Deletes a employee.';
+  Result.Parameters.Add(DocumentRequestParameterEmployeeId);
+  Result.Responses.Add('204', vResponse);
   Result.Tags.Add(c_EmployeeTagName);
 end;
 
