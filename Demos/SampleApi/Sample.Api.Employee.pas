@@ -45,7 +45,7 @@ type
     function DocumentRequestParameterEmployeeId: TSwagRequestParameter;
     function DocumentRequestBodyEmployee: TSwagRequestParameter;
 
-    function DocumentEmployeeRequestSchema: TJsonSchema;
+    function DocumentEmployeeModelSchema: TJsonSchema;
     function DocumentEmployeeResponseSchema: TJsonSchema;
 
     function CreatePath(const pRoute: string; pOperations: array of TSwagPathOperation): TSwagPath;
@@ -112,10 +112,10 @@ var
   vRoute: TSwagPath;
   vModel: TSwagDefinition;
 begin
-  vModel := CreateModel(c_EmployeeSchemaName, ExtractJsonFromSchema(DocumentEmployeeRequestSchema));
+  vModel := CreateModel(c_EmployeeSchemaName, ExtractJsonFromSchema(DocumentEmployeeModelSchema));
   pSwagDoc.Definitions.Add(vModel);
 
-  ///vModel := CreateModel(c_EmployeeSchemaNameResponse, ExtractJsonFromSchema(DocumentEmployeeRequestSchema));
+  ///vModel := CreateModel(c_EmployeeSchemaNameResponse, ExtractJsonFromSchema(DocumentEmployeeResponseSchema));
   ///pSwagDoc.Definitions.Add(vModel);
 
   vRoute := CreatePath('/employees',
@@ -147,7 +147,7 @@ end;
 function TFakeApiEmployee.DocumentEmployeeResponseSchema: TJsonSchema;
 var
   vSchema: TJsonSchema;
-  vSchemaEmployeeClone: TJsonSchema;
+  vSchemaEmployeeModel: TJsonSchema;
 begin
   vSchema := TJsonSchema.Create;
   try
@@ -155,11 +155,11 @@ begin
     vSchema.Root.Description := 'Employee request data';
     vSchema.AddField<Int64>('id', 'The employee identification code.');
 
-    vSchemaEmployeeClone := DocumentEmployeeRequestSchema;
+    vSchemaEmployeeModel := DocumentEmployeeModelSchema;
     try
-      vSchema.Root.CopyFields(vSchemaEmployeeClone.Root);
+      vSchema.Root.CopyFields(vSchemaEmployeeModel.Root);
     finally
-      vSchemaEmployeeClone.Free;
+      vSchemaEmployeeModel.Free;
     end;
 
     Result  := TJsonSchema.Create;
@@ -221,7 +221,7 @@ begin
   Result.Tags.Add(c_EmployeeTagName);
 end;
 
-function TFakeApiEmployee.DocumentEmployeeRequestSchema: TJsonSchema;
+function TFakeApiEmployee.DocumentEmployeeModelSchema: TJsonSchema;
 var
   vName: TJsonFieldString;
   vAddressSchema: TJsonSchema;
