@@ -29,6 +29,8 @@ http://petstore.swagger.io
 https://swagger.io/tools/open-source/open-source-integrations
 
 
+## Swagger UI distribution files
+
 For you to produce a page containing a Swagger documentation you need the Swagger UI distribution files.
 
 These files you can find in the github swagger-api / swagger-ui repository.
