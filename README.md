@@ -14,8 +14,19 @@ https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 
 When creating a Swagger documentation for your REST API you can produce a page like the following example.
 
-![image](https://user-images.githubusercontent.com/20048296/39936694-a4d9ac9a-5523-11e8-8161-98d0e396eb6f.png)
+![image](https://user-images.githubusercontent.com/20048296/46588904-c6cd5880-ca79-11e8-8a8a-ec38ba7ff95a.png)
+
+
+## Swagger Tools
+
+- Swagger Editor:
+https://editor.swagger.io
+
+- The classic swagger sample:
 http://petstore.swagger.io
+
+- Tools and Integrations:
+https://swagger.io/tools/open-source/open-source-integrations
 
 
 For you to produce a page containing a Swagger documentation you need the Swagger UI distribution files.
