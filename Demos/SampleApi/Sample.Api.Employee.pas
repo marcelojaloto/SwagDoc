@@ -37,6 +37,7 @@ type
     ///const c_EmployeeSchemaNameResponse = 'employeeResponse';
     const c_ParameterEmployeeId = 'employeeId';
 
+    function DocumentGetEmployeesList: TSwagPathOperation;
     function DocumentGetEmployee: TSwagPathOperation;
     function DocumentPostEmployee: TSwagPathOperation;
     function DocumentPutEmployee: TSwagPathOperation;
@@ -47,6 +48,7 @@ type
 
     function DocumentEmployeeModelSchema: TJsonSchema;
     function DocumentEmployeeResponseSchema: TJsonSchema;
+    function DocumentEmployeesListResponseSchema: TJsonSchema;
 
     function CreatePath(const pRoute: string; pOperations: array of TSwagPathOperation): TSwagPath;
     function CreateModel(const pSchemaName: string; pJsonSchema: TJsonObject): TSwagDefinition;
@@ -66,6 +68,7 @@ implementation
 
 uses
   Json.Schema.Field.Strings,
+  Json.Schema.Field.Arrays,
   Swag.Common.Types;
 
 { TApiEmployee }
@@ -119,7 +122,8 @@ begin
   ///pSwagDoc.Definitions.Add(vModel);
 
   vRoute := CreatePath('/employees',
-    [DocumentPostEmployee]);
+    [DocumentGetEmployeesList,
+     DocumentPostEmployee]);
   pSwagDoc.Paths.Add(vRoute);
 
   vRoute := CreatePath('/employees/{' + c_ParameterEmployeeId + '}',
@@ -154,6 +158,21 @@ begin
   end;
 end;
 
+function TFakeApiEmployee.DocumentEmployeesListResponseSchema: TJsonSchema;
+var
+  vSchema: TJsonSchema;
+  vFieldArray: TJsonFieldArray;
+begin
+  vSchema := DocumentEmployeeResponseSchema;
+  try
+    Result  := TJsonSchema.Create;
+    vFieldArray := TJsonFieldArray(Result.AddField<TJsonFieldArray>('employees', 'The employee datas.'));
+    vFieldArray.ItemFieldType := vSchema.Root.Clone;
+  finally
+    vSchema.Free;
+  end;
+end;
+
 function TFakeApiEmployee.DocumentGetEmployee: TSwagPathOperation;
 var
   vResponse: TSwagResponse;
@@ -167,6 +186,22 @@ begin
   Result.OperationId := '{2DDE05B6-C01A-4EB8-B7CD-2041C51C97C7}';
   Result.Description := 'Returns a employee.';
   Result.Parameters.Add(DocumentRequestParameterEmployeeId);
+  Result.Responses.Add('200', vResponse);
+  Result.Tags.Add(c_EmployeeTagName);
+end;
+
+function TFakeApiEmployee.DocumentGetEmployeesList: TSwagPathOperation;
+var
+  vResponse: TSwagResponse;
+  vResponseJson: TJsonObject;
+begin
+  vResponseJson := ExtractJsonFromSchema(DocumentEmployeesListResponseSchema);
+  vResponse := CreateResponse('200', 'Successfully returns data', vResponseJson);
+
+  Result := TSwagPathOperation.Create;
+  Result.Operation := ohvGet;
+  Result.OperationId := '{A9A8D343-00EB-402A-8248-94BDA7B6ECD4}';
+  Result.Description := 'Returns a employee list.';
   Result.Responses.Add('200', vResponse);
   Result.Tags.Add(c_EmployeeTagName);
 end;
