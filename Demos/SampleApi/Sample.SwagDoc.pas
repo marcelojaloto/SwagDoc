@@ -68,7 +68,7 @@ end;
 procedure TSampleApiSwagDocBuilder.DocumentApiInfo;
 begin
   fSwagDoc.Info.Title := 'Sample API';
-  fSwagDoc.Info.Version := 'v1.0';
+  fSwagDoc.Info.Version := 'v1';
   fSwagDoc.Info.TermsOfService := 'http://www.apache.org/licenses/LICENSE-2.0.txt';
   fSwagDoc.Info.Description := 'Sample API Description';
   fSwagDoc.Info.Contact.Name := 'Marcelo Jaloto';

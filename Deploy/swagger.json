@@ -2,7 +2,7 @@
   "swagger":"2.0",
   "info":
   {
-    "version":"v1.0",
+    "version":"v1",
     "title":"Sample API",
     "description":"Sample API Description",
     "termsOfService":"http://www.apache.org/licenses/LICENSE-2.0.txt",
