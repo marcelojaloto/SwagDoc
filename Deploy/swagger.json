@@ -47,7 +47,7 @@
         "operationId":"{A9A8D343-00EB-402A-8248-94BDA7B6ECD4}",
         "tags":
         [
-          "Employee"
+          "API Employee"
         ]
 ,
         "responses":
@@ -167,7 +167,7 @@
         "operationId":"{C450E1E0-341D-4947-A156-9C167BE021D5}",
         "tags":
         [
-          "Employee"
+          "API Employee"
         ]
 ,
         "parameters":
@@ -283,7 +283,7 @@
       }
     }
 ,
-    "/employees/{employeeId}":
+    "/employees/{id}":
     {
       "get":
       {
@@ -291,14 +291,14 @@
         "operationId":"{2DDE05B6-C01A-4EB8-B7CD-2041C51C97C7}",
         "tags":
         [
-          "Employee"
+          "API Employee"
         ]
 ,
         "parameters":
         [
                     {
             "in":"path",
-            "name":"employeeId",
+            "name":"id",
             "required":true,
             "type":"integer"
           }
@@ -409,14 +409,14 @@
         "operationId":"{28E989FB-0225-40BD-A97E-8D1EA80D09AF}",
         "tags":
         [
-          "Employee"
+          "API Employee"
         ]
 ,
         "parameters":
         [
                     {
             "in":"path",
-            "name":"employeeId",
+            "name":"id",
             "required":true,
             "type":"integer"
           }
@@ -538,14 +538,14 @@
         "operationId":"{F47F38F3-2B99-4481-AFDD-ECD89893FEA0}",
         "tags":
         [
-          "Employee"
+          "API Employee"
         ]
 ,
         "parameters":
         [
                     {
             "in":"path",
-            "name":"employeeId",
+            "name":"id",
             "required":true,
             "type":"integer"
           }

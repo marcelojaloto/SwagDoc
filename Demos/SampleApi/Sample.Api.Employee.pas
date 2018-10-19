@@ -32,10 +32,10 @@ uses
 type
   TFakeApiEmployee = class(TObject)
   strict private
-    const c_EmployeeTagName = 'Employee';
+    const c_EmployeeTagName = 'API Employee';
     const c_EmployeeSchemaName = 'employee';
     ///const c_EmployeeSchemaNameResponse = 'employeeResponse';
-    const c_ParameterEmployeeId = 'employeeId';
+    const c_ParameterEmployeeId = 'id';
 
     function DocumentGetEmployeesList: TSwagPathOperation;
     function DocumentGetEmployee: TSwagPathOperation;
@@ -55,11 +55,22 @@ type
     function CreateResponse(const pStatusCode, pDescription: string; pJsonSchema: TJsonObject): TSwagResponse;
     function ExtractJsonFromSchema(pSchema: TJsonSchema): TJsonObject;
   public
-    {procedure Post;
-    procedure GetAll;
-    procedure Get(const pId: Int64);
-    procedure Put(const pId: Int64);
-    procedure Delete(const pId: Int64); }
+    {$REGION 'Fake API Methods'}
+    // POST /api/employees
+    procedure AddEmployee;
+
+    // GET /api/employees
+    procedure GetEmployees;
+
+    // GET /api/employees/{id}
+    procedure GetEmployee(const pId: Int64);
+
+    // PUT /api/employees/{id}
+    procedure UpdateEmployee(const pId: Int64);
+
+    // DELETE /api/employees/{id}
+    procedure DeleteEmployee(const pId: Int64);
+    {$ENDREGION}
 
     procedure DocumentApi(pSwagDoc: TSwagDoc);
   end;
@@ -73,42 +84,32 @@ uses
 
 { TApiEmployee }
 
-function TFakeApiEmployee.ExtractJsonFromSchema(pSchema: TJsonSchema): TJsonObject;
+{$REGION 'Fake methods not implemented'}
+procedure TFakeApiEmployee.AddEmployee;
 begin
-  try
-    Result := pSchema.ToJson;
-  finally
-    pSchema.Free;
-  end;
+  { TODO : Fake method not implemented }
 end;
 
-function TFakeApiEmployee.CreateModel(const pSchemaName: string; pJsonSchema: TJsonObject): TSwagDefinition;
+procedure TFakeApiEmployee.GetEmployee(const pId: Int64);
 begin
-  Result := TSwagDefinition.Create;
-  Result.Name := pSchemaName;
-  Result.JsonSchema := pJsonSchema;
+  { TODO : Fake method not implemented }
 end;
 
-function TFakeApiEmployee.CreateResponse(const pStatusCode, pDescription: string;
-  pJsonSchema: TJsonObject): TSwagResponse;
+procedure TFakeApiEmployee.GetEmployees;
 begin
-  Result := TSwagResponse.Create;
-  Result.StatusCode := pStatusCode;
-  Result.Description := pDescription;
-  ///vResponse.Schema.Name := c_EmployeeSchemaNameResponse;
-  if Assigned(pJsonSchema) then
-    Result.Schema.JsonSchema := pJsonSchema;
+  { TODO : Fake method not implemented }
 end;
 
-function TFakeApiEmployee.CreatePath(const pRoute: string; pOperations: array of TSwagPathOperation): TSwagPath;
-var
-  vOperation: TSwagPathOperation;
+procedure TFakeApiEmployee.UpdateEmployee(const pId: Int64);
 begin
-  Result := TSwagPath.Create;
-  Result.Uri := pRoute;
-  for vOperation in pOperations do
-    Result.Operations.Add(vOperation);
+  { TODO : Fake method not implemented }
 end;
+
+procedure TFakeApiEmployee.DeleteEmployee(const pId: Int64);
+begin
+  { TODO : Fake method not implemented }
+end;
+{$ENDREGION}
 
 procedure TFakeApiEmployee.DocumentApi(pSwagDoc: TSwagDoc);
 var
@@ -131,6 +132,45 @@ begin
      DocumentPutEmployee,
      DocumentDeleteEmployee]);
   pSwagDoc.Paths.Add(vRoute);
+end;
+
+function TFakeApiEmployee.CreateModel(const pSchemaName: string; pJsonSchema: TJsonObject): TSwagDefinition;
+begin
+  Result := TSwagDefinition.Create;
+  Result.Name := pSchemaName;
+  Result.JsonSchema := pJsonSchema;
+end;
+
+function TFakeApiEmployee.DocumentEmployeeModelSchema: TJsonSchema;
+var
+  vName: TJsonFieldString;
+  vAddressSchema: TJsonSchema;
+begin
+  Result := TJsonSchema.Create;
+  Result.Root.Description := 'Employee response data';
+
+  vName := TJsonFieldString(Result.AddField<string>('name', 'The employee full name.'));
+  vName.Required := True;
+  vName.MaxLength := 80;
+
+  Result.AddField<string>('phone', 'The employee phone number.');
+  Result.AddField<TDate>('hireDate', 'The employee hire date.');
+  Result.AddField<Double>('salary', 'The employee gross salary.');
+
+  vAddressSchema := TJsonSchema.Create;
+  try
+    vAddressSchema.Root.Name := 'address';
+    vAddressSchema.Root.Description := 'The employee full address.';
+    vAddressSchema.AddField<string>('description', 'The employee address description.');
+    vAddressSchema.AddField<string>('city', 'The employee address city.');
+    vAddressSchema.AddField<string>('region', 'The employee address region.');
+    vAddressSchema.AddField<string>('country', 'The employee address country.');
+    vAddressSchema.AddField<string>('postalCode', 'The employee address postal code.');
+
+    Result.AddField(vAddressSchema);
+  finally
+    vAddressSchema.Free;
+  end;
 end;
 
 function TFakeApiEmployee.DocumentEmployeeResponseSchema: TJsonSchema;
@@ -256,36 +296,25 @@ begin
   Result.Tags.Add(c_EmployeeTagName);
 end;
 
-function TFakeApiEmployee.DocumentEmployeeModelSchema: TJsonSchema;
-var
-  vName: TJsonFieldString;
-  vAddressSchema: TJsonSchema;
+function TFakeApiEmployee.CreateResponse(const pStatusCode, pDescription: string;
+  pJsonSchema: TJsonObject): TSwagResponse;
 begin
-  Result := TJsonSchema.Create;
-  Result.Root.Description := 'Employee response data';
+  Result := TSwagResponse.Create;
+  Result.StatusCode := pStatusCode;
+  Result.Description := pDescription;
+  ///vResponse.Schema.Name := c_EmployeeSchemaNameResponse;
+  if Assigned(pJsonSchema) then
+    Result.Schema.JsonSchema := pJsonSchema;
+end;
 
-  vName := TJsonFieldString(Result.AddField<String>('name', 'The employee full name.'));
-  vName.Required := True;
-  vName.MaxLength := 80;
-
-  Result.AddField<String>('phone', 'The employee phone number.');
-  Result.AddField<TDate>('hireDate', 'The employee hire date.');
-  Result.AddField<Double>('salary', 'The employee gross salary.');
-
-  vAddressSchema := TJsonSchema.Create;
-  try
-    vAddressSchema.Root.Name := 'address';
-    vAddressSchema.Root.Description := 'The employee full address.';
-    vAddressSchema.AddField<String>('description', 'The employee address description.');
-    vAddressSchema.AddField<String>('city', 'The employee address city.');
-    vAddressSchema.AddField<String>('region', 'The employee address region.');
-    vAddressSchema.AddField<String>('country', 'The employee address country.');
-    vAddressSchema.AddField<String>('postalCode', 'The employee address postal code.');
-
-    Result.AddField(vAddressSchema);
-  finally
-    vAddressSchema.Free;
-  end;
+function TFakeApiEmployee.CreatePath(const pRoute: string; pOperations: array of TSwagPathOperation): TSwagPath;
+var
+  vOperation: TSwagPathOperation;
+begin
+  Result := TSwagPath.Create;
+  Result.Uri := pRoute;
+  for vOperation in pOperations do
+    Result.Operations.Add(vOperation);
 end;
 
 function TFakeApiEmployee.DocumentRequestBodyEmployee: TSwagRequestParameter;
@@ -304,6 +333,15 @@ begin
   Result.InLocation := rpiPath;
   Result.Required := True;
   Result.TypeParameter := 'integer';
+end;
+
+function TFakeApiEmployee.ExtractJsonFromSchema(pSchema: TJsonSchema): TJsonObject;
+begin
+  try
+    Result := pSchema.ToJson;
+  finally
+    pSchema.Free;
+  end;
 end;
 
 end.
