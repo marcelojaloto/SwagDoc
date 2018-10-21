@@ -102,7 +102,7 @@ begin
     vParam.InLocation := rpiPath;
     vParam.Description := 'A param required';
     vParam.Required := True;
-    vParam.TypeParameter := 'string';
+    vParam.TypeParameter := stpString;
     vOperation.Parameters.Add(vParam);
 
     vParam := TSwagRequestParameter.Create;
@@ -110,7 +110,7 @@ begin
     vParam.InLocation := rpiQuery;
     vParam.Description := 'A param that is not required';
     vParam.Required := False;
-    vParam.TypeParameter := 'string';
+    vParam.TypeParameter := stpString;
     vOperation.Parameters.Add(vParam);
 
     vParam := TSwagRequestParameter.Create;

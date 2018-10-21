@@ -36,6 +36,7 @@ const
     ('', 'get', 'post', 'put', 'delete', 'options', 'head', 'patch');
   c_SwagRequestParameterInLocation: array[TSwagRequestParameterInLocation] of string =
     ('', 'query', 'header', 'path', 'formData', 'body');
+  c_SwagTypeParameter: array[TSwagTypeParameter] of string = ('', 'string', 'number', 'integer', 'boolean', 'array', 'file');
 
 implementation
 

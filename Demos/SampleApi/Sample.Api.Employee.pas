@@ -332,7 +332,7 @@ begin
   Result.Name := c_ParameterEmployeeId;
   Result.InLocation := rpiPath;
   Result.Required := True;
-  Result.TypeParameter := 'integer';
+  Result.TypeParameter := stpInteger;
 end;
 
 function TFakeApiEmployee.ExtractJsonFromSchema(pSchema: TJsonSchema): TJsonObject;

@@ -49,6 +49,11 @@ type
     procedure Add(const pSchemeString: string); overload;
   end;
 
+  TSwagTypeParameterHelper = record helper for TSwagTypeParameter
+  public
+    procedure ToType(const pTypeParameter: string);
+  end;
+
 implementation
 
 uses
@@ -113,6 +118,21 @@ var
 begin
   vScheme.ToType(pSchemeString);
   Self.Add(vScheme);
+end;
+
+{ TSwagTypeParameterHelper }
+
+procedure TSwagTypeParameterHelper.ToType(const pTypeParameter: string);
+var
+  vSwagTypeParameter: TSwagTypeParameter;
+begin
+  Self := stpNotDefined;
+  for vSwagTypeParameter := Low(TSwagTypeParameter) to High(TSwagTypeParameter) do
+    if (LowerCase(c_SwagTypeParameter[vSwagTypeParameter]) = LowerCase(pTypeParameter)) then
+    begin
+      Self := vSwagTypeParameter;
+      Break;
+    end;
 end;
 
 end.

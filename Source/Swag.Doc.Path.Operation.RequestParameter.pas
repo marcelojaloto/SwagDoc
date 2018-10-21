@@ -41,7 +41,7 @@ type
     fRequired: Boolean;
     fSchema: TSwagDefinition;
     fDescription: string;
-    fTypeParameter: string;
+    fTypeParameter: TSwagTypeParameter;
     fPattern: string;
   protected
     function ReturnInLocationToString: string;
@@ -95,7 +95,7 @@ type
     /// If type is "file", the consumes MUST be either "multipart/form-data", " application/x-www-form-urlencoded" or both
     /// and the parameter MUST be in "formData".
     /// </summary>
-    property TypeParameter: string read fTypeParameter write fTypeParameter;
+    property TypeParameter: TSwagTypeParameter read fTypeParameter write fTypeParameter;
   end;
 
 implementation
@@ -113,6 +113,7 @@ const
   c_SwagRequestParameterRequired = 'required';
   c_SwagRequestParameterSchema = 'schema';
   c_SwagRequestParameterType = 'type';
+  c_SwagRequestParameterPattern = 'pattern';
 
 { TSwagRequestParameter }
 
@@ -138,7 +139,7 @@ begin
   if not fDescription.IsEmpty then
     vJsonObject.AddPair(c_SwagRequestParameterDescription, fDescription);
   if not fPattern.IsEmpty then
-    vJsonObject.AddPair('pattern', fPattern);
+    vJsonObject.AddPair(c_SwagRequestParameterPattern, fPattern);
 
   vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONBool.Create(fRequired));
 
@@ -146,8 +147,8 @@ begin
     vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.GenerateJsonRefDefinition)
   else if Assigned(fSchema.JsonSchema) then
     vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.JsonSchema)
-  else if not fTypeParameter.IsEmpty then
-    vJsonObject.AddPair(c_SwagRequestParameterType, fTypeParameter);
+  else if (fTypeParameter <> stpNotDefined) then
+    vJsonObject.AddPair(c_SwagRequestParameterType, c_SwagTypeParameter[fTypeParameter]);
 
   Result := vJsonObject;
 end;
@@ -159,16 +160,17 @@ begin
   else
     fRequired := False;
 
-  if Assigned(pJson.Values['pattern']) then
-    fPattern := pJson.Values['pattern'].Value;
+  if Assigned(pJson.Values[c_SwagRequestParameterPattern]) then
+    fPattern := pJson.Values[c_SwagRequestParameterPattern].Value;
 
   if Assigned(pJson.Values[c_SwagRequestParameterName]) then
     fName := pJson.Values[c_SwagRequestParameterName].Value;
 
-  if Assigned(pJson.Values['in']) then
-    fInLocation.ToType(pJson.Values['in'].Value);
+  if Assigned(pJson.Values[c_SwagRequestParameterIn]) then
+    fInLocation.ToType(pJson.Values[c_SwagRequestParameterIn].Value);
 
-  fTypeParameter := pJson.Values[c_SwagRequestParameterType].Value;
+  if Assigned(pJson.Values[c_SwagRequestParameterType]) then
+    fTypeParameter.ToType(pJson.Values[c_SwagRequestParameterType].Value);
 end;
 
 function TSwagRequestParameter.ReturnInLocationToString: string;
