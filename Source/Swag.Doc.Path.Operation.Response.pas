@@ -47,7 +47,7 @@ type
     fSchema: TSwagDefinition;
     fHeaders: TObjectList<TSwagHeaders>;
     fDescription: string;
-    fExamples: TDictionary<TSwagJsonExampleDescription, TJSONObject>;
+    fExamples: TObjectDictionary<TSwagJsonExampleDescription, TJSONObject>;
   protected
     function GenerateExamplesJsonObject: TJSONObject;
   public
@@ -86,7 +86,7 @@ type
     /// <summary>
     /// An example list of the json response message.
     /// </summary>
-    property Examples: TDictionary<TSwagJsonExampleDescription, TJSONObject> read fExamples;
+    property Examples: TObjectDictionary<TSwagJsonExampleDescription, TJSONObject> read fExamples;
   end;
 
 implementation
@@ -105,7 +105,7 @@ const
 constructor TSwagResponse.Create;
 begin
   inherited Create;
-  fExamples := TDictionary<TSwagJsonExampleDescription, TJSONObject>.Create;
+  fExamples := TObjectDictionary<TSwagJsonExampleDescription, TJSONObject>.Create([doOwnsValues]);
   fSchema := TSwagDefinition.Create;
   fHeaders := TObjectList<TSwagHeaders>.Create;
 end;
@@ -121,10 +121,15 @@ end;
 function TSwagResponse.GenerateExamplesJsonObject: TJSONObject;
 var
   vKey: TSwagJsonExampleDescription;
+  vExampleNumber: Integer;
 begin
   Result := TJsonObject.Create;
+  vExampleNumber := 0;
   for vKey in fExamples.Keys do
-    Result.AddPair(vKey, fExamples.Items[vKey]);
+  begin
+    Inc(vExampleNumber);
+    Result.AddPair(vExampleNumber.ToString, TJsonObject(fExamples.Items[vKey].Clone));
+  end;
 end;
 
 function TSwagResponse.GenerateJsonObject: TJSONObject;
