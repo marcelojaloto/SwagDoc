@@ -1,8 +1,8 @@
-program SwagDocDemo;
+program LoadSwaggerJsonToObject;
 
 uses
   Vcl.Forms,
-  frmSimpleDemo in 'frmSimpleDemo.pas' {frmSimpleSwaggerDocDemo};
+  frmLoadSwaggerJson in 'frmLoadSwaggerJson.pas' {frmSimpleSwaggerDocDemo};
 
 {$R *.res}
 

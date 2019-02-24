@@ -1,4 +1,4 @@
-unit frmSimpleDemo;
+unit frmLoadSwaggerJson;
 
 interface
 
@@ -46,9 +46,10 @@ uses
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
 begin
-  fSwagDoc.LoadFromFile('flickr.json');
+  fSwagDoc.LoadFromFile('swagger.json');
 
   fSwagDoc.GenerateSwaggerJson;
+  Memo1.Lines.Clear;
   Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
 end;
 

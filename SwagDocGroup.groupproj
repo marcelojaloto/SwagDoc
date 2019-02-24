@@ -9,7 +9,7 @@
         <Projects Include="Demos\GenerateSwaggerJsonFromCode\GenerateSwagger.dproj">
             <Dependencies/>
         </Projects>
-        <Projects Include="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj">
+        <Projects Include="Demos\LoadSwaggerJsonToObject\LoadSwaggerJsonToObject.dproj">
             <Dependencies/>
         </Projects>
         <Projects Include="Demos\SampleApi\SampleApi.dproj">
@@ -41,14 +41,14 @@
     <Target Name="GenerateSwagger:Make">
         <MSBuild Projects="Demos\GenerateSwaggerJsonFromCode\GenerateSwagger.dproj" Targets="Make"/>
     </Target>
-    <Target Name="SwagDocDemo">
-        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj"/>
+    <Target Name="LoadSwaggerJsonToObject">
+        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\LoadSwaggerJsonToObject.dproj"/>
     </Target>
-    <Target Name="SwagDocDemo:Clean">
-        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj" Targets="Clean"/>
+    <Target Name="LoadSwaggerJsonToObject:Clean">
+        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\LoadSwaggerJsonToObject.dproj" Targets="Clean"/>
     </Target>
-    <Target Name="SwagDocDemo:Make">
-        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\SwagDocDemo.dproj" Targets="Make"/>
+    <Target Name="LoadSwaggerJsonToObject:Make">
+        <MSBuild Projects="Demos\LoadSwaggerJsonToObject\LoadSwaggerJsonToObject.dproj" Targets="Make"/>
     </Target>
     <Target Name="SampleApi">
         <MSBuild Projects="Demos\SampleApi\SampleApi.dproj"/>
@@ -60,13 +60,13 @@
         <MSBuild Projects="Demos\SampleApi\SampleApi.dproj" Targets="Make"/>
     </Target>
     <Target Name="Build">
-        <CallTarget Targets="SwagDoc;GenerateSwagger;SwagDocDemo;SampleApi"/>
+        <CallTarget Targets="SwagDoc;GenerateSwagger;LoadSwaggerJsonToObject;SampleApi"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="SwagDoc:Clean;GenerateSwagger:Clean;SwagDocDemo:Clean;SampleApi:Clean"/>
+        <CallTarget Targets="SwagDoc:Clean;GenerateSwagger:Clean;LoadSwaggerJsonToObject:Clean;SampleApi:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="SwagDoc:Make;GenerateSwagger:Make;SwagDocDemo:Make;SampleApi:Make"/>
+        <CallTarget Targets="SwagDoc:Make;GenerateSwagger:Make;LoadSwaggerJsonToObject:Make;SampleApi:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>
