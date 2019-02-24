@@ -15,6 +15,18 @@ object frmSimpleSwaggerDocDemo: TfrmSimpleSwaggerDocDemo
   OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
+  object lblApiDescription: TLabel
+    Left = 102
+    Top = 8
+    Width = 6
+    Height = 25
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
   object Memo1: TMemo
     Left = 0
     Top = 39

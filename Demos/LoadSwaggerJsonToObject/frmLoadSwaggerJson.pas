@@ -23,6 +23,7 @@ type
   TfrmSimpleSwaggerDocDemo = class(TForm)
     Memo1: TMemo;
     btnLoadJSON: TButton;
+    lblApiDescription: TLabel;
     procedure btnLoadJSONClick(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure FormDestroy(Sender: TObject);
@@ -47,7 +48,7 @@ uses
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
 begin
   fSwagDoc.LoadFromFile('swagger.json');
-
+  lblApiDescription.Caption := fSwagDoc.Info.Description;
   fSwagDoc.GenerateSwaggerJson;
   Memo1.Lines.Clear;
   Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
