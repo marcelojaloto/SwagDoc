@@ -35,7 +35,7 @@ implementation
 {$R *.dfm}
 
 uses
-  REST.Json,
+  Json.Common.Helpers,
   Swag.Common.Types,
   Swag.Doc.Path,
   Swag.Doc.Path.Operation,
@@ -144,7 +144,7 @@ begin
     vSwagDoc.Paths.Add(vPath);
 
     vSwagDoc.GenerateSwaggerJson;
-    Memo1.Lines.Add(REST.Json.TJson.Format(vSwagDoc.SwaggerJson));
+    Memo1.Lines.Add(vSwagDoc.SwaggerJson.Format);
   finally
     FreeAndNil(vSwagDoc);
   end;

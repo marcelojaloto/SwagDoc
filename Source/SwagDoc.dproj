@@ -121,7 +121,7 @@
             <MainSource>MainSource</MainSource>
         </DelphiCompile>
         <DCCReference Include="rtl.dcp"/>
-        <DCCReference Include="Json.Commom.Helpers.pas"/>
+        <DCCReference Include="Json.Common.Helpers.pas"/>
         <DCCReference Include="Json.Schema.Common.Types.pas"/>
         <DCCReference Include="Json.Schema.Field.pas"/>
         <DCCReference Include="Json.Schema.Field.Booleans.pas"/>

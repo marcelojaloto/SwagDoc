@@ -51,7 +51,7 @@ implementation
 
 uses
   System.Classes,
-  Json.Commom.Helpers;
+  Json.Common.Helpers;
 
 { TJsonFieldString }
 

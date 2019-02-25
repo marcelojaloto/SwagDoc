@@ -42,7 +42,7 @@ implementation
 {$R *.dfm}
 
 uses
-  REST.Json,
+  Json.Common.Helpers,
   System.IOUtils;
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
@@ -51,7 +51,7 @@ begin
   lblApiDescription.Caption := fSwagDoc.Info.Description;
   fSwagDoc.GenerateSwaggerJson;
   Memo1.Lines.Clear;
-  Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
+  Memo1.Lines.Add(fSwagDoc.SwaggerJson.Format);
 end;
 
 procedure TfrmSimpleSwaggerDocDemo.FormCreate(Sender: TObject);

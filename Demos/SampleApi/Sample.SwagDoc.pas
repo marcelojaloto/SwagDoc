@@ -44,7 +44,7 @@ type
 implementation
 
 uses
-  Json.Commom.Helpers,
+  Json.Common.Helpers,
   Swag.Common.Types,
   Sample.Api.Employee;
 
