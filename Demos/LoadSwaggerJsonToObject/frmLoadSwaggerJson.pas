@@ -25,11 +25,8 @@ type
     btnLoadJSON: TButton;
     lblApiDescription: TLabel;
     procedure btnLoadJSONClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
-    fSwagDoc: TSwagDoc;
   public
     { Public declarations }
   end;
@@ -46,22 +43,19 @@ uses
   System.IOUtils;
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
+var
+  vSwagDoc: TSwagDoc;
 begin
-  fSwagDoc.LoadFromFile('swagger.json');
-  lblApiDescription.Caption := fSwagDoc.Info.Description;
-  fSwagDoc.GenerateSwaggerJson;
-  Memo1.Lines.Clear;
-  Memo1.Lines.Add(fSwagDoc.SwaggerJson.Format);
-end;
-
-procedure TfrmSimpleSwaggerDocDemo.FormCreate(Sender: TObject);
-begin
-  fSwagDoc := TSwagDoc.Create;
-end;
-
-procedure TfrmSimpleSwaggerDocDemo.FormDestroy(Sender: TObject);
-begin
-  FreeAndNil(fSwagDoc);
+  vSwagDoc := TSwagDoc.Create;
+  try
+    vSwagDoc.LoadFromFile('swagger.json');
+    lblApiDescription.Caption := vSwagDoc.Info.Description;
+    vSwagDoc.GenerateSwaggerJson;
+    Memo1.Lines.Clear;
+    Memo1.Lines.Add(vSwagDoc.SwaggerJson.Format);
+  finally
+    FreeAndNil(vSwagDoc);
+  end;
 end;
 
 end.
