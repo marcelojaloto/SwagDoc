@@ -79,7 +79,7 @@ window.onload = function() {
     deepLinking: true,
     presets: [
       SwaggerUIBundle.presets.apis,
-      SwaggerUIStandalonePreset
+      SwaggerUIStandalonePreset.slice(1) // No Topbar
     ],
     plugins: [
       SwaggerUIBundle.plugins.DownloadUrl
