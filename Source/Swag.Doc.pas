@@ -25,6 +25,7 @@ unit Swag.Doc;
 interface
 
 uses
+  System.SysUtils,
   System.Classes,
   System.Generics.Collections,
   System.JSON,
@@ -35,6 +36,8 @@ uses
   Swag.Doc.Definition;
 
 type
+  ESwagErrorLoadSwaggerJsonFile = class(Exception);
+
   /// <summary>
   /// This is the root document object for the API specification.
   /// It combines what previously was the Resource Listing and API Declaration (version 1.2 and earlier) together into one document.
@@ -139,9 +142,8 @@ type
 implementation
 
 uses
-  System.SysUtils,
   System.IOUtils,
-  Json.Commom.Helpers,
+  Json.Common.Helpers,
   Swag.Common.Consts,
   Swag.Common.Types.Helpers;
 
@@ -271,8 +273,6 @@ begin
   vJsonObject.AddPair(c_Swagger, GetSwaggerVersion);
   vJsonObject.AddPair(c_SwagInfo, fInfo.GenerateJsonObject);
 
-
-
   if not fHost.IsEmpty then
     vJsonObject.AddPair(c_SwagHost, fHost);
   vJsonObject.AddPair(c_SwagBasePath, fBasePath);
@@ -314,13 +314,13 @@ var
   vJsonConsumes: TJSONArray;
   vIndex: Integer;
 begin
-
   if not FileExists(pFilename) then
-  begin
-    raise Exception.Create('File Doesn''t Exist ['+pFilename+']');
-  end;
+    raise ESwagErrorLoadSwaggerJsonFile.Create('File doesn''t exist ['+pFilename+']');
 
   fSwaggerJson := TJSONObject.ParseJSONValue(TFile.ReadAllText(pFilename));
+  if not Assigned(fSwaggerJson) then
+    raise ESwagErrorLoadSwaggerJsonFile.Create('File could not be loaded ['+pFilename+']');
+
   fInfo.Load((fSwaggerJson as TJSONObject).Values[c_SwagInfo] as TJSONObject);
 
   vJsonObj := (fSwaggerJson as TJSONObject).Values[c_SwagPaths] as TJSONObject;

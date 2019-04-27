@@ -1,4 +1,4 @@
-unit frmSimpleDemo;
+unit frmLoadSwaggerJson;
 
 interface
 
@@ -23,12 +23,10 @@ type
   TfrmSimpleSwaggerDocDemo = class(TForm)
     Memo1: TMemo;
     btnLoadJSON: TButton;
+    lblApiDescription: TLabel;
     procedure btnLoadJSONClick(Sender: TObject);
-    procedure FormCreate(Sender: TObject);
-    procedure FormDestroy(Sender: TObject);
   private
     { Private declarations }
-    fSwagDoc: TSwagDoc;
   public
     { Public declarations }
   end;
@@ -41,25 +39,23 @@ implementation
 {$R *.dfm}
 
 uses
-  REST.Json,
+  Json.Common.Helpers,
   System.IOUtils;
 
 procedure TfrmSimpleSwaggerDocDemo.btnLoadJSONClick(Sender: TObject);
+var
+  vSwagDoc: TSwagDoc;
 begin
-  fSwagDoc.LoadFromFile('flickr.json');
-
-  fSwagDoc.GenerateSwaggerJson;
-  Memo1.Lines.Add(REST.Json.TJson.Format(fSwagDoc.SwaggerJson));
-end;
-
-procedure TfrmSimpleSwaggerDocDemo.FormCreate(Sender: TObject);
-begin
-  fSwagDoc := TSwagDoc.Create;
-end;
-
-procedure TfrmSimpleSwaggerDocDemo.FormDestroy(Sender: TObject);
-begin
-  FreeAndNil(fSwagDoc);
+  vSwagDoc := TSwagDoc.Create;
+  try
+    vSwagDoc.LoadFromFile('swagger.json');
+    lblApiDescription.Caption := vSwagDoc.Info.Description;
+    vSwagDoc.GenerateSwaggerJson;
+    Memo1.Lines.Clear;
+    Memo1.Lines.Add(vSwagDoc.SwaggerJson.Format);
+  finally
+    FreeAndNil(vSwagDoc);
+  end;
 end;
 
 end.

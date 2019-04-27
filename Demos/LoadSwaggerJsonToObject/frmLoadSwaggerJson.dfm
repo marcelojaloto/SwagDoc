@@ -1,7 +1,7 @@
 object frmSimpleSwaggerDocDemo: TfrmSimpleSwaggerDocDemo
   Left = 0
   Top = 0
-  Caption = 'Simple SwagDoc Demo'
+  Caption = 'Load Swagger.json to SwagDoc'
   ClientHeight = 214
   ClientWidth = 876
   Color = clBtnFace
@@ -11,10 +11,20 @@ object frmSimpleSwaggerDocDemo: TfrmSimpleSwaggerDocDemo
   Font.Name = 'Tahoma'
   Font.Style = []
   OldCreateOrder = False
-  OnCreate = FormCreate
-  OnDestroy = FormDestroy
   PixelsPerInch = 96
   TextHeight = 13
+  object lblApiDescription: TLabel
+    Left = 102
+    Top = 8
+    Width = 6
+    Height = 25
+    Font.Charset = DEFAULT_CHARSET
+    Font.Color = clWindowText
+    Font.Height = -21
+    Font.Name = 'Tahoma'
+    Font.Style = [fsBold]
+    ParentFont = False
+  end
   object Memo1: TMemo
     Left = 0
     Top = 39
@@ -26,7 +36,7 @@ object frmSimpleSwaggerDocDemo: TfrmSimpleSwaggerDocDemo
     TabOrder = 0
   end
   object btnLoadJSON: TButton
-    Left = 21
+    Left = 8
     Top = 8
     Width = 75
     Height = 25

@@ -1,7 +1,10 @@
 # SwagDoc
 SwagDoc is a Delphi library to generate swagger.json file for Swagger Spec version 2.0. Create a public documentation REST API using Swagger 2.0 for Delphi Language. SwagDoc's only responsibility is to generate the swagger.json file. The swagger.json file is responsible for containing all the documentation for your REST API. This file must be attached to the Swagger UI (User Interface) files. 
 
-## Swagger - version 2.0
+[![PayPal donate button](http://img.shields.io/paypal/donate.png?color=yellowgreen)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AW8TZ2QTDA7K8)
+
+
+## Swagger (Open API) - version 2.0
 
 SwagDoc follows the specification 2.0 because it is more popular in the market and also because it is considered a more stable version to exist the longest. SwagDoc does not yet support the Swagger 3.0 version, but depending on the demand and contributions to the project it may evolve to support spec 3.0.
 
@@ -9,11 +12,53 @@ The main prerequisite for working with SwagDoc is to know the Swagger 2.0 specif
 
 https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md
 
+https://swagger.io/docs/specification/2-0/basic-structure/
+
 When creating a Swagger documentation for your REST API you can produce a page like the following example.
 
-![image](https://user-images.githubusercontent.com/20048296/39936694-a4d9ac9a-5523-11e8-8161-98d0e396eb6f.png)
+https://app.swaggerhub.com/apis-docs/swagdoc/sample-api/v1
+
+![image](https://user-images.githubusercontent.com/20048296/46588904-c6cd5880-ca79-11e8-8a8a-ec38ba7ff95a.png)
+
+
+## Json Schema
+
+https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schemaObject
+
+http://json-schema.org
+
+
+## SwagDoc Speeches
+
+https://www.youtube.com/watch?v=9U3HP3B5UT0 (Pt-Br)
+
+
+## Swagger References and Tutorials 
+
+https://swagger.io/swagger/media/blog/wp-content/uploads/2017/02/Documenting-An-Existing-API-with-Swagger-2.pdf
+
+https://idratherbewriting.com/learnapidoc/pubapis_swagger_intro.html
+
+
+## Swagger Tools
+
+- Swagger:
+https://swagger.io
+
+- Swagger Editor:
+https://editor.swagger.io
+
+- Swagger Hub:
+https://swagger.io/tools/swaggerhub
+
+- The classic swagger sample:
 http://petstore.swagger.io
 
+- Tools and Integrations:
+https://swagger.io/tools/open-source/open-source-integrations
+
+
+## Swagger UI distribution files
 
 For you to produce a page containing a Swagger documentation you need the Swagger UI distribution files.
 

@@ -1,8 +1,3 @@
-{******************************************************************************}
-{                                                                              }
-{  Delphi SwagDoc Library                                                      }
-{  Copyright (c) 2018 Marcelo Jaloto                                           }
-{  https://github.com/marcelojaloto/SwagDoc                                    }
 {                                                                              }
 {******************************************************************************}
 {                                                                              }
@@ -20,23 +15,30 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Common.Consts;
+unit Sample.Data.Employee;
 
 interface
 
 uses
-  Swag.Common.Types;
+  Sample.Data.Address;
 
-const
-  c_SwaggerFileName = 'swagger.json';
-  c_SwaggerVersion = '2.0';
-  c_SwagTransferProtocolScheme: array[TSwagTransferProtocolScheme] of string = ('', 'http', 'https', 'ws', 'wss');
-  c_SwagSecurityDefinitionType: array[TSwagSecurityDefinitionType] of string = ('', 'basic', 'apiKey', 'oauth2');
-  c_SwagPathOperationHttpVerbs: array[TSwagPathTypeOperation] of string =
-    ('', 'get', 'post', 'put', 'delete', 'options', 'head', 'patch');
-  c_SwagRequestParameterInLocation: array[TSwagRequestParameterInLocation] of string =
-    ('', 'query', 'header', 'path', 'formData', 'body');
-  c_SwagTypeParameter: array[TSwagTypeParameter] of string = ('', 'string', 'number', 'integer', 'boolean', 'array', 'file');
+type
+  TEmployee = class(TObject)
+  strict private
+    fName: String;
+    fHireDate: TDate;
+    fPhone: String;
+    fId: Int64;
+    fSalary: Double;
+    fAddress: TAddress;
+  public
+    property Id: Int64 read fId write fId;
+    property Name: String read fName write fName;
+    property Phone: String read fPhone write fPhone;
+    property HireDate: TDate read fHireDate write fHireDate;
+    property Salary: Double read fSalary write fSalary;
+    property Address: TAddress read fAddress write fAddress;
+  end;
 
 implementation
 

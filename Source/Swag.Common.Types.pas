@@ -72,6 +72,13 @@ type
 
   TSwagPathTypeOperation = (ohvNotDefined, ohvGet, ohvPost, ohvPut, ohvDelete, ohvOptions, ohvHead, ohvPatch);
 
+  /// <summary>
+  /// The type of the parameter. Since the parameter is not located at the request body, it is limited to
+  /// simple types (that is, not an object).
+  /// The value MUST be one of "string", "number", "integer", "boolean", "array" or "file".
+  /// </summary>
+  TSwagTypeParameter = (stpNotDefined, stpString, stpNumber, stpInteger, stpBoolean, stpArray, stpFile);
+
 implementation
 
 end.

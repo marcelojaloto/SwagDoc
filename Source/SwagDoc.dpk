@@ -33,7 +33,7 @@ requires
   rtl;
 
 contains
-  Json.Commom.Helpers in 'Json.Commom.Helpers.pas',
+  Json.Common.Helpers in 'Json.Common.Helpers.pas',
   Json.Schema.Common.Types in 'Json.Schema.Common.Types.pas',
   Json.Schema.Field in 'Json.Schema.Field.pas',
   Json.Schema.Field.Booleans in 'Json.Schema.Field.Booleans.pas',

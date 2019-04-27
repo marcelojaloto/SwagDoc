@@ -35,7 +35,7 @@ implementation
 {$R *.dfm}
 
 uses
-  REST.Json,
+  Json.Common.Helpers,
   Swag.Common.Types,
   Swag.Doc.Path,
   Swag.Doc.Path.Operation,
@@ -102,7 +102,7 @@ begin
     vParam.InLocation := rpiPath;
     vParam.Description := 'A param required';
     vParam.Required := True;
-    vParam.TypeParameter := 'string';
+    vParam.TypeParameter := stpString;
     vOperation.Parameters.Add(vParam);
 
     vParam := TSwagRequestParameter.Create;
@@ -110,7 +110,7 @@ begin
     vParam.InLocation := rpiQuery;
     vParam.Description := 'A param that is not required';
     vParam.Required := False;
-    vParam.TypeParameter := 'string';
+    vParam.TypeParameter := stpString;
     vOperation.Parameters.Add(vParam);
 
     vParam := TSwagRequestParameter.Create;
@@ -144,7 +144,7 @@ begin
     vSwagDoc.Paths.Add(vPath);
 
     vSwagDoc.GenerateSwaggerJson;
-    Memo1.Lines.Add(REST.Json.TJson.Format(vSwagDoc.SwaggerJson));
+    Memo1.Lines.Add(vSwagDoc.SwaggerJson.Format);
   finally
     FreeAndNil(vSwagDoc);
   end;

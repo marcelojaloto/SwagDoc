@@ -20,66 +20,59 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Json.Schema.Field.Strings;
+unit Sample.Main;
 
 interface
 
 uses
-  System.Json,
-  Json.Schema.Field,
-  Json.Schema.Common.Types;
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
+  System.Variants,
+  FMX.Types,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Dialogs,
+  FMX.Controls.Presentation,
+  FMX.StdCtrls, FMX.ScrollBox, FMX.Memo;
 
 type
-  [ASchemaType(skString)]
-  TJsonFieldString = class(TJsonField)
-  strict private
-    fMinLength: Integer;
-    fMaxLength: Integer;
+  TForm1 = class(TForm)
+    Button1: TButton;
+    Memo1: TMemo;
+    procedure Button1Click(Sender: TObject);
+  private
+    { Private declarations }
   public
-    constructor Create; override;
-    function ToJsonSchema: TJsonObject; override;
-    function Clone: TJsonField; override;
-
-    property MinLength: Integer read fMinLength write fMinLength;
-    property MaxLength: Integer read fMaxLength write fMaxLength;
+    { Public declarations }
   end;
 
-  [ASchemaType(skGuid)]
-  TJsonFieldGuid = class(TJsonField);
+var
+  Form1: TForm1;
 
 implementation
 
+{$R *.fmx}
+
 uses
-  System.Classes,
-  Json.Common.Helpers;
+  Sample.SwagDoc;
 
-{ TJsonFieldString }
-
-function TJsonFieldString.Clone: TJsonField;
+procedure TForm1.Button1Click(Sender: TObject);
+var
+  vSampleDocApi: TSampleApiSwagDocBuilder;
 begin
-  Result := inherited Clone;
-  TJsonFieldString(Result).MinLength := Self.fMinLength;
-  TJsonFieldString(Result).MaxLength := Self.fMaxLength;
-end;
-
-constructor TJsonFieldString.Create;
-begin
-  inherited Create;
-  fMinLength := 0;
-  fMaxLength := 0;
-end;
-
-function TJsonFieldString.ToJsonSchema: TJsonObject;
-begin
-  Result := inherited ToJsonSchema;
-  if (fMinLength > 0) then
-    Result.AddPair('minLength', fMinLength);
-  if (fMaxLength > 0) then
-    Result.AddPair('maxLength', fMaxLength);
+  vSampleDocApi := TSampleApiSwagDocBuilder.Create;
+  try
+    vSampleDocApi.DeployFolder := ExtractFilePath(ParamStr(0));
+    memo1.Lines.Text := vSampleDocApi.Generate;
+  finally
+    vSampleDocApi.Free;
+  end;
 end;
 
 initialization
-  RegisterClass(TJsonFieldString);
-  RegisterClass(TJsonFieldGuid);
+  ReportMemoryLeaksOnShutdown := True;
 
 end.

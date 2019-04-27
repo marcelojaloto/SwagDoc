@@ -49,7 +49,8 @@ type
     function ToJson: TJsonObject;
     function Clone: TJsonSchema; overload;
     function Clone(pSourceField: TJsonSchema): TJsonSchema; overload;
-    function AddField<T>(const pName: string; const pDescription: string = ''): TJsonField;
+    function AddField<T>(const pName: string; const pDescription: string = ''): TJsonField; overload;
+    function AddField(pSchemaObject: TJsonSchema): TJsonField; overload;
 
     property Root: TJsonFieldObject read fRoot;
   end;
@@ -101,7 +102,7 @@ begin
     end;
     skInteger: Result := TJsonFieldInteger;
     skInt64: Result := TJsonFieldInt64;
-    skDouble: Result := TJsonFieldDouble;
+    skNumber: Result := TJsonFieldNumber;
     skDateTime: Result := TJsonFieldDateTime;
     skDate: Result := TJsonFieldDate;
     skTime: Result := TJsonFieldTime;
@@ -128,7 +129,7 @@ begin
   case vTypeInfo^.Kind of
     tkClass: Result := skObject;
     tkArray: Result := skArray;
-    tkString, tkChar: Result := skString;
+    tkString, tkUString, tkChar: Result := skString;
     tkRecord:
     begin
       if (LowerCase(string(vTypeInfo^.Name)) = 'tguid') then
@@ -152,7 +153,7 @@ begin
       else if (LowerCase(string(vTypeInfo^.Name)) = 'ttime') then
         Result := skTime
       else
-        Result := skDouble;
+        Result := skNumber;
     end;
   end;
 end;
@@ -160,6 +161,12 @@ end;
 function TJsonSchema.Clone: TJsonSchema;
 begin
   Result := Self.Clone(Self);
+end;
+
+function TJsonSchema.AddField(pSchemaObject: TJsonSchema): TJsonField;
+begin
+  Result := pSchemaObject.Root.Clone;
+  Self.Root.AddField(Result);
 end;
 
 function TJsonSchema.AddField<T>(const pName: string; const pDescription: string = ''): TJsonField;

@@ -42,6 +42,7 @@ type
     fJsonSchema: TJsonObject;
     procedure SetName(const Value: string);
     procedure SetJsonSchema(const Value: TJsonObject);
+    function GetJsonSchema: TJsonObject;
   public
     function GenerateJsonRefDefinition: TJsonObject;
 
@@ -55,7 +56,7 @@ type
     ///  * http://json-schema.org
     ///  * https://github.com/OAI/OpenAPI-Specification/blob/master/versions/2.0.md#schemaObject
     /// </summary>
-    property JsonSchema: TJsonObject read fJsonSchema write SetJsonSchema;
+    property JsonSchema: TJsonObject read GetJsonSchema write SetJsonSchema;
   end;
 
 implementation
@@ -64,6 +65,11 @@ uses
   System.SysUtils;
 
 { TSwagDefinition }
+
+function TSwagDefinition.GetJsonSchema: TJsonObject;
+begin
+  Result := fJsonSchema;
+end;
 
 procedure TSwagDefinition.SetJsonSchema(const Value: TJsonObject);
 begin
@@ -74,8 +80,6 @@ procedure TSwagDefinition.SetName(const Value: string);
 begin
   fName := Value;
 end;
-
-{ TSwagDefinition }
 
 function TSwagDefinition.GenerateJsonRefDefinition: TJsonObject;
 const

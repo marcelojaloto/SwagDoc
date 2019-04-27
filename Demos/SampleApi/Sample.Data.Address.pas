@@ -1,8 +1,3 @@
-{******************************************************************************}
-{                                                                              }
-{  Delphi SwagDoc Library                                                      }
-{  Copyright (c) 2018 Marcelo Jaloto                                           }
-{  https://github.com/marcelojaloto/SwagDoc                                    }
 {                                                                              }
 {******************************************************************************}
 {                                                                              }
@@ -20,23 +15,25 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Common.Consts;
+unit Sample.Data.Address;
 
 interface
 
-uses
-  Swag.Common.Types;
-
-const
-  c_SwaggerFileName = 'swagger.json';
-  c_SwaggerVersion = '2.0';
-  c_SwagTransferProtocolScheme: array[TSwagTransferProtocolScheme] of string = ('', 'http', 'https', 'ws', 'wss');
-  c_SwagSecurityDefinitionType: array[TSwagSecurityDefinitionType] of string = ('', 'basic', 'apiKey', 'oauth2');
-  c_SwagPathOperationHttpVerbs: array[TSwagPathTypeOperation] of string =
-    ('', 'get', 'post', 'put', 'delete', 'options', 'head', 'patch');
-  c_SwagRequestParameterInLocation: array[TSwagRequestParameterInLocation] of string =
-    ('', 'query', 'header', 'path', 'formData', 'body');
-  c_SwagTypeParameter: array[TSwagTypeParameter] of string = ('', 'string', 'number', 'integer', 'boolean', 'array', 'file');
+type
+  TAddress = class(TObject)
+  private
+    fPostalCode: string;
+    fCountry: string;
+    fDescription: string;
+    fCity: string;
+    fRegion: string;
+  public
+    property Description: string read fDescription write fDescription;
+    property City: string read fCity write fCity;
+    property Region: string read fRegion write fRegion;
+    property Country: string read fCountry write fCountry;
+    property PostalCode: string read fPostalCode write fPostalCode;
+  end;
 
 implementation
 

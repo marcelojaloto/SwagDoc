@@ -50,7 +50,7 @@ type
     function GetCount: Integer;
     function GetItem(const pIndex: Byte): TJsonFieldEnumItem;
   public
-    constructor Create; reintroduce;
+    constructor Create; override;
     destructor Destroy; override;
 
     procedure AddItem(const pValue: Byte; const pDescription: string);
