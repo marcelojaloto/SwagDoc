@@ -33,7 +33,7 @@ const
   c_SwagTransferProtocolScheme: array[TSwagTransferProtocolScheme] of string = ('', 'http', 'https', 'ws', 'wss');
   c_SwagSecurityDefinitionType: array[TSwagSecurityDefinitionType] of string = ('', 'basic', 'apiKey', 'oauth2');
   c_SwagPathOperationHttpVerbs: array[TSwagPathTypeOperation] of string =
-    ('', 'get', 'post', 'put', 'delete', 'options', 'head', 'patch');
+    ('', 'get', 'post', 'put', 'delete', 'options', 'head', 'patch', 'trace');
   c_SwagRequestParameterInLocation: array[TSwagRequestParameterInLocation] of string =
     ('', 'query', 'header', 'path', 'formData', 'body');
   c_SwagTypeParameter: array[TSwagTypeParameter] of string = ('', 'string', 'number', 'integer', 'boolean', 'array', 'file');

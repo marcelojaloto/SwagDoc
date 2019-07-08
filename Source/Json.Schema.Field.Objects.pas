@@ -35,6 +35,7 @@ type
   TJsonFieldObject = class(TJsonField)
   strict private
     fFields: TObjectList<TJsonField>;
+    fRef : string;
 
     function GetFieldsCount: Integer;
     function GetField(const pFieldIndex: Integer): TJsonField;
@@ -56,6 +57,7 @@ type
     property Fields[const pFieldIndex: Integer]: TJsonField read GetField; default;
     property FieldsByName[const pName: string]: TJsonField read GetFieldByName;
     property FieldsCount: Integer read GetFieldsCount;
+    property Ref: string read fRef write fRef;
   end;
 
 implementation
@@ -145,6 +147,13 @@ var
   vJsonRequiredList: TJsonArray;
   vField: TJsonField;
 begin
+  if fref.length > 0 then
+  begin
+    Result := TJSONObject.Create;
+    Result.AddPair('$Ref', FRef);
+    Exit;
+  end;
+  
   Result := inherited ToJsonSchema;
 
   vJsonRequiredList := TJsonArray.Create;

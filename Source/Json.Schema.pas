@@ -42,6 +42,9 @@ type
 
     function GetJsonFieldClass<T>: TJsonFieldClass;
     function GetSchemaKind<T>: TSchemaKind;
+  private
+    procedure SetRef(const Value: string);
+    function GetRef: string;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -53,6 +56,7 @@ type
     function AddField(pSchemaObject: TJsonSchema): TJsonField; overload;
 
     property Root: TJsonFieldObject read fRoot;
+    property Ref: string read GetRef write SetRef;
   end;
 
 implementation
@@ -116,6 +120,11 @@ begin
   end;
 end;
 
+procedure TJsonSchema.SetRef(const Value: string);
+begin
+  fRoot.Ref := Value;
+end;
+
 function TJsonSchema.GetSchemaKind<T>: TSchemaKind;
 var
   vTypeInfo: PTypeInfo;
@@ -158,6 +167,11 @@ begin
   end;
 end;
 
+function TJsonSchema.GetRef: string;
+begin
+  Result := FRef;
+end;
+
 function TJsonSchema.Clone: TJsonSchema;
 begin
   Result := Self.Clone(Self);
@@ -181,11 +195,18 @@ function TJsonSchema.Clone(pSourceField: TJsonSchema): TJsonSchema;
 begin
   Result := TJsonSchema.Create;
   Result.Root.CopyFields(pSourceField.Root);
+  Result.Root.Ref := pSourceField.Root.Ref;
 end;
 
 function TJsonSchema.ToJson: TJsonObject;
 begin
-  Result := fRoot.ToJsonSchema;
+  if fRef.Length = 0 then
+    Result := fRoot.ToJsonSchema
+  else
+  begin
+    Result := TJSONObject.Create;
+    Result.AddPair('$ref', fRef);
+  end;
 end;
 
 end.

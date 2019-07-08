@@ -70,7 +70,7 @@ type
   /// </summary>
   TSwagRequestParameterInLocation = (rpiNotDefined, rpiQuery, rpiHeader, rpiPath, rpiFormData, rpiBody);
 
-  TSwagPathTypeOperation = (ohvNotDefined, ohvGet, ohvPost, ohvPut, ohvDelete, ohvOptions, ohvHead, ohvPatch);
+  TSwagPathTypeOperation = (ohvNotDefined, ohvGet, ohvPost, ohvPut, ohvDelete, ohvOptions, ohvHead, ohvPatch, ohvTrace);
 
   /// <summary>
   /// The type of the parameter. Since the parameter is not located at the request body, it is limited to
