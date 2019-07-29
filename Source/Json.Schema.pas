@@ -37,7 +37,7 @@ type
   TJsonSchema = class(TObject)
   strict private
     fRoot: TJsonFieldObject;
-
+    fRef : string;
     const c_ErrorTypeNotSupportedByAField = 'Type not supported by a field.';
 
     function GetJsonFieldClass<T>: TJsonFieldClass;

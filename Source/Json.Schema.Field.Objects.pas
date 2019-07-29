@@ -139,6 +139,7 @@ function TJsonFieldObject.Clone(pSourceField: TJsonFieldObject): TJsonFieldObjec
 begin
   Result := TJsonFieldObject(inherited Clone);
   Result.CopyFields(pSourceField);
+  Result.Ref := pSourceField.Ref;
 end;
 
 function TJsonFieldObject.ToJsonSchema: TJsonObject;
@@ -150,7 +151,7 @@ begin
   if fref.length > 0 then
   begin
     Result := TJSONObject.Create;
-    Result.AddPair('$Ref', FRef);
+    Result.AddPair('$ref', FRef);
     Exit;
   end;
   
