@@ -25,6 +25,7 @@ unit Json.Schema.Field.Strings;
 interface
 
 uses
+  System.SysUtils,
   System.Json,
   Json.Schema.Field,
   Json.Schema.Common.Types;
@@ -35,6 +36,7 @@ type
   strict private
     fMinLength: Integer;
     fMaxLength: Integer;
+    fPattern: string;
   public
     constructor Create; override;
     function ToJsonSchema: TJsonObject; override;
@@ -42,6 +44,7 @@ type
 
     property MinLength: Integer read fMinLength write fMinLength;
     property MaxLength: Integer read fMaxLength write fMaxLength;
+    property Pattern: String read fPattern write fPattern;
   end;
 
   [ASchemaType(skGuid)]
@@ -60,6 +63,7 @@ begin
   Result := inherited Clone;
   TJsonFieldString(Result).MinLength := Self.fMinLength;
   TJsonFieldString(Result).MaxLength := Self.fMaxLength;
+  TJsonFieldString(Result).Pattern   := Self.fPattern;
 end;
 
 constructor TJsonFieldString.Create;
@@ -67,6 +71,7 @@ begin
   inherited Create;
   fMinLength := 0;
   fMaxLength := 0;
+  fPattern := '';
 end;
 
 function TJsonFieldString.ToJsonSchema: TJsonObject;
@@ -76,6 +81,8 @@ begin
     Result.AddPair('minLength', fMinLength);
   if (fMaxLength > 0) then
     Result.AddPair('maxLength', fMaxLength);
+  if (fPattern.Length > 0) then
+    Result.AddPair('pattern', fPattern);
 end;
 
 initialization
