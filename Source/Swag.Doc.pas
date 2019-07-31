@@ -343,16 +343,18 @@ begin
   end;
 
   vJsonProduces := (fSwaggerJson as TJSONObject).Values[c_SwagProduces] as TJSONArray;
-  for vIndex := 0 to vJsonProduces.Count - 1 do
-  begin
-    Produces.Add(vJsonProduces.Items[vIndex].Value);
-  end;
+  if Assigned(vJsonProduces) then
+    for vIndex := 0 to vJsonProduces.Count - 1 do
+    begin
+      Produces.Add(vJsonProduces.Items[vIndex].Value);
+    end;
 
   vJsonConsumes := (fSwaggerJson as TJSONObject).Values[c_SwagConsumes] as TJSONArray;
-  for vIndex := 0 to vJsonConsumes.count - 1 do
-  begin
-    Consumes.Add(vJsonConsumes.Items[vIndex].Value);
-  end;
+  if Assigned(vJsonConsumes) then
+    for vIndex := 0 to vJsonConsumes.count - 1 do
+    begin
+      Consumes.Add(vJsonConsumes.Items[vIndex].Value);
+    end;
 end;
 
 function TSwagDoc.ReturnSwaggerFileName: string;
