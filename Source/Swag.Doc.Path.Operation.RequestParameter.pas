@@ -43,6 +43,7 @@ type
     fDescription: string;
     fTypeParameter: TSwagTypeParameter;
     fPattern: string;
+    fItems: TJSONObject;
   protected
     function ReturnInLocationToString: string;
   public
@@ -86,6 +87,8 @@ type
     /// Required. The schema defining the type used for the body parameter.
     /// </summary>
     property Schema: TSwagDefinition read fSchema;
+
+    property Items: TJSONObject read fItems;
 
     /// <summary>
     /// If in is any value other than "body"
@@ -171,6 +174,13 @@ begin
 
   if Assigned(pJson.Values[c_SwagRequestParameterType]) then
     fTypeParameter.ToType(pJson.Values[c_SwagRequestParameterType].Value);
+
+  if Assigned(pJson.Values[c_SwagRequestParameterSchema]) then
+    fSchema.JsonSchema := pJson.Values[c_SwagRequestParameterSchema] as TJSONObject;
+
+  if Assigned(pJson.Values['items']) then
+    fItems := pJson.Values['items'] as TJSONObject;
+
 end;
 
 function TSwagRequestParameter.ReturnInLocationToString: string;
