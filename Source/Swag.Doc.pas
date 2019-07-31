@@ -312,6 +312,8 @@ var
   vJsonSchemesArray: TJSONArray;
   vJsonProduces: TJSONArray;
   vJsonConsumes: TJSONArray;
+  vJsonDefinitions : TJSONObject;
+  vDefinition : TSwagDefinition;
   vIndex: Integer;
 begin
   if not FileExists(pFilename) then
@@ -354,6 +356,16 @@ begin
     for vIndex := 0 to vJsonConsumes.count - 1 do
     begin
       Consumes.Add(vJsonConsumes.Items[vIndex].Value);
+    end;
+
+  vJsonDefinitions := (fSwaggerJson as TJSONObject).Values[c_SwagDefinitions] as TJSONObject;
+  if Assigned(vJsonDefinitions) then
+    for vIndex := 0 to vJsonDefinitions.Count - 1 do
+    begin
+      vDefinition := TSwagDefinition.Create;
+      vDefinition.Name := (vJsonDefinitions.Pairs[vIndex] as TJSONPair).JsonString.Value;
+      vDefinition.JsonSchema := ((vJsonDefinitions.Pairs[vIndex] as TJSONPair).JsonValue as TJSONObject);
+      Definitions.Add(vDefinition);
     end;
 end;
 
