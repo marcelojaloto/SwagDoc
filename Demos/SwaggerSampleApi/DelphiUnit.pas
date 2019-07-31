@@ -55,6 +55,9 @@ type
     FParams: TObjectList<TUnitParameter>;
     FVars: TObjectList<TUnitParameter>;
     FContent: TStringList;
+    function MethodKindToDelphiString(var LHasReturn: Boolean): string;
+    procedure ParametersToDelphiString(var LParamString: string);
+    procedure MethodLocalVarsToDelphiString(LFuncSL: TStringList);
   public
     property Content: TStringList read FContent write FContent;
     property MethodKind: TMethodKind read FMethodKind write FMethodKind;
@@ -114,6 +117,16 @@ type
   end;
 
 implementation
+
+function DelphiVarName(const inVarname: string):string;
+begin
+  Result := inVarname;
+  if Result.ToLower = 'type' then
+    Result := '&' + Result
+  else if Result.ToLower = 'file' then
+    Result := '&' + Result;
+end;
+
 
 { TDelphiUnit }
 
@@ -334,7 +347,6 @@ var
   i : Integer;
   SL : TStringList;
   LType : string;
-  LFieldName : string;
 begin
   SL := TStringList.Create;
   try
@@ -348,14 +360,7 @@ begin
     if Description.Length > 0 then
       SL.Add('    [MVCDoc(' + QuotedStr(Description) + ')]');
 
-    LFieldName := FFieldName;
-    if LFieldName.ToLower = 'type' then
-      LFieldName := '&' + LFieldName
-    else if LFieldName.ToLower = 'file' then
-      LFieldName := '&' + LFieldName;
-
-
-    SL.Add('    ' + LFieldName + ' : ' + LType + ';');
+    SL.Add('    ' + DelphiVarName(FFieldName) + ' : ' + LType + ';');
     Result := SL.Text;
   finally
     FreeAndNil(SL);
@@ -396,50 +401,26 @@ begin
   inherited;
 end;
 
-function TUnitMethod.GenerateImplementation(inOnType: TUnitTypeDefinition): string;
+procedure TUnitMethod.MethodLocalVarsToDelphiString(LFuncSL: TStringList);
 var
-  LProcTypeString: string;
-  LHasReturn: Boolean;
+  i: Integer;
+begin
+  if FVars.Count > 0 then
+  begin
+    LFuncSL.Add('var');
+    for i := 0 to FVars.Count - 1 do
+    begin
+      LFuncSL.Add('  ' + FVars[i].ParamName + ' : ' + FVars[i].ParamType.TypeName + ';');
+    end;
+  end;
+end;
+
+procedure TUnitMethod.ParametersToDelphiString(var LParamString: string);
+var
   LParam: TUnitParameter;
   LParamFlagString: string;
-  LParamString: string;
-  LClassNameProcIn: string;
-  i: Integer;
-  LFuncSL: TStringList;
-  LParamName : string;
+  LParamName: string;
 begin
-  LHasReturn := False;
-  LClassNameProcIn := '';
-  case MethodKind of
-    mkProcedure:
-      LProcTypeString := 'procedure';
-    mkFunction:
-      begin
-        LProcTypeString := 'function';
-        LHasReturn := True;
-      end;
-    mkDestructor:
-      LProcTypeString := 'destructor';
-    mkConstructor:
-      LProcTypeString := 'constructor';
-    mkClassFunction:
-      begin
-        LProcTypeString := 'class function';
-        LHasReturn := True;
-      end;
-    mkClassProcedure:
-      LProcTypeString := 'class procedure';
-    mkClassConstructor:
-      LProcTypeString := 'class constructor';
-    mkClassDestructor:
-      LProcTypeString := 'class destructor';
-  else
-    LProcTypeString := 'unknown'; // invalid ... will cause a compile error
-  end;
-
-  if Assigned(inOnType) then
-    LClassNameProcIn := inOnType.TypeName + '.';
-
   LParamString := '(';
   for LParam in GetParameters do
   begin
@@ -448,26 +429,64 @@ begin
       LParamFlagString := 'const'
     else if pfVar in LParam.Flags then
       LParamFlagString := 'var';
-
     if LParamFlagString.Length > 0 then
       LParamFlagString := LParamFlagString + ' ';
 
-    LParamName := LParam.ParamName;
-    if LParamName.ToLower = 'type' then
-      LParamName := '&' + LParamName
-    else if LParamName.ToLower = 'file' then
-      LParamName := '&' + LParamName;
-
+    LParamName := DelphiVarName(LParam.ParamName);
     LParamString := LParamString + LParamFlagString + LParamName + ': ' + LParam.FType.FTypeName + '; ';
   end;
-
   if LParamString.EndsWith('; ') then
     LParamString := LParamString.Remove(LParamString.Length - 2);
-
   LParamString := LParamString + ')';
-
   if LParamString = '()' then
     LParamString := '';
+end;
+
+function TUnitMethod.MethodKindToDelphiString(var LHasReturn: Boolean): string;
+begin
+  case MethodKind of
+    mkProcedure:
+      Result := 'procedure';
+    mkFunction:
+      begin
+        Result := 'function';
+        LHasReturn := True;
+      end;
+    mkDestructor:
+      Result := 'destructor';
+    mkConstructor:
+      Result := 'constructor';
+    mkClassFunction:
+      begin
+        Result := 'class function';
+        LHasReturn := True;
+      end;
+    mkClassProcedure:
+      Result := 'class procedure';
+    mkClassConstructor:
+      Result := 'class constructor';
+    mkClassDestructor:
+      Result := 'class destructor';
+  else
+    Result := 'unknown';
+  end;
+end;
+
+function TUnitMethod.GenerateImplementation(inOnType: TUnitTypeDefinition): string;
+var
+  LProcTypeString: string;
+  LHasReturn: Boolean;
+  LParamString: string;
+  LClassNameProcIn: string;
+  LFuncSL: TStringList;
+begin
+  LHasReturn := False;
+  LClassNameProcIn := '';
+  LProcTypeString := MethodKindToDelphiString(LHasReturn);
+
+  if Assigned(inOnType) then
+    LClassNameProcIn := inOnType.TypeName + '.';
+  ParametersToDelphiString(LParamString);
 
   if LHasReturn then
     Result := LProcTypeString + ' ' + LClassNameProcIn + FName + LParamString + ': ' + ReturnType.FTypeName + ';'
@@ -477,14 +496,9 @@ begin
   LFuncSL := TStringList.Create;
   try
     LFuncSL.Text := Result;
-    if FVars.Count > 0 then
-    begin
-      LFuncSL.Add('var');
-      for i := 0 to FVars.Count - 1 do
-      begin
-        LFuncSL.Add('  ' + FVars[i].ParamName + ' : ' + FVars[i].ParamType.TypeName + ';');
-      end;
-    end;
+
+    MethodLocalVarsToDelphiString(LFuncSL);
+
     LFuncSL.Add('begin');
     LFuncSL.Add(Content.Text);
     LFuncSL.Add('end;');
@@ -503,6 +517,7 @@ var
   LParamFlagString: string;
   LParamString: string;
   LAttributeString: string;
+  LParamName : string;
 begin
   LHasReturn := False;
   case MethodKind of
@@ -541,11 +556,7 @@ begin
     else if pfVar in LParam.Flags then
       LParamFlagString := 'var';
 
-    LParamName := LParam.ParamName;
-    if LParamName.ToLower = 'type' then
-      LParamName := '&' + LParamName
-    else if LParamName.ToLower = 'file' then
-      LParamName := '&' + LParamName;
+    LParamName := DelphiVarName(LParam.ParamName);
 
     if LParamFlagString.Length > 0 then
       LParamFlagString := LParamFlagString + ' ';
