@@ -31,6 +31,9 @@ type
     procedure HandleArray(inField: TUnitFieldDefinition; json: TJSONPair);
     procedure ConvertSwaggerDefinitionsToTypeDefinitions(delphiUnit: TDelphiUnit);
     function SwaggerTypeAsString(ASwaggerType: TSwagTypeParameter): string;
+    procedure CreatePathParam(ASwagParam: TSwagRequestParameter; AParam: TUnitParameter);
+    function HandleFormatOnParameter(const inParamType:string; param: TSwagRequestParameter): string;
+    procedure CreateNonPathParam(ASwagParam: TSwagRequestParameter; AMethod : TUnitMethod);
     function InLocationAsString(ASwaggerType: TSwagRequestParameterInLocation): string;
   public
     constructor Create(SwagDoc: TSwagDoc);
@@ -179,23 +182,6 @@ begin
             LResultParam.ParamType.TypeName := ConvertRefToType(LRef);
             LMethod.AddLocalVariable(LResultParam);
             LMethod.Content.Add('  ' + ConvertRefToVarName(LRef) + ' := ' + ConvertRefToType(LRef) + '.Create;');
-              for k := 0 to FSwagDoc.Paths[i].Operations[j].Parameters.Count - 1 do
-              begin
-//              if fSwagDoc.Paths[i].Operations[j].Parameters[k].InLocation <> rpiPath then
-                begin
-                  LResultParam := TUnitParameter.Create;
-                  LResultParam.ParamName := CapitalizeFirstLetter(fSwagDoc.Paths[i].Operations[j].Parameters[k].Name);
-                  LResultParam.ParamType := TUnitTypeDefinition.Create;
-                  LResultParam.ParamType := ConvertSwaggerTypeToDelphiType(fSwagDoc.Paths[i].Operations[j].Parameters[k]);
-                  if LResultParam.ParamType.TypeName = 'array of' then
-                  begin
-                    LResultParam.ParamType.TypeName := LResultParam.ParamType.TypeName + ' ' + fSwagDoc.Paths[i].Operations[j].Parameters[k].Schema.JsonSchema.Values['type'].Value;
-                  end;
-                  LMethod.AddParameter(LResultParam);
-//                  LMethod.AddLocalVariable(LResultParam);
-//                  LMethod.Content.Add('  param' + TidyUpTypeName(fSwagDoc.Paths[i].Operations[j].Parameters[k].Name) + ' := Context.Request.Params[' + QuotedStr(fSwagDoc.Paths[i].Operations[j].Parameters[k].Name) + '];');
-                end;
-              end;
 //            method.Content.Add('  Render(' + response.Key + ', ' + ConvertRefToVarName(ref) + ');');
           end
           else
@@ -218,18 +204,6 @@ begin
               LDelphiUnit.AddInterfaceUnit('Generics.Collections');
               LMethod.Content.Add('  ' + ConvertRefToVarName(LRef) + ' := TObjectList<' + ConvertRefToType(LRef) + '>.Create;');
 
-              for k := 0 to FSwagDoc.Paths[i].Operations[j].Parameters.Count - 1 do
-              begin
-//                if fSwagDoc.Paths[i].Operations[j].Parameters[k].InLocation <> rpiPath then
-                begin
-                  LResultParam := TUnitParameter.Create;
-                  LResultParam.ParamName := fSwagDoc.Paths[i].Operations[j].Parameters[k].Name;
-                  LResultParam.ParamType := TUnitTypeDefinition.Create;
-                  LResultParam.ParamType := ConvertSwaggerTypeToDelphiType(fSwagDoc.Paths[i].Operations[j].Parameters[k]);
-                  LMethod.AddLocalVariable(LResultParam);
-                  LMethod.Content.Add('  ' + fSwagDoc.Paths[i].Operations[j].Parameters[k].Name + ' := Context.Request.Params[' + QuotedStr(fSwagDoc.Paths[i].Operations[j].Parameters[k].Name) + '];');
-                end;
-              end;
             end;
 
           end;
@@ -247,6 +221,71 @@ begin
   end;
 end;
 
+procedure TSwagDocToDelphiRESTClientBuilder.CreateNonPathParam(ASwagParam: TSwagRequestParameter; AMethod : TUnitMethod);
+var
+  param1 : string;
+  param2 : string;
+  paramType : string;
+  param4 : string;
+  param5 : string;
+  params : string;
+
+begin
+  param1 := ASwagParam.Name;
+  param2 := InLocationAsString(ASwagParam.InLocation);
+  paramType := SwaggerTypeAsString(ASwagParam.TypeParameter);
+  param4 := ASwagParam.Pattern;
+  param5 := ASwagParam.Format;
+
+  if ASwagParam.TypeParameter = stpNotDefined then
+  begin
+    if ASwagParam.Schema.JsonSchema.Values['$ref']<>nil then
+      paramType := ConvertRefToType(ASwagParam.Schema.JsonSchema.Values['$ref'].Value);
+  end;
+
+
+  if param1.Length = 0 then
+    raise Exception.Create('Parameter name not specified');
+
+  if ASwagParam.InLocation = rpiNotDefined then
+    raise Exception.Create('Parameter location not specified');
+
+  if paramType.Length = 0 then
+    raise Exception.Create('Parameter type not specified');
+
+  params := param1.QuotedString + ', ' + param2 + ', '+ paramType;
+  if param5.Length > 0 then
+    params := params + ', ' + param4.QuotedString + ', ' + param5.QuotedString
+  else if param4.Length > 0 then
+  params := params + ', ' + param4.QuotedString;
+
+  AMethod.AddAttribute('[MVCParam(' + params + ')]');
+end;
+procedure TSwagDocToDelphiRESTClientBuilder.CreatePathParam(ASwagParam: TSwagRequestParameter; AParam: TUnitParameter);
+var
+  param1 : string;
+  param2 : string;
+  param3 : string;
+  params : string;
+begin
+  param1 := SwaggerTypeAsString(ASwagParam.TypeParameter);
+  param2 := ASwagParam.Pattern;
+  param3 := ASwagParam.Format;
+
+  params := param1;
+  if param3.Length > 0 then
+    params := params + ', ' + param2.QuotedString + ', ' + param3.QuotedString
+  else if param2.Length > 0 then
+    params := params + ', ' + param2.QuotedString;
+
+  if ASwagParam.Description.Trim <> '' then
+  begin
+  AParam.AddAttribute('[MVCDoc(' + ASwagParam.Description.QuotedString + ')]');
+  end;
+
+  AParam.AddAttribute('[MVCPathParam(' + params + ')]');
+end;
+
 function ReturnStatusCode(inStatusCode: string):string;
 begin
   inStatusCode := inStatusCode.ToLower;
@@ -260,6 +299,19 @@ begin
     Result := 'HTTP_STATUS.MethodNotAllowed'
   else
     Result := inStatusCode;
+end;
+function TSwagDocToDelphiRESTClientBuilder.HandleFormatOnParameter(const inParamType:string; param: TSwagRequestParameter): string;
+begin
+  if param.Format.ToLower = 'int64' then
+  begin
+    Result := 'Int64';
+    if inParamType.ToLower <> 'integer' then
+       raise Exception.Create('Parameter Type and Format do not match');
+  end
+  else
+  begin
+    Result := inParamType;
+  end;
 end;
 procedure TSwagDocToDelphiRESTClientBuilder.HandleArray(inField : TUnitFieldDefinition; json: TJSONPair);
 var
