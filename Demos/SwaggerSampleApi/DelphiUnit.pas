@@ -347,6 +347,7 @@ var
   i : Integer;
   SL : TStringList;
   LType : string;
+  LFieldName : string;
 begin
   SL := TStringList.Create;
   try
@@ -476,9 +477,13 @@ function TUnitMethod.GenerateImplementation(inOnType: TUnitTypeDefinition): stri
 var
   LProcTypeString: string;
   LHasReturn: Boolean;
+  LParam: TUnitParameter;
+  LParamFlagString: string;
   LParamString: string;
   LClassNameProcIn: string;
+  i: Integer;
   LFuncSL: TStringList;
+  LParamName : string;
 begin
   LHasReturn := False;
   LClassNameProcIn := '';
