@@ -47,6 +47,7 @@ type
   public
     function GenerateJsonRefDefinition: TJsonObject;
     procedure SetJsonSchema(const Name:string; Value: TJsonSchema); overload;
+    procedure Load(pJson: TJSONObject);
     /// <summary>
     /// The schema name alias.
     /// </summary>
@@ -70,6 +71,11 @@ uses
 function TSwagDefinition.GetJsonSchema: TJsonObject;
 begin
   Result := fJsonSchema;
+end;
+
+procedure TSwagDefinition.Load(pJson: TJSONObject);
+begin
+  fJsonSchema := pJson;
 end;
 
 procedure TSwagDefinition.SetJsonSchema(const Value: TJsonObject);

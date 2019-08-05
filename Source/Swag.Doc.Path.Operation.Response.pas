@@ -165,9 +165,12 @@ end;
 procedure TSwagResponse.Load(pJson: TJSONObject);
 var
   vJSONHeaders: TJSONObject;
+  vJSONSchema: TJSONObject;
   vIndex: Integer;
   vHeader: TSwagHeaders;
 begin
+  if not Assigned(pJson) then
+    Exit;
   if Assigned(pJson.Values[c_SwagResponseDescription]) then
     fDescription := pJson.Values[c_SwagResponseDescription].Value;
 
@@ -181,6 +184,13 @@ begin
       vHeader.Name := vJSONHeaders.Pairs[vIndex].JsonString.Value;
       fHeaders.Add(vheader);
     end;
+  end;
+
+  if Assigned(pJson.Values[c_SwagResponseSchema]) then
+  begin
+    vJSONSchema := pJson.Values[c_SwagResponseSchema] as TJSONObject;
+    fSchema := TSwagDefinition.Create;
+    fSchema.Load(vJSONSchema);
   end;
 end;
 
