@@ -37,6 +37,7 @@ type
     fMinLength: Integer;
     fMaxLength: Integer;
     fPattern: string;
+    fFormat: string;
   public
     constructor Create; override;
     function ToJsonSchema: TJsonObject; override;
@@ -45,6 +46,7 @@ type
     property MinLength: Integer read fMinLength write fMinLength;
     property MaxLength: Integer read fMaxLength write fMaxLength;
     property Pattern: String read fPattern write fPattern;
+    property Format: string read fFormat write fFormat;
   end;
 
   [ASchemaType(skGuid)]

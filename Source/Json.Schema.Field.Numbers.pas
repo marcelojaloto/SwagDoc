@@ -36,6 +36,7 @@ type
     fDefaultValue: TValue;
     fMinValue: TValue;
     fMaxValue: TValue;
+    fFormat: string;
 
     procedure SetDefaultValue(const Value: T);
     procedure SetMaxValue(const Value: T);
@@ -51,6 +52,7 @@ type
     property MinValue: T read GetMinValue write SetMinValue;
     property MaxValue: T read GetMaxValue write SetMaxValue;
     property DefaultValue: T read GetDefaultValue write SetDefaultValue;
+    property Format: string read fFormat write fFormat;
   end;
 
   [ASchemaType(skInt64)]
