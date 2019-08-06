@@ -148,7 +148,7 @@ var
   vJsonRequiredList: TJsonArray;
   vField: TJsonField;
 begin
-  if fref.length > 0 then
+  if (fRef.Length > 0) then
   begin
     Result := TJSONObject.Create;
     Result.AddPair('$ref', FRef);

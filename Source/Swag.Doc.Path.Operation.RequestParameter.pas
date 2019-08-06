@@ -44,7 +44,7 @@ type
     fTypeParameter: TSwagTypeParameter;
     fPattern: string;
     fItems: TJSONObject;
-    fFormat: String;
+    fFormat: string;
   protected
     function ReturnInLocationToString: string;
   public
@@ -107,7 +107,7 @@ type
     /// to support documentation needs. Formats such as "email", "uuid", etc., can be used even though they are not
     /// defined by this specification.
     ///  </summary>
-    property Format: String read fFormat write fFormat;
+    property Format: string read fFormat write fFormat;
 
   end;
 
