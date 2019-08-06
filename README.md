@@ -1,7 +1,7 @@
 # SwagDoc
 SwagDoc is a Delphi library to generate swagger.json file for Swagger Spec version 2.0. Create a public documentation REST API using Swagger 2.0 for Delphi Language. SwagDoc's only responsibility is to generate the swagger.json file. The swagger.json file is responsible for containing all the documentation for your REST API. This file must be attached to the Swagger UI (User Interface) files. 
 
-[![PayPal donate button](http://img.shields.io/paypal/donate.png?color=yellowgreen)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AW8TZ2QTDA7K8)
+[![PayPal donate button](https://user-images.githubusercontent.com/26885358/62579415-11765780-b87a-11e9-8b57-171e3c678f98.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AW8TZ2QTDA7K8)
 
 
 ## Swagger (Open API) - version 2.0
