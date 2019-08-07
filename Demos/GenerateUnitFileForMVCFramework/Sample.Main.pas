@@ -4,6 +4,8 @@
 {  Copyright (c) 2018 Marcelo Jaloto                                           }
 {  https://github.com/marcelojaloto/SwagDoc                                    }
 {                                                                              }
+{  Sample author: geoffsmith82 - 2019                                          }
+{                                                                              }
 {******************************************************************************}
 {                                                                              }
 {  Licensed under the Apache License, Version 2.0 (the "License");             }
@@ -20,24 +22,75 @@
 {                                                                              }
 {******************************************************************************}
 
-unit Swag.Common.Consts;
+unit Sample.Main;
 
 interface
 
 uses
-  Swag.Common.Types;
+  System.SysUtils,
+  System.Types,
+  System.UITypes,
+  System.Classes,
+  System.Variants,
+  FMX.Types,
+  FMX.Controls,
+  FMX.Forms,
+  FMX.Graphics,
+  FMX.Dialogs,
+  FMX.Controls.Presentation,
+  FMX.StdCtrls,
+  FMX.ScrollBox,
+  FMX.Memo,
+  FMX.TabControl;
 
-const
-  c_SwaggerFileName = 'swagger.json';
-  c_SwaggerVersion = '2.0';
-  c_SwagTransferProtocolScheme: array[TSwagTransferProtocolScheme] of string = ('', 'http', 'https', 'ws', 'wss');
-  c_SwagSecurityDefinitionType: array[TSwagSecurityDefinitionType] of string = ('', 'basic', 'apiKey', 'oauth2');
-  c_SwagPathOperationHttpVerbs: array[TSwagPathTypeOperation] of string =
-    ('', 'get', 'post', 'put', 'delete', 'options', 'head', 'patch', 'trace');
-  c_SwagRequestParameterInLocation: array[TSwagRequestParameterInLocation] of string =
-    ('', 'query', 'header', 'path', 'formData', 'body');
-  c_SwagTypeParameter: array[TSwagTypeParameter] of string = ('', 'string', 'number', 'integer', 'boolean', 'array', 'file');
+type
+  TForm1 = class(TForm)
+    Memo1: TMemo;
+    TabControl1: TTabControl;
+    TabItem1: TTabItem;
+    TabItem2: TTabItem;
+    Memo2: TMemo;
+    btnGenerateClient: TButton;
+    procedure btnGenerateClientClick(Sender: TObject);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form1: TForm1;
 
 implementation
+
+{$R *.fmx}
+
+uses
+  System.IOUtils,
+  Swag.Doc,
+  Sample.MvcControllerClientFileBuilder;
+
+procedure TForm1.btnGenerateClientClick(Sender: TObject);
+var
+  vClientBuilder: TSwagDocToDelphiRESTClientBuilder;
+  vSwagDoc: TSwagDoc;
+  vFilename: string;
+begin
+  vClientBuilder := nil;
+  try
+    vSwagDoc := TSwagDoc.Create;
+    vFilename := ExtractFilePath(ParamStr(0)) + 'Swagger.json';
+    vSwagDoc.LoadFromFile(vFilename);
+    memo1.Lines.Text := TFile.ReadAllText(vFilename);
+    vClientBuilder := TSwagDocToDelphiRESTClientBuilder.Create(vSwagDoc);
+    memo2.Lines.Text := vClientBuilder.Generate;
+  finally
+    FreeAndNil(vClientBuilder);
+    FreeAndNil(vSwagDoc);
+  end;
+end;
+
+initialization
+  ReportMemoryLeaksOnShutdown := True;
 
 end.

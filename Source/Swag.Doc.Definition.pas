@@ -25,6 +25,7 @@ unit Swag.Doc.Definition;
 interface
 
 uses
+  Json.Schema,
   System.JSON;
 
 type
@@ -41,11 +42,12 @@ type
     fName: string;
     fJsonSchema: TJsonObject;
     procedure SetName(const Value: string);
-    procedure SetJsonSchema(const Value: TJsonObject);
+    procedure SetJsonSchema(const Value: TJsonObject); overload;
     function GetJsonSchema: TJsonObject;
   public
     function GenerateJsonRefDefinition: TJsonObject;
-
+    procedure SetJsonSchema(const Name:string; Value: TJsonSchema); overload;
+    procedure Load(pJson: TJSONObject);
     /// <summary>
     /// The schema name alias.
     /// </summary>
@@ -71,9 +73,23 @@ begin
   Result := fJsonSchema;
 end;
 
+procedure TSwagDefinition.Load(pJson: TJSONObject);
+begin
+  fJsonSchema := pJson;
+end;
+
 procedure TSwagDefinition.SetJsonSchema(const Value: TJsonObject);
 begin
   fJsonSchema := Value;
+end;
+
+procedure TSwagDefinition.SetJsonSchema(const Name:string; Value: TJsonSchema);
+const
+  c_SchemaRef = '$ref';
+  c_PrefixDefinitionName = '#/definitions/';
+begin
+  fJsonSchema := Value.Clone.Root.ToJsonSchema;
+  fName := Name;
 end;
 
 procedure TSwagDefinition.SetName(const Value: string);

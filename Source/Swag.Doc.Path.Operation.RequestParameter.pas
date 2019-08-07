@@ -43,6 +43,8 @@ type
     fDescription: string;
     fTypeParameter: TSwagTypeParameter;
     fPattern: string;
+    fItems: TJSONObject;
+    fFormat: string;
   protected
     function ReturnInLocationToString: string;
   public
@@ -87,6 +89,8 @@ type
     /// </summary>
     property Schema: TSwagDefinition read fSchema;
 
+    property Items: TJSONObject read fItems;
+
     /// <summary>
     /// If in is any value other than "body"
     /// Required. The type of the parameter. Since the parameter is not located at the request body, it is limited to
@@ -96,6 +100,15 @@ type
     /// and the parameter MUST be in "formData".
     /// </summary>
     property TypeParameter: TSwagTypeParameter read fTypeParameter write fTypeParameter;
+
+    /// <summary>
+    /// Primitives have an optional modifier property format. Swagger uses several known formats to more finely define
+    /// the data type being used. However, the format property is an open string-valued property, and can have any value
+    /// to support documentation needs. Formats such as "email", "uuid", etc., can be used even though they are not
+    /// defined by this specification.
+    ///  </summary>
+    property Format: string read fFormat write fFormat;
+
   end;
 
 implementation
@@ -114,6 +127,7 @@ const
   c_SwagRequestParameterSchema = 'schema';
   c_SwagRequestParameterType = 'type';
   c_SwagRequestParameterPattern = 'pattern';
+  c_SwagRequestParameterFormat = 'format';
 
 { TSwagRequestParameter }
 
@@ -141,6 +155,7 @@ begin
   if not fPattern.IsEmpty then
     vJsonObject.AddPair(c_SwagRequestParameterPattern, fPattern);
 
+
   vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONBool.Create(fRequired));
 
   if (not fSchema.Name.IsEmpty) then
@@ -149,6 +164,9 @@ begin
     vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.JsonSchema)
   else if (fTypeParameter <> stpNotDefined) then
     vJsonObject.AddPair(c_SwagRequestParameterType, c_SwagTypeParameter[fTypeParameter]);
+
+  if not fFormat.IsEmpty then
+    vJsonObject.AddPair(c_SwagRequestParameterFormat, fFormat);
 
   Result := vJsonObject;
 end;
@@ -166,11 +184,24 @@ begin
   if Assigned(pJson.Values[c_SwagRequestParameterName]) then
     fName := pJson.Values[c_SwagRequestParameterName].Value;
 
+  if Assigned(pJson.Values[c_SwagRequestParameterDescription]) then
+    fDescription := pJson.Values[c_SwagRequestParameterDescription].Value;
+
   if Assigned(pJson.Values[c_SwagRequestParameterIn]) then
     fInLocation.ToType(pJson.Values[c_SwagRequestParameterIn].Value);
 
+  if Assigned(pJson.Values[c_SwagRequestParameterFormat]) then
+    fFormat := pJson.Values[c_SwagRequestParameterFormat].Value;
+
   if Assigned(pJson.Values[c_SwagRequestParameterType]) then
     fTypeParameter.ToType(pJson.Values[c_SwagRequestParameterType].Value);
+
+  if Assigned(pJson.Values[c_SwagRequestParameterSchema]) then
+    fSchema.JsonSchema := pJson.Values[c_SwagRequestParameterSchema] as TJSONObject;
+
+  if Assigned(pJson.Values['items']) then
+    fItems := pJson.Values['items'] as TJSONObject;
+
 end;
 
 function TSwagRequestParameter.ReturnInLocationToString: string;
