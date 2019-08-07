@@ -1,6 +1,6 @@
 ﻿<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
     <PropertyGroup>
-        <ProjectGuid>{B07537E3-021C-4905-B342-7B3332F81692}</ProjectGuid>
+        <ProjectGuid>{24FD5F7F-9158-4F54-B5A0-2AEC408AD0BB}</ProjectGuid>
         <ProjectVersion>18.7</ProjectVersion>
         <FrameworkType>FMX</FrameworkType>
         <MainSource>GenerateUnitFileForMVCFramework.dpr</MainSource>

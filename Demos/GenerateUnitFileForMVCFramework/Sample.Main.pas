@@ -4,6 +4,8 @@
 {  Copyright (c) 2018 Marcelo Jaloto                                           }
 {  https://github.com/marcelojaloto/SwagDoc                                    }
 {                                                                              }
+{  Sample author: geoffsmith82 - 2019                                          }
+{                                                                              }
 {******************************************************************************}
 {                                                                              }
 {  Licensed under the Apache License, Version 2.0 (the "License");             }
