@@ -1,11 +1,11 @@
-program ClientApiGenerator;
+program GenerateUnitFileForMVCFramework;
 
 uses
   System.StartUpCopy,
   FMX.Forms,
   Sample.Main in 'Sample.Main.pas' {Form1},
-  DelphiUnit in 'DelphiUnit.pas',
-  SwagDoc.DelphiRESTClient in 'SwagDoc.DelphiRESTClient.pas';
+  Sample.DelphiUnit.Generate in 'Sample.DelphiUnit.Generate.pas',
+  Sample.MvcControllerClientFileBuilder in 'Sample.MvcControllerClientFileBuilder.pas';
 
 {$R *.res}
 

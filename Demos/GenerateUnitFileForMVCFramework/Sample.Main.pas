@@ -66,7 +66,7 @@ implementation
 uses
   System.IOUtils,
   Swag.Doc,
-  SwagDoc.DelphiRESTClient;
+  Sample.MvcControllerClientFileBuilder;
 
 procedure TForm1.btnGenerateClientClick(Sender: TObject);
 var

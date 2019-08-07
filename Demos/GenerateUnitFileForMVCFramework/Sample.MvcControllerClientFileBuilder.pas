@@ -1,4 +1,4 @@
-unit SwagDoc.DelphiRESTClient;
+unit Sample.MvcControllerClientFileBuilder;
 
 interface
 
@@ -13,7 +13,7 @@ uses
   Swag.Doc.Path.Operation,
   Swag.Doc.Path.Operation.Response,
   Swag.Doc.Path.Operation.RequestParameter,
-  DelphiUnit;
+  Sample.DelphiUnit.Generate;
 
 type
   TSwagDocToDelphiRESTClientBuilder = class(TObject)

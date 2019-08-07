@@ -1,4 +1,4 @@
-unit DelphiUnit;
+unit Sample.DelphiUnit.Generate;
 
 interface
 
