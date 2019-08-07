@@ -32,6 +32,8 @@ http://json-schema.org
 
 https://www.youtube.com/watch?v=9U3HP3B5UT0 (Pt-Br)
 
+https://www.youtube.com/watch?v=PhgMQAd8O6c (Pt-Br)
+
 
 ## Swagger References and Tutorials 
 
