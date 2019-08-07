@@ -3,441 +3,455 @@ unit DelphiUnit;
 interface
 
 uses
-  classes,
-  system.json,
+  System.Classes,
+  System.Json,
   System.SysUtils,
   System.Rtti,
   System.TypInfo,
   System.Generics.Collections,
-  System.Generics.Defaults
-  ;
+  System.Generics.Defaults;
 
 type
   TUnitTypeDefinition = class;
 
   TUnitFieldDefinition = class
-  private
-    FFieldName: string;
-    FFieldType: string;
-    FAttributes: TStringList;
-    FDescription: string;
+  strict private
+    fFieldName: string;
+    fFieldType: string;
+    fAttributes: TStringList;
+    fDescription: string;
   public
-    property FieldName: string read FFieldName write FFieldName;
-    property FieldType: string read FFieldType write FFieldType;
-    property Description: string read FDescription write FDescription;
-    procedure AddAttribute(const inAttribute: string);
-    function GenerateInterface: string;
     constructor Create;
     destructor Destroy; override;
+
+    procedure AddAttribute(const pAttribute: string);
+
+    function GenerateInterface: string;
+
+    property FieldName: string read fFieldName write fFieldName;
+    property FieldType: string read fFieldType write fFieldType;
+    property Description: string read fDescription write fDescription;
   end;
 
   TUnitParameter = class
-  private
-    FFlags: TParamFlags;
-    FType: TUnitTypeDefinition;
-    FParamName: string;
-    FAttributes: TStringList;
+  strict private
+    fFlags: TParamFlags;
+    fType: TUnitTypeDefinition;
+    fParamName: string;
+    fAttributes: TStringList;
   public
-    property Attributes: TStringList read FAttributes write FAttributes;
-    property ParamName: string read FParamName write FParamName;
-    property Flags: TParamFlags read FFlags write FFlags;
-    property ParamType: TUnitTypeDefinition read FType write FType;
-    procedure AddAttribute(const inAttribute: string);
     constructor Create;
     destructor Destroy; override;
 
+    procedure AddAttribute(const pAttribute: string);
+
+    property Attributes: TStringList read fAttributes write fAttributes;
+    property ParamName: string read fParamName write fParamName;
+    property Flags: TParamFlags read fFlags write fFlags;
+    property ParamType: TUnitTypeDefinition read fType write fType;
   end;
 
   TUnitMethod = class
-  private
-    FAttributes: TStringList;
-    FMethodKind: TMethodKind;
-    FVisibility: TMemberVisibility;
-    FName: string;
-    FIsStatic: Boolean;
-    FIsClassMethod: Boolean;
-    FReturnType: TUnitTypeDefinition;
-    FParams: TObjectList<TUnitParameter>;
-    FVars: TObjectList<TUnitParameter>;
-    FContent: TStringList;
-    function MethodKindToDelphiString(var LHasReturn: Boolean): string;
-    procedure ParametersToDelphiString(var AParamString: string; AIncludeAttributes: Boolean);
-    procedure MethodLocalVarsToDelphiString(LFuncSL: TStringList);
+  strict private
+    fAttributes: TStringList;
+    fMethodKind: TMethodKind;
+    fVisibility: TMemberVisibility;
+    fName: string;
+    fIsStatic: Boolean;
+    fIsClassMethod: Boolean;
+    fReturnType: TUnitTypeDefinition;
+    fParams: TObjectList<TUnitParameter>;
+    fVars: TObjectList<TUnitParameter>;
+    fContent: TStringList;
+
+    procedure ParametersToDelphiString(var pParamString: string; pIncludeAttributes: Boolean);
+    procedure MethodLocalVarsToDelphiString(pFuncSL: TStringList);
+
+    function MethodKindToDelphiString(var pHasReturn: Boolean): string;
     function GetIsConstructor: Boolean;
     function GetIsDestructor: Boolean;
   public
-    property Content: TStringList read FContent write FContent;
-    property MethodKind: TMethodKind read FMethodKind write FMethodKind;
-    property Visibility: TMemberVisibility read FVisibility write FVisibility;
-    property Name: string read FName write FName;
-    property IsConstructor: Boolean read GetIsConstructor;
-    property IsDestructor: Boolean read GetIsDestructor;
-    property IsClassMethod: Boolean read FIsClassMethod write FIsClassMethod;
-    // Static: No 'Self' parameter
-    property IsStatic: Boolean read FIsStatic write FIsStatic;
-    property ReturnType: TUnitTypeDefinition read FReturnType write FReturnType;
-    function GetParameters: TArray<TUnitParameter>;
-    procedure AddParameter(param: TUnitParameter);
-    procedure AddLocalVariable(inVar: TUnitParameter);
-    procedure AddAttribute(const inAttribute: string);
-    function GenerateInterface: string;
-    function GenerateImplementation(inOnType: TUnitTypeDefinition): string;
     constructor Create;
     destructor Destroy; override;
+
+    procedure AddParameter(pParam: TUnitParameter);
+    procedure AddLocalVariable(pVar: TUnitParameter);
+    procedure AddAttribute(const pAttribute: string);
+
+    function GetParameters: TArray<TUnitParameter>;
+    function GenerateInterface: string;
+    function GenerateImplementation(pOnType: TUnitTypeDefinition): string;
+
+    property Content: TStringList read fContent write fContent;
+    property MethodKind: TMethodKind read fMethodKind write fMethodKind;
+    property Visibility: TMemberVisibility read fVisibility write fVisibility;
+    property Name: string read fName write fName;
+    property IsConstructor: Boolean read GetIsConstructor;
+    property IsDestructor: Boolean read GetIsDestructor;
+    property IsClassMethod: Boolean read fIsClassMethod write fIsClassMethod;
+    // Static: No 'Self' parameter
+    property IsStatic: Boolean read fIsStatic write fIsStatic;
+    property ReturnType: TUnitTypeDefinition read fReturnType write fReturnType;
   end;
 
   TUnitTypeDefinition = class
-  private
-    FTypeName: string;
-    FTypeInheritedFrom: string;
-    FAttributes: TStringList;
-    FTypeKind: TTypeKind;
-    FForwardDeclare: Boolean;
-    FGuid : TGUID;
+  strict private
+    fTypeName: string;
+    fTypeInheritedFrom: string;
+    fAttributes: TStringList;
+    fTypeKind: TTypeKind;
+    fForwardDeclare: Boolean;
+    fGuid : TGUID;
+    fFields: TObjectList<TUnitFieldDefinition>;
+    fMethods: TObjectList<TUnitMethod>;
   public
-    Fields: TObjectList<TUnitFieldDefinition>;
-    FMethods: TObjectList<TUnitMethod>;
-    property Guid: TGUID read FGuid write FGuid;
-    property TypeName: string read FTypeName write FTypeName;
-    property TypeKind: TTypeKind read FTypeKind write FTypeKind;
-    property TypeInherited: string read FTypeInheritedFrom write FTypeInheritedFrom;
-    property ForwardDeclare: Boolean read FForwardDeclare write FForwardDeclare;
-    function GetMethods(): TArray<TUnitMethod>;
-    procedure AddAttribute(const inAttribute: string);
-    function GenerateInterface: string;
-    function GenerateForwardInterface: string;
     constructor Create;
     destructor Destroy; override;
+
+    procedure AddAttribute(const pAttribute: string);
+
+    function GetMethods: TArray<TUnitMethod>;
+    function GenerateInterface: string;
+    function GenerateForwardInterface: string;
+
+    property Guid: TGUID read fGuid write fGuid;
+    property TypeName: string read fTypeName write fTypeName;
+    property TypeKind: TTypeKind read fTypeKind write fTypeKind;
+    property TypeInherited: string read fTypeInheritedFrom write fTypeInheritedFrom;
+    property ForwardDeclare: Boolean read fForwardDeclare write fForwardDeclare;
+    property Fields: TObjectList<TUnitFieldDefinition> read fFields;
+    property Methods: TObjectList<TUnitMethod> read fMethods;
   end;
 
   TDelphiUnit = class
-  private
-    FInterfaceUses: TStringList;
-    FImplementationUses: TStringList;
-    FInterfaceConstant: TStringList;
-    FImplementationConstant: TStringList;
-    FUnitName: string;
-    FTitle: String;
-    FDescription: string;
-    FLicense: string;
+  strict private
+    fInterfaceUses: TStringList;
+    fImplementationUses: TStringList;
+    fInterfaceConstant: TStringList;
+    fImplementationConstant: TStringList;
+    fUnitName: string;
+    fTitle: string;
+    fDescription: string;
+    fLicense: string;
+    fTypeDefinitions: TObjectList<TUnitTypeDefinition>;
   public
-    TypeDefinitions: TObjectList<TUnitTypeDefinition>;
+    constructor Create; virtual;
+    destructor Destroy; override;
+
+    function Generate: string;
     function GenerateInterfaceSectionStart: string; virtual;
     function GenerateInterfaceUses: string; virtual;
     function GenerateImplementationSectionStart: string; virtual;
     function GenerateImplementationUses: string; virtual;
     function GenerateImplementationConstants: string; virtual;
     function CreateGUID: TGuid;
-  public
-    property UnitFile: string read FUnitName write FUnitName;
-    property Title: String read FTitle write FTitle;
-    property Description: string read FDescription write FDescription;
-    property License: string read FLicense write FLicense;
-    procedure AddInterfaceUnit(const inFilename: string); virtual;
-    procedure AddInterfaceConstant(const inName:string; const inValue:string);
-    procedure AddImplementationUnit(const inFilename: string); virtual;
-    procedure AddImplementationConstant(const inName:string; const inValue:string);
-    procedure AddType(inTypeInfo: TUnitTypeDefinition);
+
+    procedure AddInterfaceUnit(const pFilename: string); virtual;
+    procedure AddInterfaceConstant(const pName: string; const pValue: string);
+    procedure AddImplementationUnit(const pFilename: string); virtual;
+    procedure AddImplementationConstant(const pName: string; const pValue: string);
+    procedure AddType(pTypeInfo: TUnitTypeDefinition);
     procedure SortTypeDefinitions;
-    function Generate: string;
-    constructor Create; virtual;
-    destructor Destroy; override;
+
+    property UnitFile: string read fUnitName write fUnitName;
+    property Title: string read fTitle write fTitle;
+    property Description: string read fDescription write fDescription;
+    property License: string read fLicense write fLicense;
   end;
 
 implementation
 
-function DelphiVarName(const inVarname: string):string;
+function DelphiVarName(const pVarName: string):string;
 begin
-  Result := inVarname;
+  Result := pVarName;
   if Result.ToLower = 'type' then
     Result := '&' + Result
   else if Result.ToLower = 'file' then
     Result := '&' + Result;
 end;
 
-
 { TDelphiUnit }
 
-procedure TDelphiUnit.AddImplementationConstant(const inName, inValue: string);
+procedure TDelphiUnit.AddImplementationConstant(const pName, pValue: string);
 begin
-  FImplementationConstant.AddPair(inName, inValue);
+  fImplementationConstant.AddPair(pName, pValue);
 end;
 
-procedure TDelphiUnit.AddImplementationUnit(const inFilename: string);
+procedure TDelphiUnit.AddImplementationUnit(const pFilename: string);
 var
-  IntIndex : Integer;
+  vInterfaceIndex : Integer;
 begin
-  IntIndex := FInterfaceUses.IndexOf(inFilename);
-  if IntIndex < 0 then
+  vInterfaceIndex := fInterfaceUses.IndexOf(pFilename);
+  if vInterfaceIndex < 0 then
   begin
-    if FImplementationUses.IndexOf(inFilename) < 0 then
-      FImplementationUses.Add(inFilename);
+    if fImplementationUses.IndexOf(pFilename) < 0 then
+      fImplementationUses.Add(pFilename);
   end;
 end;
 
-procedure TDelphiUnit.AddInterfaceConstant(const inName, inValue: string);
+procedure TDelphiUnit.AddInterfaceConstant(const pName, pValue: string);
 begin
-  FInterfaceConstant.AddPair(inName, inValue);
+  fInterfaceConstant.AddPair(pName, pValue);
 end;
 
-procedure TDelphiUnit.AddInterfaceUnit(const inFilename: string);
+procedure TDelphiUnit.AddInterfaceUnit(const pFilename: string);
 var
-  ImpIndex : Integer;
+  vImpIndex : Integer;
 begin
-  ImpIndex := FImplementationUses.IndexOf(inFilename);
-  if ImpIndex >= 0 then
-    FImplementationUses.Delete(ImpIndex);
+  vImpIndex := fImplementationUses.IndexOf(pFilename);
+  if vImpIndex >= 0 then
+    fImplementationUses.Delete(vImpIndex);
 
-  if FInterfaceUses.IndexOf(inFilename) < 0 then
-    FInterfaceUses.Add(inFilename);
+  if fInterfaceUses.IndexOf(pFilename) < 0 then
+    fInterfaceUses.Add(pFilename);
 end;
 
-procedure TDelphiUnit.AddType(inTypeInfo: TUnitTypeDefinition);
+procedure TDelphiUnit.AddType(pTypeInfo: TUnitTypeDefinition);
 begin
-  TypeDefinitions.Add(inTypeInfo);
+  fTypeDefinitions.Add(pTypeInfo);
 end;
 
 constructor TDelphiUnit.Create;
 begin
-  FInterfaceUses := TStringList.Create;
-  FInterfaceConstant := TStringList.Create;
-  FImplementationConstant := TStringList.Create;
-  FImplementationUses := TStringList.Create;
-  TypeDefinitions := TObjectList<TUnitTypeDefinition>.Create;
+  fInterfaceUses := TStringList.Create;
+  fInterfaceConstant := TStringList.Create;
+  fImplementationConstant := TStringList.Create;
+  fImplementationUses := TStringList.Create;
+  fTypeDefinitions := TObjectList<TUnitTypeDefinition>.Create;
 end;
 
 destructor TDelphiUnit.Destroy;
 begin
-  FreeAndNil(FInterfaceUses);
-  FreeAndNil(FImplementationUses);
-  FreeAndNil(FInterfaceConstant);
-  FreeAndNil(FImplementationConstant);
-  FreeAndNil(TypeDefinitions);
+  FreeAndNil(fInterfaceUses);
+  FreeAndNil(fImplementationUses);
+  FreeAndNil(fInterfaceConstant);
+  FreeAndNil(fImplementationConstant);
+  FreeAndNil(fTypeDefinitions);
   inherited;
 end;
 
 function TDelphiUnit.GenerateImplementationConstants: string;
 var
-  SL : TStringList;
-  i : Integer;
+  vConstList : TStringList;
+  vImpIndex : Integer;
 begin
-  SL := TStringList.Create;
+  vConstList := TStringList.Create;
   try
-    if FImplementationConstant.Count > 0 then
+    if fImplementationConstant.Count > 0 then
     begin
-      SL.Add('const');
-      for i := 0 to FImplementationConstant.Count - 1 do
+      vConstList.Add('const');
+      for vImpIndex := 0 to fImplementationConstant.Count - 1 do
       begin
-        SL.Add('  ' + FImplementationConstant.Names[i] + ' = ' + FImplementationConstant.ValueFromIndex[i] + ';');
+        vConstList.Add('  ' + fImplementationConstant.Names[vImpIndex] + ' = ' + fImplementationConstant.ValueFromIndex[vImpIndex] + ';');
       end;
     end;
-    Result := SL.Text;
+    Result := vConstList.Text;
   finally
-    FreeAndNil(SL);
+    FreeAndNil(vConstList);
   end;
 end;
 
 function TDelphiUnit.GenerateImplementationSectionStart: string;
 var
-  LImplementationSection: TStringList;
+  vImplementationSection: TStringList;
 begin
-  LImplementationSection := TStringList.Create;
+  vImplementationSection := TStringList.Create;
   try
-    LImplementationSection.Add('');
-    LImplementationSection.Add('implementation');
-    LImplementationSection.Add('');
-    Result := LImplementationSection.Text;
+    vImplementationSection.Add('');
+    vImplementationSection.Add('implementation');
+    vImplementationSection.Add('');
+    Result := vImplementationSection.Text;
   finally
-    FreeAndNil(LImplementationSection);
+    FreeAndNil(vImplementationSection);
   end;
 end;
 
 function TDelphiUnit.GenerateImplementationUses: string;
 var
-  LUsesSL: TStringList;
-  i: Integer;
+  vUsesList: TStringList;
+  vImplIndex: Integer;
 begin
-  LUsesSL := TStringList.Create;
+  vUsesList := TStringList.Create;
   try
-    if FImplementationUses.Count > 0 then
+    if fImplementationUses.Count > 0 then
     begin
-      LUsesSL.Add('uses');
-      for i := 0 to FImplementationUses.Count - 1 do
+      vUsesList.Add('uses');
+      for vImplIndex := 0 to fImplementationUses.Count - 1 do
       begin
-        if i = 0 then
-          LUsesSL.Add('    ' + FImplementationUses[i])
+        if vImplIndex = 0 then
+          vUsesList.Add('    ' + fImplementationUses[vImplIndex])
         else
-          LUsesSL.Add('  , ' + FImplementationUses[i]);
+          vUsesList.Add('  , ' + fImplementationUses[vImplIndex]);
       end;
-      LUsesSL.Add('  ;');
+      vUsesList.Add('  ;');
     end;
-    LUsesSL.Add('');
-    Result := LUsesSL.Text;
+    vUsesList.Add('');
+    Result := vUsesList.Text;
   finally
-    FreeAndNil(LUsesSL);
+    FreeAndNil(vUsesList);
   end;
 end;
 
 function TDelphiUnit.GenerateInterfaceSectionStart: string;
 var
-  LInterfaceSection: TStringList;
+  vInterfaceSectionList: TStringList;
 begin
-  LInterfaceSection := TStringList.Create;
+  vInterfaceSectionList := TStringList.Create;
   try
-    LInterfaceSection.Add('unit ' + UnitFile + ';');
-    LInterfaceSection.Add('');
-    LInterfaceSection.Add('interface');
-    LInterfaceSection.Add('');
-    Result := LInterfaceSection.Text;
+    vInterfaceSectionList.Add('unit ' + UnitFile + ';');
+    vInterfaceSectionList.Add('');
+    vInterfaceSectionList.Add('interface');
+    vInterfaceSectionList.Add('');
+    Result := vInterfaceSectionList.Text;
   finally
-    FreeAndNil(LInterfaceSection);
+    FreeAndNil(vInterfaceSectionList);
   end;
 end;
 
 function TDelphiUnit.GenerateInterfaceUses: string;
 var
-  LUsesSL: TStringList;
-  i: Integer;
+  vUsesList: TStringList;
+  vUseIndex: Integer;
 begin
-  LUsesSL := TStringList.Create;
+  vUsesList := TStringList.Create;
   try
-    if FInterfaceUses.Count > 0 then
+    if fInterfaceUses.Count > 0 then
     begin
-      LUsesSL.Add('uses');
-      for i := 0 to FInterfaceUses.Count - 1 do
+      vUsesList.Add('uses');
+      for vUseIndex := 0 to fInterfaceUses.Count - 1 do
       begin
-        if i = 0 then
-          LUsesSL.Add('    ' + FInterfaceUses[i])
+        if vUseIndex = 0 then
+          vUsesList.Add('    ' + fInterfaceUses[vUseIndex])
         else
-          LUsesSL.Add('  , ' + FInterfaceUses[i]);
+          vUsesList.Add('  , ' + fInterfaceUses[vUseIndex]);
       end;
-      LUsesSL.Add('  ;');
+      vUsesList.Add('  ;');
     end;
-    LUsesSL.Add('');
-    Result := LUsesSL.Text;
+    vUsesList.Add('');
+    Result := vUsesList.Text;
   finally
-    FreeAndNil(LUsesSL);
+    FreeAndNil(vUsesList);
   end;
 end;
 
-function TDelphiUnit.Generate:string;
+function TDelphiUnit.Generate: string;
 var
-  i: Integer;
-  j: Integer;
-  LMethod: TUnitMethod;
-  LMvcFile: TStringList;
-  LForwardAlreadyDeclared : Boolean;
+  vIndex: Integer;
+  vMethod: TUnitMethod;
+  vUnitFileList: TStringList;
+  vForwardAlreadyDeclared: Boolean;
 begin
-  LForwardAlreadyDeclared := False;
-  LMvcFile := TStringList.Create;
+  vForwardAlreadyDeclared := False;
+  vUnitFileList := TStringList.Create;
   try
-    LMvcFile.Add(GenerateInterfaceSectionStart);
-    LMvcFile.Add(GenerateInterfaceUses);
-    LMvcFile.Add('(*');
-    LMvcFile.Add('Title: ' + Title);
-    LMvcFile.Add('Description: ' + Description);
-    LMvcFile.Add('License: ' + License);
-    LMvcFile.Add('*)');
-    LMvcFile.Add('');
-    LMvcFile.Add('type');
+    vUnitFileList.Add(GenerateInterfaceSectionStart);
+    vUnitFileList.Add(GenerateInterfaceUses);
+    vUnitFileList.Add('(*');
+    vUnitFileList.Add('Title: ' + Title);
+    vUnitFileList.Add('Description: ' + Description);
+    vUnitFileList.Add('License: ' + License);
+    vUnitFileList.Add('*)');
+    vUnitFileList.Add('');
+    vUnitFileList.Add('type');
 
     SortTypeDefinitions;
 
-    if FInterfaceConstant.Count > 0 then
+    if fInterfaceConstant.Count > 0 then
     begin
-      LMvcFile.Add('const');
-      for i := 0 to FInterfaceConstant.Count - 1 do
+      vUnitFileList.Add('const');
+      for vIndex := 0 to fInterfaceConstant.Count - 1 do
       begin
-        LMvcFile.Add('  ' + FInterfaceConstant.Names[i] + ' = ' + FInterfaceConstant.ValueFromIndex[i] + ';');
+        vUnitFileList.Add('  ' + fInterfaceConstant.Names[vIndex] + ' = ' + fInterfaceConstant.ValueFromIndex[vIndex] + ';');
       end;
     end;
 
-    for i := 0 to TypeDefinitions.Count - 1 do
+    for vIndex := 0 to fTypeDefinitions.Count - 1 do
     begin
-      if TypeDefinitions[i].ForwardDeclare then
+      if fTypeDefinitions[vIndex].ForwardDeclare then
       begin
-        if not LForwardAlreadyDeclared then
-          LMvcFile.Add('  // Forward Declarations');
-        LMvcFile.Add(TypeDefinitions[i].GenerateForwardInterface);
-        LForwardAlreadyDeclared := True;
+        if not vForwardAlreadyDeclared then
+          vUnitFileList.Add('  // Forward Declarations');
+        vUnitFileList.Add(fTypeDefinitions[vIndex].GenerateForwardInterface);
+        vForwardAlreadyDeclared := True;
       end;
     end;
 
-    for i := 0 to TypeDefinitions.Count - 1 do
+    for vIndex := 0 to fTypeDefinitions.Count - 1 do
     begin
-      LMvcFile.Add(TypeDefinitions[i].GenerateInterface);
+      vUnitFileList.Add(fTypeDefinitions[vIndex].GenerateInterface);
     end;
 
-    LMvcFile.Add(GenerateImplementationSectionStart);
-    LMvcFile.Add(GenerateImplementationUses);
-    LMvcFile.Add('');
+    vUnitFileList.Add(GenerateImplementationSectionStart);
+    vUnitFileList.Add(GenerateImplementationUses);
+    vUnitFileList.Add('');
     GenerateImplementationConstants;
-    for j := 0 to TypeDefinitions.Count - 1 do
+    for vIndex := 0 to fTypeDefinitions.Count - 1 do
     begin
-      for LMethod in TypeDefinitions[j].GetMethods do
+      for vMethod in fTypeDefinitions[vIndex].GetMethods do
       begin
-        LMvcFile.Add(LMethod.GenerateImplementation(TypeDefinitions[j]));
+        vUnitFileList.Add(vMethod.GenerateImplementation(fTypeDefinitions[vIndex]));
       end;
     end;
-    LMvcFile.Add('end.');
-    Result := LMvcFile.Text;
+    vUnitFileList.Add('end.');
+    Result := vUnitFileList.Text;
   finally
-    FreeAndNil(LMvcFile);
+    FreeAndNil(vUnitFileList);
   end;
 end;
 
-function TDelphiUnit.CreateGUID:TGuid;
+function TDelphiUnit.CreateGUID: TGuid;
 var
-  guid : TGUID;
+  vGuid: TGUID;
 begin
-  System.SysUtils.CreateGuid(guid);
-  Result := guid;
+  System.SysUtils.CreateGuid(vGuid);
+  Result := vGuid;
 end;
 
 procedure TDelphiUnit.SortTypeDefinitions;
 begin
   { TODO : Make this much more advanced to handle dependency ordering of declarations }
 
-  TypeDefinitions.Sort(TComparer<TUnitTypeDefinition>.Construct(function (const L, R: TUnitTypeDefinition): integer
-  begin
-    if L.TypeName = 'TMyMVCController' then
-      Result := 1
-    else if R.TypeName = 'TMyMVCController' then
-      Result := -1
-    else
-      Result := CompareText(L.TypeName, R.TypeName);
-  end));
+  fTypeDefinitions.Sort(TComparer<TUnitTypeDefinition>.Construct(
+    function(const vTypeA, vTypeB: TUnitTypeDefinition): Integer
+    begin
+      if vTypeA.TypeName = 'TMyMVCController' then
+        Result := 1
+      else if vTypeB.TypeName = 'TMyMVCController' then
+        Result := -1
+      else
+        Result := CompareText(vTypeA.TypeName, vTypeB.TypeName);
+    end));
 end;
 
 { TTypeDefinition }
 
-procedure TUnitTypeDefinition.AddAttribute(const inAttribute: string);
-begin
-  FAttributes.Add(inAttribute);
-end;
-
 constructor TUnitTypeDefinition.Create;
 begin
-  FAttributes := TStringList.Create;
-  Fields := TObjectList<TUnitFieldDefinition>.Create;
-  FMethods := TObjectList<TUnitMethod>.Create;
-  FTypeKind := tkClass;
-  FForwardDeclare := False;
+  fAttributes := TStringList.Create;
+  fFields := TObjectList<TUnitFieldDefinition>.Create;
+  fMethods := TObjectList<TUnitMethod>.Create;
+  fTypeKind := tkClass;
+  fForwardDeclare := False;
 end;
 
 destructor TUnitTypeDefinition.Destroy;
 begin
-  FreeAndNil(FAttributes);
-  FreeAndNil(Fields);
-  FreeAndNil(FMethods);
+  FreeAndNil(fAttributes);
+  FreeAndNil(fFields);
+  FreeAndNil(fMethods);
   inherited;
+end;
+
+procedure TUnitTypeDefinition.AddAttribute(const pAttribute: string);
+begin
+  fAttributes.Add(pAttribute);
 end;
 
 function TUnitTypeDefinition.GenerateForwardInterface: string;
 begin
-  if FTypeKind = tkClass then
+  if fTypeKind = tkClass then
     Result := '  ' + TypeName + ' : class;'
-  else if FTypeKind = tkInterface then
+  else if fTypeKind = tkInterface then
     Result := '  ' + TypeName + ' : interface;'
   else
     Result := '  ' + TypeName + 'xxxx';
@@ -445,202 +459,201 @@ end;
 
 function TUnitTypeDefinition.GenerateInterface: string;
 var
-  LInterfaceSL: TStringList;
-  i: Integer;
-  j: Integer;
+  vInterfaceList: TStringList;
+  vAttributeIndex: Integer;
+  vFieldIndex: Integer;
 begin
-  LInterfaceSL := TStringList.Create;
+  vInterfaceList := TStringList.Create;
   try
-    for i := 0 to FAttributes.Count - 1 do
+    for vAttributeIndex := 0 to fAttributes.Count - 1 do
     begin
-      LInterfaceSL.Add(FAttributes[i]);
+      vInterfaceList.Add(fAttributes[vAttributeIndex]);
     end;
-    if FTypeKind = tkClass then
+    if fTypeKind = tkClass then
     begin
       if TypeInherited.Length > 0 then
-        LInterfaceSL.Add('  ' + TypeName + ' = class(' + TypeInherited + ')')
+        vInterfaceList.Add('  ' + TypeName + ' = class(' + TypeInherited + ')')
       else
-        LInterfaceSL.Add('  ' + TypeName + ' = class');
+        vInterfaceList.Add('  ' + TypeName + ' = class');
     end
-    else if FTypeKind = tkInterface then
+    else if fTypeKind = tkInterface then
     begin
       if TypeInherited.Length > 0 then
       begin
-        LInterfaceSL.Add('  ' + TypeName + ' = interface(' + TypeInherited + ')');
-        LInterfaceSL.Add('    [' + GUIDToString(FGuid).QuotedString + ']');
+        vInterfaceList.Add('  ' + TypeName + ' = interface(' + TypeInherited + ')');
+        vInterfaceList.Add('    [' + GUIDToString(fGuid).QuotedString + ']');
       end
       else
       begin
-        LInterfaceSL.Add('  ' + TypeName + ' = interface');
-        LInterfaceSL.Add('    [' + GUIDToString(FGuid).QuotedString + ']');
+        vInterfaceList.Add('  ' + TypeName + ' = interface');
+        vInterfaceList.Add('    [' + GUIDToString(fGuid).QuotedString + ']');
       end;
     end;
 
-    for j := 0 to Fields.Count - 1 do
+    for vFieldIndex := 0 to fFields.Count - 1 do
     begin
-      LInterfaceSL.Add(Fields[j].GenerateInterface);
+      vInterfaceList.Add(fFields[vFieldIndex].GenerateInterface);
     end;
 
-    for j := 0 to FMethods.Count - 1 do
+    for vFieldIndex := 0 to fMethods.Count - 1 do
     begin
-      LInterfaceSL.Add(TrimRight(FMethods[j].GenerateInterface));
-      LInterfaceSL.Add('');
+      vInterfaceList.Add(TrimRight(fMethods[vFieldIndex].GenerateInterface));
+      vInterfaceList.Add('');
     end;
 
-    LInterfaceSL.Add('  end;');
+    vInterfaceList.Add('  end;');
 
-    Result := LInterfaceSL.Text;
+    Result := vInterfaceList.Text;
   finally
-    FreeAndNil(LInterfaceSL);
+    FreeAndNil(vInterfaceList);
   end;
 end;
 
 function TUnitTypeDefinition.GetMethods: TArray<TUnitMethod>;
 var
-  i: Integer;
+  vMethodIndex: Integer;
 begin
-  SetLength(Result, FMethods.Count);
-  for i := 0 to FMethods.Count - 1 do
+  SetLength(Result, fMethods.Count);
+  for vMethodIndex := 0 to fMethods.Count - 1 do
   begin
-    Result[i] := FMethods[i];
+    Result[vMethodIndex] := fMethods[vMethodIndex];
   end;
 end;
 
 { TFieldDefinition }
 
-procedure TUnitFieldDefinition.AddAttribute(const inAttribute: string);
-begin
-  FAttributes.Add(inAttribute);
-end;
-
 constructor TUnitFieldDefinition.Create;
 begin
-  FAttributes := TStringList.Create;
+  fAttributes := TStringList.Create;
 end;
 
 destructor TUnitFieldDefinition.Destroy;
 begin
-  FreeAndNil(FAttributes);
-  inherited;
+  FreeAndNil(fAttributes);
+  inherited Destroy;
+end;
+
+procedure TUnitFieldDefinition.AddAttribute(const pAttribute: string);
+begin
+  fAttributes.Add(pAttribute);
 end;
 
 function TUnitFieldDefinition.GenerateInterface: string;
 var
-  i : Integer;
-  SL : TStringList;
-  LType : string;
+  vAttributeIndex: Integer;
+  vInterfaceList: TStringList;
+  vType: string;
 begin
-  SL := TStringList.Create;
+  vInterfaceList := TStringList.Create;
   try
-    LType := FFieldType;
-    for i := 0 to FAttributes.Count - 1 do
+    vType := fFieldType;
+    for vAttributeIndex := 0 to fAttributes.Count - 1 do
     begin
-      SL.Add('    ' + FAttributes[i]);
+      vInterfaceList.Add('    ' + fAttributes[vAttributeIndex]);
     end;
 
     if Description.Length > 0 then
-      SL.Add('    [MVCDoc(' + QuotedStr(Description) + ')]');
+      vInterfaceList.Add('    [MVCDoc(' + QuotedStr(Description) + ')]');
 
-    SL.Add('    ' + DelphiVarName(FFieldName) + ' : ' + LType + ';');
-    Result := SL.Text;
+    vInterfaceList.Add('    ' + DelphiVarName(fFieldName + ' : ' + vType + ';'));
+    Result := vInterfaceList.Text;
   finally
-    FreeAndNil(SL);
+    FreeAndNil(vInterfaceList);
   end;
 end;
 
 { TUnitMethod }
 
-procedure TUnitMethod.AddAttribute(const inAttribute: string);
-begin
-  FAttributes.Add(inAttribute);
-end;
-
-procedure TUnitMethod.AddLocalVariable(inVar: TUnitParameter);
-begin
-  FVars.Add(inVar);
-end;
-
-procedure TUnitMethod.AddParameter(param: TUnitParameter);
-begin
-  FParams.Add(param);
-end;
-
 constructor TUnitMethod.Create;
 begin
-  FParams := TObjectList<TUnitParameter>.Create;
-  FAttributes := TStringList.Create;
-  FVars := TObjectList<TUnitParameter>.Create;
-  FContent := TStringList.Create;
+  fParams := TObjectList<TUnitParameter>.Create;
+  fAttributes := TStringList.Create;
+  fVars := TObjectList<TUnitParameter>.Create;
+  fContent := TStringList.Create;
 end;
 
 destructor TUnitMethod.Destroy;
 begin
-  FreeAndNil(FParams);
-  FreeAndNil(FAttributes);
-  FreeAndNil(FVars);
-  FreeAndNil(FContent);
-  inherited;
+  FreeAndNil(fParams);
+  FreeAndNil(fAttributes);
+  FreeAndNil(fVars);
+  FreeAndNil(fContent);
+  inherited Destroy;
 end;
 
-procedure TUnitMethod.MethodLocalVarsToDelphiString(LFuncSL: TStringList);
-var
-  i: Integer;
+procedure TUnitMethod.AddAttribute(const pAttribute: string);
 begin
-  if FVars.Count > 0 then
+  fAttributes.Add(pAttribute);
+end;
+
+procedure TUnitMethod.AddLocalVariable(pVar: TUnitParameter);
+begin
+  fVars.Add(pVar);
+end;
+
+procedure TUnitMethod.AddParameter(pParam: TUnitParameter);
+begin
+  fParams.Add(pParam);
+end;
+
+procedure TUnitMethod.MethodLocalVarsToDelphiString(pFuncSL: TStringList);
+var
+  vVarIndex: Integer;
+begin
+  if fVars.Count <= 0 then
+    Exit;
+
+  pFuncSL.Add('var');
+  for vVarIndex := 0 to fVars.Count - 1 do
   begin
-    LFuncSL.Add('var');
-    for i := 0 to FVars.Count - 1 do
-    begin
-      LFuncSL.Add('  ' + FVars[i].ParamName + ' : ' + FVars[i].ParamType.TypeName + ';');
-    end;
+    pFuncSL.Add('  ' + fVars[vVarIndex].ParamName + ' : ' + fVars[vVarIndex].ParamType.TypeName + ';');
   end;
 end;
 
-procedure TUnitMethod.ParametersToDelphiString(var AParamString: string; AIncludeAttributes: Boolean);
+procedure TUnitMethod.ParametersToDelphiString(var pParamString: string; pIncludeAttributes: Boolean);
 var
-  LParam: TUnitParameter;
-  LParamFlagString: string;
-  LParamName: string;
-  LParamAttributeString : string;
-  I: Integer;
+  vParam: TUnitParameter;
+  vParamFlagString: string;
+  vParamName: string;
+  vParamAttributeString : string;
+  vAttributeIndex: Integer;
 begin
-  AParamString := '(';
-  for LParam in GetParameters do
+  pParamString := '(';
+  for vParam in GetParameters do
   begin
-    LParamFlagString := '';
-    if pfConst in LParam.Flags then
-      LParamFlagString := 'const'
-    else if pfVar in LParam.Flags then
-      LParamFlagString := 'var'
-    else if pfOut in LParam.Flags then
-      LParamFlagString := 'out'
-    else if pfArray in LParam.Flags then
-      LParamFlagString := 'array of';
-    if LParamFlagString.Length > 0 then
-      LParamFlagString := LParamFlagString + ' ';
+    vParamFlagString := '';
+    if pfConst in vParam.Flags then
+      vParamFlagString := 'const'
+    else if pfVar in vParam.Flags then
+      vParamFlagString := 'var'
+    else if pfOut in vParam.Flags then
+      vParamFlagString := 'out'
+    else if pfArray in vParam.Flags then
+      vParamFlagString := 'array of';
+    if vParamFlagString.Length > 0 then
+      vParamFlagString := vParamFlagString + ' ';
 
-    if AIncludeAttributes then
+    if pIncludeAttributes then
     begin
-      for I := 0 to LParam.Attributes.Count - 1 do
+      for vAttributeIndex := 0 to vParam.Attributes.Count - 1 do
       begin
-        LParamAttributeString := LParamAttributeString + ' ' + LParam.Attributes[i];
+        vParamAttributeString := vParamAttributeString + ' ' + vParam.Attributes[vAttributeIndex];
       end;
 
-      LParamAttributeString := Trim(LParamAttributeString) + ' ';
+      vParamAttributeString := Trim(vParamAttributeString) + ' ';
     end;
 
-
-    LParamName := DelphiVarName(LParam.ParamName);
-    AParamString := AParamString + LParamAttributeString + LParamFlagString + LParamName + ': ' + LParam.FType.FTypeName + '; ';
+    vParamName := DelphiVarName(vParam.ParamName);
+    pParamString := pParamString + vParamAttributeString + vParamFlagString + vParamName + ': ' + vParam.ParamType.TypeName + '; ';
   end;
-  if AParamString.EndsWith('; ') then
-    AParamString := AParamString.Remove(AParamString.Length - 2);
-  AParamString := AParamString + ')';
-  if AParamString = '()' then
-    AParamString := '';
+  if pParamString.EndsWith('; ') then
+    pParamString := pParamString.Remove(pParamString.Length - 2);
+  pParamString := pParamString + ')';
+  if pParamString = '()' then
+    pParamString := '';
 end;
 
-function TUnitMethod.MethodKindToDelphiString(var LHasReturn: Boolean): string;
+function TUnitMethod.MethodKindToDelphiString(var pHasReturn: Boolean): string;
 begin
   case MethodKind of
     mkProcedure:
@@ -648,7 +661,7 @@ begin
     mkFunction:
       begin
         Result := 'function';
-        LHasReturn := True;
+        pHasReturn := True;
       end;
     mkDestructor:
       Result := 'destructor';
@@ -657,7 +670,7 @@ begin
     mkClassFunction:
       begin
         Result := 'class function';
-        LHasReturn := True;
+        pHasReturn := True;
       end;
     mkClassProcedure:
       Result := 'class procedure';
@@ -670,63 +683,62 @@ begin
   end;
 end;
 
-function TUnitMethod.GenerateImplementation(inOnType: TUnitTypeDefinition): string;
+function TUnitMethod.GenerateImplementation(pOnType: TUnitTypeDefinition): string;
 var
-  LProcTypeString: string;
-  LHasReturn: Boolean;
-  LParamString: string;
-  LClassNameProcIn: string;
-  LFuncSL: TStringList;
+  vProcTypeString: string;
+  vHasReturn: Boolean;
+  vParamString: string;
+  vClassNameProcIn: string;
+  vFunctionList: TStringList;
 begin
-  LHasReturn := False;
-  LClassNameProcIn := '';
-  LProcTypeString := MethodKindToDelphiString(LHasReturn);
+  vHasReturn := False;
+  vClassNameProcIn := '';
+  vProcTypeString := MethodKindToDelphiString(vHasReturn);
 
-  if Assigned(inOnType) then
-    LClassNameProcIn := inOnType.TypeName + '.';
-  ParametersToDelphiString(LParamString, False);
+  if Assigned(pOnType) then
+    vClassNameProcIn := pOnType.TypeName + '.';
+  ParametersToDelphiString(vParamString, False);
 
-  if LHasReturn then
-    Result := LProcTypeString + ' ' + LClassNameProcIn + FName + LParamString + ': ' + ReturnType.FTypeName + ';'
+  if vHasReturn then
+    Result := vProcTypeString + ' ' + vClassNameProcIn + fName + vParamString + ': ' + ReturnType.TypeName + ';'
   else
-    Result := LProcTypeString + ' ' + LClassNameProcIn + FName + LParamString + ';';
+    Result := vProcTypeString + ' ' + vClassNameProcIn + fName + vParamString + ';';
 
-  LFuncSL := TStringList.Create;
+  vFunctionList := TStringList.Create;
   try
-    LFuncSL.Text := Result;
+    vFunctionList.Text := Result;
 
-    MethodLocalVarsToDelphiString(LFuncSL);
+    MethodLocalVarsToDelphiString(vFunctionList);
 
-    LFuncSL.Add('begin');
-    LFuncSL.Add(Content.Text);
-    LFuncSL.Add('end;');
+    vFunctionList.Add('begin');
+    vFunctionList.Add(Content.Text);
+    vFunctionList.Add('end;');
 
-    Result := LFuncSL.Text;
+    Result := vFunctionList.Text;
   finally
-    FreeAndNil(LFuncSL);
+    FreeAndNil(vFunctionList);
   end;
 end;
 
 function TUnitMethod.GenerateInterface: string;
 var
-  LProcTypeString: string;
-  LHasReturn: Boolean;
-  LParamString: string;
-  LAttributeString: string;
+  vProcTypeString: string;
+  vHasReturn: Boolean;
+  vParamString: string;
+  vAttributeString: string;
 begin
-  LHasReturn := False;
+  vHasReturn := False;
+  vProcTypeString := MethodKindToDelphiString(vHasReturn);
 
-  LProcTypeString := MethodKindToDelphiString(LHasReturn);
+  ParametersToDelphiString(vParamString, True);
 
-  ParametersToDelphiString(LParamString, True);
-
-  if LHasReturn then
-    Result := '    ' + LProcTypeString + ' ' + FName + LParamString + ': ' + ReturnType.FTypeName + ';'
+  if vHasReturn then
+    Result := '    ' + vProcTypeString + ' ' + fName + vParamString + ': ' + ReturnType.TypeName + ';'
   else
-    Result := '    ' + LProcTypeString + ' ' + FName + LParamString + ';';
+    Result := '    ' + vProcTypeString + ' ' + fName + vParamString + ';';
 
-  LAttributeString := FAttributes.Text;
-  Result := LAttributeString + Result;
+  vAttributeString := fAttributes.Text;
+  Result := vAttributeString + Result;
 end;
 
 function TUnitMethod.GetIsConstructor: Boolean;
@@ -741,31 +753,31 @@ end;
 
 function TUnitMethod.GetParameters: TArray<TUnitParameter>;
 var
-  i: Integer;
+  vParam: Integer;
 begin
-  setLength(Result, FParams.Count);
-  for i := 0 to FParams.Count - 1 do
+  SetLength(Result, fParams.Count);
+  for vParam := 0 to fParams.Count - 1 do
   begin
-    Result[i] := FParams[i];
+    Result[vParam] := fParams[vParam];
   end;
 end;
 
 { TUnitParameter }
 
-procedure TUnitParameter.AddAttribute(const inAttribute: string);
-begin
-  FAttributes.Add(inAttribute);
-end;
-
 constructor TUnitParameter.Create;
 begin
-  FAttributes := TStringList.Create;
+  fAttributes := TStringList.Create;
 end;
 
 destructor TUnitParameter.Destroy;
 begin
-  FreeAndNil(FAttributes);
-  inherited;
+  FreeAndNil(fAttributes);
+  inherited Destroy;
+end;
+
+procedure TUnitParameter.AddAttribute(const pAttribute: string);
+begin
+  fAttributes.Add(pAttribute);
 end;
 
 end.

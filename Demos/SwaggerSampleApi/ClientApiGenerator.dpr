@@ -5,8 +5,7 @@ uses
   FMX.Forms,
   Sample.Main in 'Sample.Main.pas' {Form1},
   DelphiUnit in 'DelphiUnit.pas',
-  SwagDoc.DelphiRESTClient in 'SwagDoc.DelphiRESTClient.pas',
-  mvccontrollerclient in 'mvccontrollerclient.pas';
+  SwagDoc.DelphiRESTClient in 'SwagDoc.DelphiRESTClient.pas';
 
 {$R *.res}
 

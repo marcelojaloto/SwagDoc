@@ -39,8 +39,7 @@ uses
   FMX.StdCtrls,
   FMX.ScrollBox,
   FMX.Memo,
-  FMX.TabControl
-  ;
+  FMX.TabControl;
 
 type
   TForm1 = class(TForm)
@@ -65,28 +64,27 @@ implementation
 {$R *.fmx}
 
 uses
+  System.IOUtils,
   Swag.Doc,
-  SwagDoc.DelphiRESTClient,
-  System.IOUtils
-  ;
+  SwagDoc.DelphiRESTClient;
 
 procedure TForm1.btnGenerateClientClick(Sender: TObject);
 var
-  clientBuilder : TSwagDocToDelphiRESTClientBuilder;
-  swagDoc : TSwagDoc;
-  filename : string;
+  vClientBuilder: TSwagDocToDelphiRESTClientBuilder;
+  vSwagDoc: TSwagDoc;
+  vFilename: string;
 begin
-  clientBuilder := nil;
+  vClientBuilder := nil;
   try
-    swagDoc := TSwagDoc.Create;
-    filename := 'C:\Programming\SwagDoc\Demos\SwaggerSampleApi\Swagger.json';
-    swagDoc.LoadFromFile(filename);
-    memo1.Lines.Text := TFile.ReadAllText(filename);
-    clientBuilder := TSwagDocToDelphiRESTClientBuilder.Create(swagDoc);
-    memo2.Lines.Text := clientBuilder.Generate;
+    vSwagDoc := TSwagDoc.Create;
+    vFilename := ExtractFilePath(ParamStr(0)) + 'Swagger.json';
+    vSwagDoc.LoadFromFile(vFilename);
+    memo1.Lines.Text := TFile.ReadAllText(vFilename);
+    vClientBuilder := TSwagDocToDelphiRESTClientBuilder.Create(vSwagDoc);
+    memo2.Lines.Text := vClientBuilder.Generate;
   finally
-    FreeAndNil(clientBuilder);
-    FreeAndNil(swagDoc);
+    FreeAndNil(vClientBuilder);
+    FreeAndNil(vSwagDoc);
   end;
 end;
 

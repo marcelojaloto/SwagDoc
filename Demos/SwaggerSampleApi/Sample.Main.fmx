@@ -14,7 +14,7 @@ object Form1: TForm1
     Size.Width = 605.000000000000000000
     Size.Height = 645.000000000000000000
     Size.PlatformDefault = False
-    TabIndex = 0
+    TabIndex = 1
     TabOrder = 2
     TabPosition = PlatformDefault
     Sizes = (
@@ -26,7 +26,7 @@ object Form1: TForm1
       CustomIcon = <
         item
         end>
-      IsSelected = True
+      IsSelected = False
       Size.Width = 98.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -43,15 +43,15 @@ object Form1: TForm1
         Size.Height = 619.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
-        Viewport.Width = 601.000000000000000000
-        Viewport.Height = 615.000000000000000000
+        Viewport.Width = 605.000000000000000000
+        Viewport.Height = 619.000000000000000000
       end
     end
     object TabItem2: TTabItem
       CustomIcon = <
         item
         end>
-      IsSelected = False
+      IsSelected = True
       Size.Width = 89.000000000000000000
       Size.Height = 26.000000000000000000
       Size.PlatformDefault = False
@@ -68,8 +68,8 @@ object Form1: TForm1
         Size.Height = 619.000000000000000000
         Size.PlatformDefault = False
         TabOrder = 0
-        Viewport.Width = 601.000000000000000000
-        Viewport.Height = 615.000000000000000000
+        Viewport.Width = 605.000000000000000000
+        Viewport.Height = 619.000000000000000000
       end
     end
   end
