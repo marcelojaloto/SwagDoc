@@ -46,6 +46,8 @@ type
     procedure LoadResponse(pOperation: TSwagPathOperation; pJsonResponse: TJSONObject);
     procedure LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
     procedure LoadTags(pOperation: TSwagPathOperation; pJsonTags: TJSONArray);
+    procedure LoadProduces(pOperation: TSwagPathOperation; pJsonProduces: TJSONArray);
+    procedure LoadConsumes(pOperation: TSwagPathOperation; pJsonConsumes: TJSONArray);
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -108,6 +110,8 @@ begin
     vOperation := TSwagPathOperation.Create;
     vOperationJson := pJson.Pairs[vIndex].JsonValue as TJSONObject;
     vOperation.Description := vOperationJson.Values['description'].Value;
+    if Assigned(vOperationJson.Values['summary']) then
+      vOperation.Summary := vOperationJson.Values['summary'].Value;
     vOperation.Operation.ToType(pJson.Pairs[vIndex].JsonString.Value);
 
     if Assigned(vOperationJson.Values['operationId']) then
@@ -117,6 +121,9 @@ begin
       vOperation.Deprecated := (vOperationJson.Values['deprecated'] as TJSONBool).AsBoolean;
 
     LoadTags(vOperation, vOperationJson.Values['tags'] as TJSONArray);
+    LoadProduces(vOperation, vOperationJson.Values['produces'] as TJSONArray);
+    LoadConsumes(vOperation, vOperationJson.Values['consumes'] as TJSONArray);
+
     LoadParameters(vOperation, vOperationJson.Values['parameters'] as TJSONArray);
     LoadResponse(vOperation, vOperationJson.Values['responses'] as TJSONObject);
 
@@ -152,6 +159,36 @@ begin
     vRequestParam := TSwagRequestParameter.Create;
     vRequestParam.Load(pJsonRequestParams.Items[vIndex] as TJSONObject);
     pOperation.Parameters.Add(vRequestParam);
+  end;
+end;
+
+procedure TSwagPath.LoadProduces(pOperation: TSwagPathOperation; pJsonProduces: TJSONArray);
+var
+  vIndex: Integer;
+  vProduces: string;
+begin
+  if not Assigned(pJsonProduces) then
+    Exit;
+
+  for vIndex := 0 to pJsonProduces.Count - 1 do
+  begin
+    vProduces := pJsonProduces.Items[vIndex].Value;
+    pOperation.Produces.Add(vProduces);
+  end;
+end;
+
+procedure TSwagPath.LoadConsumes(pOperation: TSwagPathOperation; pJsonConsumes: TJSONArray);
+var
+  vIndex: Integer;
+  vConsumes: string;
+begin
+  if not Assigned(pJsonConsumes) then
+    Exit;
+
+  for vIndex := 0 to pJsonConsumes.Count - 1 do
+  begin
+    vConsumes := pJsonConsumes.Items[vIndex].Value;
+    pOperation.Consumes.Add(vConsumes);
   end;
 end;
 
