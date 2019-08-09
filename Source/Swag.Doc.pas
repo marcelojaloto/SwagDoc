@@ -352,11 +352,14 @@ begin
 
   vJsonTagsArray := (fSwaggerJson as TJSONObject).Values[c_SwagTags] as TJSONArray;
 
-  for vIndex := 0 to vJsonTagsArray.Count - 1 do
+  if Assigned(vJsonTagsArray) then
   begin
-    vTag := TSwagTag.Create;
-    vTag.Load(vJsonTagsArray.Items[vIndex] as TJSONObject);
-    fTags.Add(vTag);
+    for vIndex := 0 to vJsonTagsArray.Count - 1 do
+    begin
+      vTag := TSwagTag.Create;
+      vTag.Load(vJsonTagsArray.Items[vIndex] as TJSONObject);
+      fTags.Add(vTag);
+    end;
   end;
 
   vJsonObj := (fSwaggerJson as TJSONObject).Values[c_SwagPaths] as TJSONObject;
@@ -418,8 +421,8 @@ begin
         vSecurityDefinition := vSecurityClass.Create;
         vSecurityDefinition.SchemeName := (vJsonSecurityDefinitions.Pairs[vIndex] as TJSONPair).JsonString.Value;
         vSecurityDefinition.Load((vJsonSecurityDefinitions.Pairs[vIndex] as TJSONPair).JsonValue as TJSONObject);
+        SecurityDefinitions.Add(vSecurityDefinition);
       end;
-      SecurityDefinitions.Add(vSecurityDefinition);
     end;
 end;
 
