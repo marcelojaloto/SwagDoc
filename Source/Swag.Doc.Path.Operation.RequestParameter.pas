@@ -25,6 +25,8 @@ unit Swag.Doc.Path.Operation.RequestParameter;
 interface
 
 uses
+  System.SysUtils,
+  System.Classes,
   System.JSON,
   Swag.Common.Types,
   Swag.Doc.Definition;
@@ -45,6 +47,8 @@ type
     fPattern: string;
     fItems: TJSONObject;
     fFormat: string;
+    fDefault: string;
+    fEnum: TStringList;
   protected
     function ReturnInLocationToString: string;
   public
@@ -109,12 +113,21 @@ type
     ///  </summary>
     property Format: string read fFormat write fFormat;
 
+    /// <summary>
+    /// Declares the value of the parameter that the server will use if none is provided, for example a "count" to
+    /// control the number of results per page might default to 100 if not supplied by the client in the request.
+    /// (Note: "default" has no meaning for required parameters.)
+    /// See https://tools.ietf.org/html/draft-fge-json-schema-validation-00#section-6.2. Unlike JSON Schema
+    /// this value MUST conform to the defined type for this parameter.
+    property Default: string read fDefault write fDefault;
+
+
+    property Enum: TStringList read fEnum;
   end;
 
 implementation
 
 uses
-  System.SysUtils,
   System.StrUtils,
   Swag.Common.Consts,
   Swag.Common.Types.Helpers;
@@ -126,8 +139,10 @@ const
   c_SwagRequestParameterRequired = 'required';
   c_SwagRequestParameterSchema = 'schema';
   c_SwagRequestParameterType = 'type';
+  c_SwagRequestParameterDefault = 'default';
   c_SwagRequestParameterPattern = 'pattern';
   c_SwagRequestParameterFormat = 'format';
+  c_SwagRequestParameterEnum = 'enum';
 
 { TSwagRequestParameter }
 
@@ -135,17 +150,21 @@ constructor TSwagRequestParameter.Create;
 begin
   inherited Create;
   fSchema := TSwagDefinition.Create;
+  fEnum := TStringList.Create;
 end;
 
 destructor TSwagRequestParameter.Destroy;
 begin
   FreeAndNil(fSchema);
+  FreeAndNil(fEnum);
   inherited Destroy;
 end;
 
 function TSwagRequestParameter.GenerateJsonObject: TJSONObject;
 var
   vJsonObject: TJsonObject;
+  vJsonEnum: TJSONArray;
+  i: Integer;
 begin
   vJsonObject := TJsonObject.Create;
   vJsonObject.AddPair(c_SwagRequestParameterIn, ReturnInLocationToString);
@@ -154,7 +173,8 @@ begin
     vJsonObject.AddPair(c_SwagRequestParameterDescription, fDescription);
   if not fPattern.IsEmpty then
     vJsonObject.AddPair(c_SwagRequestParameterPattern, fPattern);
-
+  if not fDefault.IsEmpty then
+    vJsonObject.AddPair(c_SwagRequestParameterDefault, fDefault);
 
   vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONBool.Create(fRequired));
 
@@ -167,10 +187,23 @@ begin
   if not fFormat.IsEmpty then
     vJsonObject.AddPair(c_SwagRequestParameterFormat, fFormat);
 
+  if fEnum.Count > 0 then
+  begin
+    vJsonEnum := TJSONArray.Create;
+    for i := 0 to fEnum.Count - 1 do
+    begin
+      vJsonEnum.Add(fEnum[i]);
+    end;
+    vJsonObject.AddPair(c_SwagRequestParameterEnum, vJsonEnum);
+  end;
+
   Result := vJsonObject;
 end;
 
 procedure TSwagRequestParameter.Load(pJson: TJSONObject);
+var
+ vEnum : TJSONArray;
+  i: Integer;
 begin
   if Assigned(pJson.Values[c_SwagRequestParameterRequired]) then
     fRequired := (pJson.Values[c_SwagRequestParameterRequired] as TJSONBool).AsBoolean
@@ -195,11 +228,23 @@ begin
   if Assigned(pJson.Values[c_SwagRequestParameterType]) then
     fTypeParameter.ToType(pJson.Values[c_SwagRequestParameterType].Value);
 
+  if Assigned(pJson.Values[c_SwagRequestParameterDefault]) then
+    fDefault := pJson.Values[c_SwagRequestParameterDefault].Value;
+
   if Assigned(pJson.Values[c_SwagRequestParameterSchema]) then
     fSchema.JsonSchema := pJson.Values[c_SwagRequestParameterSchema] as TJSONObject;
 
   if Assigned(pJson.Values['items']) then
     fItems := pJson.Values['items'] as TJSONObject;
+
+  if Assigned(pJson.Values[c_SwagRequestParameterEnum]) then
+  begin
+    vEnum := pJson.Values[c_SwagRequestParameterEnum] as TJSONArray;
+    for i := 0 to vEnum.Count - 1 do
+    begin
+      fEnum.Add(vEnum.Items[i].Value);
+    end;
+  end;
 
 end;
 
