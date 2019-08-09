@@ -80,7 +80,7 @@ end;
 
 procedure TSwagDefinition.SetJsonSchema(const Value: TJsonObject);
 begin
-  fJsonSchema := Value;
+  fJsonSchema := Value.Clone as TJSONObject;
 end;
 
 procedure TSwagDefinition.SetJsonSchema(const Name:string; Value: TJsonSchema);

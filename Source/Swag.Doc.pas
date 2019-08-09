@@ -367,8 +367,15 @@ begin
     fSchemes.Add(vJsonSchemesArray.Items[vIndex].Value);
   end;
 
-  fHost := (fSwaggerJson as TJSONObject).Values[c_SwagHost].Value;
-  fBasePath := (fSwaggerJson as TJSONObject).Values[c_SwagBasePath].Value;
+  if Assigned((fSwaggerJson as TJSONObject).Values[c_SwagHost]) then
+    fHost := (fSwaggerJson as TJSONObject).Values[c_SwagHost].Value
+  else
+    fHost := '';
+
+  if Assigned((fSwaggerJson as TJSONObject).Values[c_SwagBasePath]) then
+    fBasePath := (fSwaggerJson as TJSONObject).Values[c_SwagBasePath].Value
+  else
+    fBasePath := '';
 
   for vIndex := 0 to vJsonObj.Count - 1 do
   begin

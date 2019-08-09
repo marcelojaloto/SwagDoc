@@ -109,7 +109,8 @@ begin
   begin
     vOperation := TSwagPathOperation.Create;
     vOperationJson := pJson.Pairs[vIndex].JsonValue as TJSONObject;
-    vOperation.Description := vOperationJson.Values['description'].Value;
+    if Assigned(vOperationJson.Values['description']) then
+      vOperation.Description := vOperationJson.Values['description'].Value;
     if Assigned(vOperationJson.Values['summary']) then
       vOperation.Summary := vOperationJson.Values['summary'].Value;
     vOperation.Operation.ToType(pJson.Pairs[vIndex].JsonString.Value);
