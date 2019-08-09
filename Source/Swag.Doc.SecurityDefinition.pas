@@ -25,28 +25,30 @@ unit Swag.Doc.SecurityDefinition;
 interface
 
 uses
-  System.JSON,
-  Swag.Common.Types;
+  System.JSON, System.SysUtils, System.Generics.Collections, Swag.Common.Types;
 
 type
+  TSwagSecurityDefinitionClass = class of TSwagSecurityDefinition;
+
   /// <summary>
   /// A declaration of the security schemes available to be used in the specification.
   /// This does not enforce the security schemes on the operations and only serves to provide the relevant details for each scheme.
   /// </summary>
-  TSwagSecurityDefinition = class abstract(TObject)
+  TSwagSecurityDefinition = class (TObject)
   protected
-    fSchemaName: TSwagSecuritySchemaName;
+    fSchemaName: TSwagSecuritySchemeName;
     fDescription: string;
-
     function GetTypeSecurity: TSwagSecurityDefinitionType; virtual; abstract;
     function ReturnTypeSecurityToString: string; virtual;
   public
     function GenerateJsonObject: TJSONObject; virtual; abstract;
+    procedure Load(pJson: TJSONObject); virtual; abstract;
+    class function GetSecurityDefinitionClass(pJson: TJSONObject): TSwagSecurityDefinitionClass;
 
     /// <summary>
     /// A single security scheme definition, mapping a "name" to the scheme it defines.
     /// </summary>
-    property SchemaName: TSwagSecuritySchemaName read fSchemaName write fSchemaName;
+    property SchemeName: TSwagSecuritySchemeName read fSchemaName write fSchemaName;
 
     /// <summary>
     /// Required. The type of the security scheme. Valid values are "basic", "apiKey" or "oauth2".
@@ -57,18 +59,51 @@ type
     /// A short description for security scheme.
     /// </summary>
     property Description: string read fDescription write fDescription;
+
+    constructor Create; virtual; abstract;
   end;
+
+
+procedure AddSecurityDefinition(pName: string; pClass: TSwagSecurityDefinitionClass);
 
 implementation
 
 uses
   Swag.Common.Consts;
 
+var
+  securityTypes: TObjectDictionary<string, TSwagSecurityDefinitionClass>;
+
+procedure AddSecurityDefinition(pName: string; pClass: TSwagSecurityDefinitionClass);
+begin
+  securityTypes.Add(pName, pClass);
+end;
+
 { TSwagSecurityDefinition }
+
+class function TSwagSecurityDefinition.GetSecurityDefinitionClass(pJson: TJSONObject): TSwagSecurityDefinitionClass;
+var
+  vSecurityType : string;
+begin
+  Result := nil;
+  if not Assigned(pJson) then
+    Exit;
+  if Assigned(pJson.Values['type']) then
+    vSecurityType := pJson.Values['type'].Value;
+  if securityTypes.ContainsKey(vSecurityType) then
+    Result := securityTypes.Items[vSecurityType];
+end;
 
 function TSwagSecurityDefinition.ReturnTypeSecurityToString: string;
 begin
   Result := c_SwagSecurityDefinitionType[GetTypeSecurity];
 end;
 
+initialization
+  securityTypes := TObjectDictionary<string, TSwagSecurityDefinitionClass>.Create;
+
+finalization
+  FreeAndNil(securityTypes);
+
 end.
+

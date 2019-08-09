@@ -25,6 +25,7 @@ unit Swag.Doc.SecurityDefinitionApiKey;
 interface
 
 uses
+  System.SysUtils,
   System.JSON,
   Swag.Common.Types,
   Swag.Doc.SecurityDefinition;
@@ -44,7 +45,7 @@ type
     function ReturnInLocationToString: string;
   public
     function GenerateJsonObject: TJSONObject; override;
-
+    procedure Load(pJson: TJSONObject); override;
     /// <summary>
     /// Required The location of the API key. Valid values are "query" or "header".
     /// </summary>
@@ -54,6 +55,8 @@ type
     /// Required. The name of the header or query parameter to be used.
     /// </summary>
     property Name: string read fName write fName;
+
+    constructor Create; override;
   end;
 
 implementation
@@ -66,13 +69,20 @@ const
 
 { TSwagSecurityDefinitionApiKey }
 
+constructor TSwagSecurityDefinitionApiKey.Create;
+begin
+  inherited;
+
+end;
+
 function TSwagSecurityDefinitionApiKey.GenerateJsonObject: TJSONObject;
 var
   vJsonItem: TJsonObject;
 begin
   vJsonItem := TJsonObject.Create;
   vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyType, ReturnTypeSecurityToString);
-  vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyDescription, fDescription);
+  if fDescription.Length > 0 then
+    vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyDescription, fDescription);
   vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyIn, ReturnInLocationToString);
   vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyName, fName);
 
@@ -93,5 +103,29 @@ function TSwagSecurityDefinitionApiKey.GetTypeSecurity: TSwagSecurityDefinitionT
 begin
   Result := ssdApiKey;
 end;
+
+procedure TSwagSecurityDefinitionApiKey.Load(pJson: TJSONObject);
+var
+  vIn : string;
+begin
+  inherited;
+  if Assigned(pJson.Values[c_SwagSecurityDefinitionApiKeyDescription]) then
+    fDescription := pJson.Values[c_SwagSecurityDefinitionApiKeyDescription].Value;
+  if Assigned(pJson.Values[c_SwagSecurityDefinitionApiKeyName]) then
+    fName := pJson.Values[c_SwagSecurityDefinitionApiKeyName].Value;
+  if Assigned(pJson.Values[c_SwagSecurityDefinitionApiKeyIn]) then
+  begin
+    vIn := pJson.Values[c_SwagSecurityDefinitionApiKeyIn].Value;
+    if vIn.ToLower = 'query' then
+      fInLocation := kilQuery
+    else if vIn.ToLower = 'header' then
+      fInLocation := kilHeader
+    else
+      fInLocation := kilNotDefined;
+  end;
+end;
+
+initialization
+  AddSecurityDefinition('apiKey', TSwagSecurityDefinitionApiKey);
 
 end.
