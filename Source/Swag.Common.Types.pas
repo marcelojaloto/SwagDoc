@@ -32,7 +32,7 @@ type
   TSwagMimeType = string;
   TSwagJsonExampleDescription = string;
 
-  TSwagSecuritySchemaName = string;
+  TSwagSecuritySchemeName = string;
 
   /// <summary>
   /// Allows the definition of a security scheme that can be used by the operations.
