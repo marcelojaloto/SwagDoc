@@ -37,6 +37,7 @@ type
     fName: string;
     fDescription: string;
     fType: string;
+    fFormat: string;
   public
     function GenerateJsonObject: TJSONObject;
     procedure Load(pJson : TJSONObject);
@@ -55,6 +56,8 @@ type
     /// Required. The type of the object. The value MUST be one of "string", "number", "integer", "boolean", or "array".
     /// </summary>
     property ValueType: string read fType write fType;
+
+    property Format: string read fFormat write fFormat;
   end;
 
 implementation
@@ -70,6 +73,8 @@ begin
     vJsonObject.AddPair('description', fDescription);
   if fType.Length > 0 then
     vJsonObject.AddPair('type', fType);
+  if fFormat.Length > 0 then
+    vJsonObject.AddPair('format', fFormat);
   Result := vJsonObject;
 end;
 
@@ -79,6 +84,8 @@ begin
     fDescription := pJson.Values['description'].Value;
   if Assigned(pJson.Values['type']) then
     fType := pJson.Values['type'].Value;
+  if Assigned(pJson.Values['format']) then
+    fFormat := pJson.Values['format'].Value;
 end;
 
 end.
