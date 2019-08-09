@@ -43,10 +43,11 @@ type
     fProduces: TList<TSwagMimeType>;
     fParameters: TObjectList<TSwagRequestParameter>;
     fResponses: TObjectDictionary<TSwagStatusCode, TSwagResponse>;
-    fSecurity: TList<TSwagSecuritySchemaName>;
+    fSecurity: TList<TSwagSecuritySchemeName>;
     fTags: TList<string>;
     fOperationId: string;
     fDeprecated: Boolean;
+    fSummary: string;
     function GetOperationToString: string;
   protected
     function GenerateTagsJsonArray(pTagList: TList<string>): TJSONArray;
@@ -63,6 +64,7 @@ type
     property Operation: TSwagPathTypeOperation read fOperation write fOperation;
     property OperationToString: string read GetOperationToString;
     property OperationId : string read fOperationId write fOperationId;
+    property Summary: string read fSummary write fSummary;
 
     /// <summary>
     /// A list of tags for API documentation control.
@@ -118,7 +120,7 @@ type
     /// OR between the security requirements). This definition overrides any declared top-level security.
     /// To remove a top-level security declaration, an empty array can be used.
     /// </summary>
-    property Security: TList<TSwagSecuritySchemaName> read fSecurity;
+    property Security: TList<TSwagSecuritySchemeName> read fSecurity;
   end;
 
 implementation
@@ -137,6 +139,7 @@ const
   c_SwagPathOperationParameters = 'parameters';
   c_SwagPathOperationResponses = 'responses';
   c_SwagPathOperationSecurity = 'security';
+  c_SwagPathOperationSummary = 'summary';
 
 { TSwagPathOperation }
 
@@ -149,7 +152,7 @@ begin
   fProduces := TList<TSwagMimeType>.Create;
   fParameters := TObjectList<TSwagRequestParameter>.Create;
   fResponses := TObjectDictionary<TSwagStatusCode, TSwagResponse>.Create([doOwnsValues]);
-  fSecurity := TList<TSwagSecuritySchemaName>.Create;
+  fSecurity := TList<TSwagSecuritySchemeName>.Create;
 end;
 
 destructor TSwagPathOperation.Destroy;
@@ -234,13 +237,16 @@ var
   vJsonObject: TJsonObject;
 begin
   vJsonObject := TJsonObject.Create;
-  vJsonObject.AddPair(c_SwagPathOperationDescription, fDescription);
-  if fDeprecated then
-    vJsonObject.AddPair(c_SwagPathOperationDeprecated, TJSONBool.Create(FDeprecated));
-  if not fOperationId.IsEmpty then
-    vJsonObject.AddPair(c_SwagPathOperationOperationId, fOperationId);
   if (fTags.Count > 0) then
     vJsonObject.AddPair(c_SwagPathOperationTags, GenerateTagsJsonArray(fTags));
+
+  if fSummary.Length > 0 then
+    vJsonObject.AddPair(c_SwagPathOperationSummary, fSummary);
+  vJsonObject.AddPair(c_SwagPathOperationDescription, fDescription);
+  if fDeprecated then
+    vJsonObject.AddPair(c_SwagPathOperationDeprecated, TJSONBool.Create(fDeprecated));
+  if not fOperationId.IsEmpty then
+    vJsonObject.AddPair(c_SwagPathOperationOperationId, fOperationId);
   if (fConsumes.Count > 0) then
     vJsonObject.AddPair(c_SwagPathOperationConsumes, GenerateMimeTypesJsonArray(fConsumes));
   if (fProduces.Count > 0) then
