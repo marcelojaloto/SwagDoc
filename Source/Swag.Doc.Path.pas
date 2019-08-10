@@ -31,7 +31,8 @@ uses
   Swag.Common.Types,
   Swag.Doc.Path.Operation.RequestParameter,
   Swag.Doc.Path.Operation.Response,
-  Swag.Doc.Path.Operation;
+  Swag.Doc.Path.Operation,
+  Windows;
 
 type
   /// <summary>
@@ -108,6 +109,11 @@ begin
   for vIndex := 0 to pJson.Count - 1 do
   begin
     vOperation := TSwagPathOperation.Create;
+    if pJson.Pairs[vIndex].JsonString.Value = 'parameters' then
+    begin
+      { TODO : Handle Path Shared Parameters }
+      continue;
+    end;
     vOperationJson := pJson.Pairs[vIndex].JsonValue as TJSONObject;
     if Assigned(vOperationJson.Values['description']) then
       vOperation.Description := vOperationJson.Values['description'].Value;
@@ -117,6 +123,8 @@ begin
 
     if Assigned(vOperationJson.Values['operationId']) then
       vOperation.OperationId := vOperationJson.Values['operationId'].Value;
+
+    OutputDebugString(PChar(vOperation.OperationId));
 
     if Assigned(vOperationJson.Values['deprecated']) then
       vOperation.Deprecated := (vOperationJson.Values['deprecated'] as TJSONBool).AsBoolean;
