@@ -27,6 +27,7 @@ interface
 uses
   System.SysUtils,
   System.Classes,
+  System.Generics.Collections,
   System.JSON,
   Swag.Common.Types,
   Swag.Doc.Definition;
@@ -49,6 +50,8 @@ type
     fFormat: string;
     fDefault: string;
     fEnum: TStringList;
+    fAllowEmptyValue: Boolean;
+    procedure SetAllowEmptyValue(const Value: Boolean);
   protected
     function ReturnInLocationToString: string;
   public
@@ -123,6 +126,8 @@ type
 
 
     property Enum: TStringList read fEnum;
+
+    property AllowEmptyValue: Boolean read fAllowEmptyValue write SetAllowEmptyValue;
   end;
 
 implementation
@@ -143,6 +148,7 @@ const
   c_SwagRequestParameterPattern = 'pattern';
   c_SwagRequestParameterFormat = 'format';
   c_SwagRequestParameterEnum = 'enum';
+  c_SwagRequestParameterAllowEmptyValue = 'allowEmptyValue';
 
 { TSwagRequestParameter }
 
@@ -176,14 +182,22 @@ begin
   if not fDefault.IsEmpty then
     vJsonObject.AddPair(c_SwagRequestParameterDefault, fDefault);
 
-  vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONBool.Create(fRequired));
+  if fRequired or (fInLocation = rpiPath) then
+    vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONBool.Create(True));
 
-  if (not fSchema.Name.IsEmpty) then
-    vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.GenerateJsonRefDefinition)
-  else if Assigned(fSchema.JsonSchema) then
-    vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.JsonSchema.Clone as TJSONObject)
-  else if (fTypeParameter <> stpNotDefined) then
+  if fAllowEmptyValue and (fInLocation = rpiQuery) or (fInLocation = rpiFormData) then
+    vJsonObject.AddPair(c_SwagRequestParameterAllowEmptyValue, TJSONBool.Create(True));
+
+  if fInLocation = rpiBody then // schema only allow in body parameters
+  begin
+    if (not fSchema.Name.IsEmpty) then
+      vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.GenerateJsonRefDefinition)
+    else if Assigned(fSchema.JsonSchema) then
+      vJsonObject.AddPair(c_SwagRequestParameterSchema, fSchema.JsonSchema.Clone as TJSONObject);
+  end;
+  if (fTypeParameter <> stpNotDefined) then
     vJsonObject.AddPair(c_SwagRequestParameterType, c_SwagTypeParameter[fTypeParameter]);
+
   if not fFormat.IsEmpty then
     vJsonObject.AddPair(c_SwagRequestParameterFormat, fFormat);
 
@@ -205,6 +219,13 @@ var
  vEnum : TJSONArray;
   i: Integer;
 begin
+  if Assigned(pJson.Values[c_SwagRequestParameterIn]) then
+    fInLocation.ToType(pJson.Values[c_SwagRequestParameterIn].Value);
+
+  if Assigned(pJson.Values[c_SwagRequestParameterAllowEmptyValue]) and
+             ((fInLocation = rpiQuery) or (fInLocation = rpiFormData)) then
+    fAllowEmptyValue := (pJson.Values[c_SwagRequestParameterAllowEmptyValue] as TJSONBool).AsBoolean;
+
   if Assigned(pJson.Values[c_SwagRequestParameterRequired]) then
     fRequired := (pJson.Values[c_SwagRequestParameterRequired] as TJSONBool).AsBoolean
   else
@@ -218,9 +239,6 @@ begin
 
   if Assigned(pJson.Values[c_SwagRequestParameterDescription]) then
     fDescription := pJson.Values[c_SwagRequestParameterDescription].Value;
-
-  if Assigned(pJson.Values[c_SwagRequestParameterIn]) then
-    fInLocation.ToType(pJson.Values[c_SwagRequestParameterIn].Value);
 
   if Assigned(pJson.Values[c_SwagRequestParameterFormat]) then
     fFormat := pJson.Values[c_SwagRequestParameterFormat].Value;
@@ -251,6 +269,14 @@ end;
 function TSwagRequestParameter.ReturnInLocationToString: string;
 begin
   Result := c_SwagRequestParameterInLocation[fInLocation];
+end;
+
+procedure TSwagRequestParameter.SetAllowEmptyValue(const Value: Boolean);
+begin
+  if (fInLocation = rpiQuery) or (fInLocation = rpiFormData) then
+    fAllowEmptyValue := Value
+  else
+    raise Exception.Create('allowEmptyValue not allowed to be set on ' + ReturnInLocationToString);
 end;
 
 end.
