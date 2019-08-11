@@ -29,6 +29,7 @@ uses
   System.JSON,
   Swag.Common.Types,
   Swag.Doc.Path.Operation.Response,
+  Swag.Doc.Tags,
   Swag.Doc.Path.Operation.RequestParameter;
 
 type
@@ -45,9 +46,11 @@ type
     fResponses: TObjectDictionary<TSwagStatusCode, TSwagResponse>;
     fSecurity: TList<TSwagSecuritySchemeName>;
     fTags: TList<string>;
+    fExternalDocs: TSwagExternalDocs;
     fOperationId: string;
     fDeprecated: Boolean;
     fSummary: string;
+    fUrl: string;
     function GetOperationToString: string;
   protected
     function GenerateTagsJsonArray(pTagList: TList<string>): TJSONArray;
@@ -121,12 +124,15 @@ type
     /// To remove a top-level security declaration, an empty array can be used.
     /// </summary>
     property Security: TList<TSwagSecuritySchemeName> read fSecurity;
+
+    property ExternalDocs: TSwagExternalDocs read fExternalDocs;
   end;
 
 implementation
 
 uses
   System.SysUtils,
+  Swag.Doc.Path,
   Swag.Common.Consts;
 
 const
@@ -140,19 +146,21 @@ const
   c_SwagPathOperationResponses = 'responses';
   c_SwagPathOperationSecurity = 'security';
   c_SwagPathOperationSummary = 'summary';
+  c_SwagPathOperationExternalDocs = 'externalDocs';
+
 
 { TSwagPathOperation }
 
 constructor TSwagPathOperation.Create;
 begin
   inherited Create;
-
   fTags := TList<string>.Create;
   fConsumes := TList<TSwagMimeType>.Create;
   fProduces := TList<TSwagMimeType>.Create;
   fParameters := TObjectList<TSwagRequestParameter>.Create;
   fResponses := TObjectDictionary<TSwagStatusCode, TSwagResponse>.Create([doOwnsValues]);
   fSecurity := TList<TSwagSecuritySchemeName>.Create;
+  fExternalDocs := TSwagExternalDocs.Create;
 end;
 
 destructor TSwagPathOperation.Destroy;
@@ -163,6 +171,7 @@ begin
   FreeAndNil(fParameters);
   FreeAndNil(fSecurity);
   FreeAndNil(fTags);
+  FreeAndNil(fExternalDocs);
 
   inherited Destroy;
 end;
@@ -242,7 +251,11 @@ begin
 
   if fSummary.Length > 0 then
     vJsonObject.AddPair(c_SwagPathOperationSummary, fSummary);
-  vJsonObject.AddPair(c_SwagPathOperationDescription, fDescription);
+  if fDescription.Length > 0  then
+    vJsonObject.AddPair(c_SwagPathOperationDescription, fDescription);
+  if (not fExternalDocs.url.IsEmpty) or (not fExternalDocs.description.IsEmpty) then
+    vJsonObject.AddPair(c_SwagPathOperationExternalDocs, fExternalDocs.GenerateJsonObject);
+  
   if fDeprecated then
     vJsonObject.AddPair(c_SwagPathOperationDeprecated, TJSONBool.Create(fDeprecated));
   if not fOperationId.IsEmpty then

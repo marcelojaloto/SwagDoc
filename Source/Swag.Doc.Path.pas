@@ -27,6 +27,7 @@ interface
 uses
   System.Classes,
   System.Generics.Collections,
+  System.RegularExpressions,
   System.JSON,
   Swag.Common.Types,
   Swag.Doc.Path.Operation.RequestParameter,
@@ -44,11 +45,14 @@ type
   private
     fOperations: TObjectList<TSwagPathOperation>;
     fUri: string;
+    fParameters: TObjectList<TSwagRequestParameter>;
     procedure LoadResponse(pOperation: TSwagPathOperation; pJsonResponse: TJSONObject);
-    procedure LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
+    procedure LoadOperationScopedParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
+    procedure LoadPathScopedParameters(pJsonRequestParams: TJSONArray);
     procedure LoadTags(pOperation: TSwagPathOperation; pJsonTags: TJSONArray);
     procedure LoadProduces(pOperation: TSwagPathOperation; pJsonProduces: TJSONArray);
     procedure LoadConsumes(pOperation: TSwagPathOperation; pJsonConsumes: TJSONArray);
+    function GenerateParametersJsonObject: TJSONArray;
   public
     constructor Create; reintroduce;
     destructor Destroy; override;
@@ -66,6 +70,8 @@ type
     /// Describes a single API operation on a path.
     /// </summary>
     property Operations: TObjectList<TSwagPathOperation> read fOperations;
+
+    property Parameters: TObjectList<TSwagRequestParameter> read fParameters;
   end;
 
 implementation
@@ -80,12 +86,25 @@ constructor TSwagPath.Create;
 begin
   inherited Create;
   fOperations := TObjectList<TSwagPathOperation>.Create;
+  fParameters := TObjectList<TSwagRequestParameter>.Create;
 end;
 
 destructor TSwagPath.Destroy;
 begin
   FreeAndNil(fOperations);
+  FreeAndNil(fParameters);
   inherited Destroy;
+end;
+
+function TSwagPath.GenerateParametersJsonObject: TJSONArray;
+var
+  vIndex : Integer;
+begin
+  Result := TJSONArray.Create;
+  for vIndex := 0 to fParameters.Count - 1 do
+  begin
+    Result.Add(fParameters[vIndex].GenerateJsonObject);
+  end;
 end;
 
 function TSwagPath.GenerateJsonObject: TJSONObject;
@@ -93,6 +112,8 @@ var
   vIndex: integer;
 begin
   Result := TJsonObject.Create;
+  if fParameters.Count > 0 then
+    Result.AddPair('parameters', GenerateParametersJsonObject);
   for vIndex := 0 to fOperations.Count -1 do
     Result.AddPair(fOperations.Items[vIndex].OperationToString, fOperations.Items[vIndex].GenerateJsonObject);
 end;
@@ -102,6 +123,8 @@ var
   vIndex: Integer;
   vOperation: TSwagPathOperation;
   vOperationJson: TJSONObject;
+  vOperationExternalDocs: TJSONObject;
+  vOperationName : string;
 begin
   if not Assigned(pJson) then
     Exit;
@@ -109,16 +132,38 @@ begin
   for vIndex := 0 to pJson.Count - 1 do
   begin
     vOperation := TSwagPathOperation.Create;
-    if pJson.Pairs[vIndex].JsonString.Value = 'parameters' then
+    vOperationName := pJson.Pairs[vIndex].JsonString.Value;
+    if vOperationName = 'parameters' then
     begin
-      { TODO : Handle Path Shared Parameters }
+      LoadPathScopedParameters(pJson.Pairs[vIndex].JsonValue as TJSONArray);
       continue;
     end;
+    if TRegEx.IsMatch(vOperationName, '(^x-)') then
+    begin
+      // This is an extension value - ignore
+      continue;
+    end;
+    if not (pJson.Pairs[vIndex].JsonValue is TJSONObject) then
+    begin
+      Beep; // This shouldn't happen - although it may be valid in openapi documents
+      continue;
+    end;
+
     vOperationJson := pJson.Pairs[vIndex].JsonValue as TJSONObject;
     if Assigned(vOperationJson.Values['description']) then
       vOperation.Description := vOperationJson.Values['description'].Value;
     if Assigned(vOperationJson.Values['summary']) then
       vOperation.Summary := vOperationJson.Values['summary'].Value;
+
+    vOperationExternalDocs := vOperationJson.Values['externalDocs'] as TJSONObject;
+    if Assigned(vOperationExternalDocs) then
+    begin
+      if Assigned(vOperationExternalDocs.Values['url']) then
+        vOperation.ExternalDocs.Url := vOperationExternalDocs.Values['url'].Value;
+      if Assigned(vOperationExternalDocs.Values['description'])then
+        vOperation.ExternalDocs.Description := vOperationExternalDocs.Values['description'].Value;
+    end;
+
     vOperation.Operation.ToType(pJson.Pairs[vIndex].JsonString.Value);
 
     if Assigned(vOperationJson.Values['operationId']) then
@@ -133,7 +178,7 @@ begin
     LoadProduces(vOperation, vOperationJson.Values['produces'] as TJSONArray);
     LoadConsumes(vOperation, vOperationJson.Values['consumes'] as TJSONArray);
 
-    LoadParameters(vOperation, vOperationJson.Values['parameters'] as TJSONArray);
+    LoadOperationScopedParameters(vOperation, vOperationJson.Values['parameters'] as TJSONArray);
     LoadResponse(vOperation, vOperationJson.Values['responses'] as TJSONObject);
 
     fOperations.Add(vOperation);
@@ -155,7 +200,23 @@ begin
   end;
 end;
 
-procedure TSwagPath.LoadParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
+procedure TSwagPath.LoadPathScopedParameters(pJsonRequestParams: TJSONArray);
+var
+  vIndex: Integer;
+  vRequestParam: TSwagRequestParameter;
+begin
+  if not Assigned(pJsonRequestParams) then
+    Exit;
+
+  for vIndex := 0 to pJsonRequestParams.Count - 1 do
+  begin
+    vRequestParam := TSwagRequestParameter.Create;
+    vRequestParam.Load(pJsonRequestParams.Items[vIndex] as TJSONObject);
+    Parameters.Add(vRequestParam);
+  end;
+end;
+
+procedure TSwagPath.LoadOperationScopedParameters(pOperation: TSwagPathOperation; pJsonRequestParams: TJSONArray);
 var
   vIndex: Integer;
   vRequestParam: TSwagRequestParameter;

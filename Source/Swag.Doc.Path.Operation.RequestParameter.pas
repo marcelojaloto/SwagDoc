@@ -51,6 +51,7 @@ type
     fDefault: string;
     fEnum: TStringList;
     fAllowEmptyValue: Boolean;
+    fRef: string;
     procedure SetAllowEmptyValue(const Value: Boolean);
   protected
     function ReturnInLocationToString: string;
@@ -128,6 +129,8 @@ type
     property Enum: TStringList read fEnum;
 
     property AllowEmptyValue: Boolean read fAllowEmptyValue write SetAllowEmptyValue;
+
+    property Ref: string read fRef write fRef;
   end;
 
 implementation
@@ -149,6 +152,7 @@ const
   c_SwagRequestParameterFormat = 'format';
   c_SwagRequestParameterEnum = 'enum';
   c_SwagRequestParameterAllowEmptyValue = 'allowEmptyValue';
+  c_SwagRequestParameterRef = '$ref';
 
 { TSwagRequestParameter }
 
@@ -172,7 +176,17 @@ var
   vJsonEnum: TJSONArray;
   i: Integer;
 begin
+//  if fRequired and not fDefault.IsEmpty then
+//    raise Exception.Create('A Parameter can not be required and have a default value');
   vJsonObject := TJsonObject.Create;
+
+  if fRef.Length > 0 then
+  begin
+    vJsonObject.AddPair('$ref', fRef);
+    Result := vJsonObject;
+    Exit;
+  end;
+
   vJsonObject.AddPair(c_SwagRequestParameterIn, ReturnInLocationToString);
   vJsonObject.AddPair(c_SwagRequestParameterName, fName);
   if not fDescription.IsEmpty then
@@ -219,6 +233,13 @@ var
  vEnum : TJSONArray;
   i: Integer;
 begin
+
+  if Assigned(pJson.Values[c_SwagRequestParameterRef]) then
+  begin
+    fRef := pJson.Values[c_SwagRequestParameterRef].Value;
+    Exit;
+  end;
+
   if Assigned(pJson.Values[c_SwagRequestParameterIn]) then
     fInLocation.ToType(pJson.Values[c_SwagRequestParameterIn].Value);
 
