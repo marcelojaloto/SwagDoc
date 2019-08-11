@@ -48,7 +48,7 @@ type
 
 
   /// <summary>
-  /// The security scheme object API key (either as a header or as a query parameter)
+  /// The security scheme object for OAuth2 
   /// </summary>
   TSwagSecurityDefinitionOAuth2 = class(TSwagSecurityDefinition)
   private
@@ -62,9 +62,6 @@ type
     function GenerateJsonObject: TJSONObject; override;
     procedure Load(pJson: TJSONObject); override;
 
-    /// <summary>
-    /// Required. The name of the header or query parameter to be used.
-    /// </summary>
     property Name: string read fName write fName;
     property AuthorizationUrl: string read fAuthorizationUrl write fAuthorizationUrl;
     property Flow: string read fFlow write fFlow;

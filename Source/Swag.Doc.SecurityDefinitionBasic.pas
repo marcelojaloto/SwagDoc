@@ -43,9 +43,6 @@ type
     function GenerateJsonObject: TJSONObject; override;
     procedure Load(pJson: TJSONObject); override;
 
-    /// <summary>
-    /// Required. The name of the header or query parameter to be used.
-    /// </summary>
     property Name: string read fName write fName;
 
     constructor Create; override;
