@@ -152,12 +152,16 @@ type
     fInterfaceUses: TStringList;
     fImplementationUses: TStringList;
     fInterfaceConstant: TStringList;
+    fInterfaceVar: TStringList;
     fImplementationConstant: TStringList;
     fUnitName: string;
     fTitle: string;
     fDescription: string;
     fLicense: string;
     fTypeDefinitions: TObjectList<TUnitTypeDefinition>;
+    fUnitHasResourceFile: Boolean;
+  private
+    function GenerateInterfaceVar: string;
   public
     constructor Create; virtual;
     destructor Destroy; override;
@@ -172,12 +176,14 @@ type
 
     procedure AddInterfaceUnit(const pFilename: string); virtual;
     procedure AddInterfaceConstant(const pName: string; const pValue: string);
+    procedure AddInterfaceVar(const pName:string; pTypeInfo: TUnitTypeDefinition);
     procedure AddImplementationUnit(const pFilename: string); virtual;
     procedure AddImplementationConstant(const pName: string; const pValue: string);
     procedure AddType(pTypeInfo: TUnitTypeDefinition);
     procedure SortTypeDefinitions;
 
     property UnitFile: string read fUnitName write fUnitName;
+    property UnitHasResourceFile: Boolean read fUnitHasResourceFile write fUnitHasResourceFile;
     property Title: string read fTitle write fTitle;
     property Description: string read fDescription write fDescription;
     property License: string read fLicense write fLicense;
@@ -213,6 +219,11 @@ begin
   end;
 end;
 
+procedure TDelphiUnit.AddInterfaceVar(const pName: string; pTypeInfo: TUnitTypeDefinition);
+begin
+  fInterfaceVar.AddPair(pName, pTypeInfo.TypeName);
+end;
+
 procedure TDelphiUnit.AddInterfaceConstant(const pName, pValue: string);
 begin
   fInterfaceConstant.AddPair(pName, pValue);
@@ -239,6 +250,7 @@ constructor TDelphiUnit.Create;
 begin
   fInterfaceUses := TStringList.Create;
   fInterfaceConstant := TStringList.Create;
+  fInterfaceVar := TStringList.Create;
   fImplementationConstant := TStringList.Create;
   fImplementationUses := TStringList.Create;
   fTypeDefinitions := TObjectList<TUnitTypeDefinition>.Create;
@@ -249,6 +261,7 @@ begin
   FreeAndNil(fInterfaceUses);
   FreeAndNil(fImplementationUses);
   FreeAndNil(fInterfaceConstant);
+  FreeAndNil(fInterfaceVar);
   FreeAndNil(fImplementationConstant);
   FreeAndNil(fTypeDefinitions);
   inherited;
@@ -275,6 +288,27 @@ begin
   end;
 end;
 
+function TDelphiUnit.GenerateInterfaceVar: string;
+var
+  vVarList : TStringList;
+  vImpIndex : Integer;
+begin
+  vVarList := TStringList.Create;
+  try
+    if fInterfaceVar.Count > 0 then
+    begin
+      vVarList.Add('var');
+      for vImpIndex := 0 to fInterfaceVar.Count - 1 do
+      begin
+        vVarList.Add('  ' + fInterfaceVar.Names[vImpIndex] + ' : ' + fInterfaceVar.ValueFromIndex[vImpIndex] + ';');
+      end;
+    end;
+    Result := vVarList.Text;
+  finally
+    FreeAndNil(vVarList);
+  end;
+end;
+
 function TDelphiUnit.GenerateImplementationSectionStart: string;
 var
   vImplementationSection: TStringList;
@@ -297,6 +331,9 @@ var
 begin
   vUsesList := TStringList.Create;
   try
+    if fUnitHasResourceFile then
+    vUsesList.Add('{$R *.dfm}');
+    vUsesList.Add('');
     if fImplementationUses.Count > 0 then
     begin
       vUsesList.Add('uses');
@@ -404,6 +441,8 @@ begin
     begin
       vUnitFileList.Add(fTypeDefinitions[vIndex].GenerateInterface);
     end;
+
+    vUnitFileList.Add(GenerateInterfaceVar);
 
     vUnitFileList.Add(GenerateImplementationSectionStart);
     vUnitFileList.Add(GenerateImplementationUses);
