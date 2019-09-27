@@ -62,6 +62,11 @@ type
 
 implementation
 
+const
+  c_SwagHeadersDescription = 'description';
+  c_SwagHeadersType = 'type';
+  c_SwagHeadersFormat = 'format';
+
 { TSwagHeaders }
 
 function TSwagHeaders.GenerateJsonObject: TJSONObject;
@@ -70,22 +75,22 @@ var
 begin
   vJsonObject := TJSONObject.Create;
   if fDescription.Length > 0 then
-    vJsonObject.AddPair('description', fDescription);
+    vJsonObject.AddPair(c_SwagHeadersDescription, fDescription);
   if fType.Length > 0 then
-    vJsonObject.AddPair('type', fType);
+    vJsonObject.AddPair(c_SwagHeadersType, fType);
   if fFormat.Length > 0 then
-    vJsonObject.AddPair('format', fFormat);
+    vJsonObject.AddPair(c_SwagHeadersFormat, fFormat);
   Result := vJsonObject;
 end;
 
 procedure TSwagHeaders.Load(pJson: TJSONObject);
 begin
-  if Assigned(pJson.Values['description']) then
-    fDescription := pJson.Values['description'].Value;
-  if Assigned(pJson.Values['type']) then
-    fType := pJson.Values['type'].Value;
-  if Assigned(pJson.Values['format']) then
-    fFormat := pJson.Values['format'].Value;
+  if Assigned(pJson.Values[c_SwagHeadersDescription]) then
+    fDescription := pJson.Values[c_SwagHeadersDescription].Value;
+  if Assigned(pJson.Values[c_SwagHeadersType]) then
+    fType := pJson.Values[c_SwagHeadersType].Value;
+  if Assigned(pJson.Values[c_SwagHeadersFormat]) then
+    fFormat := pJson.Values[c_SwagHeadersFormat].Value;
 end;
 
 end.

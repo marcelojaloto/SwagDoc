@@ -25,25 +25,45 @@ unit Swag.Doc.SecurityDefinition;
 interface
 
 uses
-  System.JSON, System.SysUtils, System.Generics.Collections, Swag.Common.Types;
+  System.Classes,
+  System.JSON,
+  System.SysUtils,
+  System.Generics.Collections,
+  Swag.Common.Types;
 
 type
   TSwagSecurityDefinitionClass = class of TSwagSecurityDefinition;
+
+  TSwagGetClassSecurityDefinition = class(TObject)
+  strict private
+    fClassFound: TPersistentClass;
+    fSecurityType: TSwagSecurityDefinitionType;
+    fSecurityTypes: TDictionary<TSwagSecurityDefinitionType, TSwagSecurityDefinitionClass>;
+    procedure DoGettingSecurityDefinitionClass(pClass: TPersistentClass);
+    procedure GetClasses;
+  public
+    constructor Create(const pSecurityType: TSwagSecurityDefinitionType);
+    destructor Destroy; override;
+
+    class function Find(const pSecurityType: TSwagSecurityDefinitionType): TPersistentClass;
+    property ClassFound: TPersistentClass read fClassFound;
+  end;
 
   /// <summary>
   /// A declaration of the security schemes available to be used in the specification.
   /// This does not enforce the security schemes on the operations and only serves to provide the relevant details for each scheme.
   /// </summary>
-  TSwagSecurityDefinition = class (TObject)
+  TSwagSecurityDefinition = class abstract(TPersistent)
   protected
     fSchemaName: TSwagSecuritySchemeName;
     fDescription: string;
     function GetTypeSecurity: TSwagSecurityDefinitionType; virtual; abstract;
     function ReturnTypeSecurityToString: string; virtual;
   public
+    constructor Create; virtual;
+
     function GenerateJsonObject: TJSONObject; virtual; abstract;
     procedure Load(pJson: TJSONObject); virtual; abstract;
-    class function GetSecurityDefinitionClass(pJson: TJSONObject): TSwagSecurityDefinitionClass;
 
     /// <summary>
     /// A single security scheme definition, mapping a "name" to the scheme it defines.
@@ -59,51 +79,84 @@ type
     /// A short description for security scheme.
     /// </summary>
     property Description: string read fDescription write fDescription;
-
-    constructor Create; virtual; abstract;
   end;
 
-
-procedure AddSecurityDefinition(pName: string; pClass: TSwagSecurityDefinitionClass);
 
 implementation
 
 uses
-  Swag.Common.Consts;
+  System.Rtti,
+  Swag.Common.Consts,
+  Swag.Common.Types.Helpers;
 
-var
-  securityTypes: TObjectDictionary<string, TSwagSecurityDefinitionClass>;
+{ TSwagGetClassSecurityDefinition }
 
-procedure AddSecurityDefinition(pName: string; pClass: TSwagSecurityDefinitionClass);
+constructor TSwagGetClassSecurityDefinition.Create(const pSecurityType: TSwagSecurityDefinitionType);
 begin
-  securityTypes.Add(pName, pClass);
+  inherited Create;
+  fSecurityType := pSecurityType;
+  fSecurityTypes :=  TDictionary<TSwagSecurityDefinitionType, TSwagSecurityDefinitionClass>.Create;
+end;
+
+destructor TSwagGetClassSecurityDefinition.Destroy;
+begin
+  fSecurityTypes.Free;
+  inherited Destroy;
+end;
+
+procedure TSwagGetClassSecurityDefinition.DoGettingSecurityDefinitionClass(pClass: TPersistentClass);
+var
+  vContext: TRttiContext;
+  vType: TRttiType;
+  vAttribute: TCustomAttribute;
+begin
+  vContext := TRttiContext.Create;
+  vType := vContext.GetType(pClass);
+  for vAttribute in vType.GetAttributes do
+    if (vAttribute is ASecurityDefinition) and
+      (fSecurityType = ASecurityDefinition(vAttribute).Definition) then
+    begin
+      fClassFound := pClass;
+      Break;
+    end;
+end;
+
+class function TSwagGetClassSecurityDefinition.Find(const pSecurityType: TSwagSecurityDefinitionType): TPersistentClass;
+var
+  vGetClass: TSwagGetClassSecurityDefinition;
+begin
+  vGetClass := TSwagGetClassSecurityDefinition.Create(pSecurityType);
+  try
+    vGetClass.GetClasses;
+    Result := vGetClass.ClassFound;
+  finally
+    vGetClass.Free;
+  end;
+end;
+
+procedure TSwagGetClassSecurityDefinition.GetClasses;
+var
+  vClassFinder: TClassFinder;
+begin
+  vClassFinder := TClassFinder.Create(TSwagSecurityDefinition, False);
+  try
+    vClassFinder.GetClasses(DoGettingSecurityDefinitionClass);
+  finally
+    vClassFinder.Free;
+  end;
 end;
 
 { TSwagSecurityDefinition }
 
-class function TSwagSecurityDefinition.GetSecurityDefinitionClass(pJson: TJSONObject): TSwagSecurityDefinitionClass;
-var
-  vSecurityType : string;
+constructor TSwagSecurityDefinition.Create;
 begin
-  Result := nil;
-  if not Assigned(pJson) then
-    Exit;
-  if Assigned(pJson.Values['type']) then
-    vSecurityType := pJson.Values['type'].Value;
-  if securityTypes.ContainsKey(vSecurityType) then
-    Result := securityTypes.Items[vSecurityType];
+  inherited Create;
 end;
 
 function TSwagSecurityDefinition.ReturnTypeSecurityToString: string;
 begin
   Result := c_SwagSecurityDefinitionType[GetTypeSecurity];
 end;
-
-initialization
-  securityTypes := TObjectDictionary<string, TSwagSecurityDefinitionClass>.Create;
-
-finalization
-  FreeAndNil(securityTypes);
 
 end.
 

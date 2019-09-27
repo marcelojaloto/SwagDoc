@@ -25,6 +25,7 @@ unit Swag.Doc.Path;
 interface
 
 uses
+  WinApi.Windows,
   System.Classes,
   System.Generics.Collections,
   System.RegularExpressions,
@@ -32,8 +33,7 @@ uses
   Swag.Common.Types,
   Swag.Doc.Path.Operation.RequestParameter,
   Swag.Doc.Path.Operation.Response,
-  Swag.Doc.Path.Operation,
-  Windows;
+  Swag.Doc.Path.Operation;
 
 type
   /// <summary>
@@ -98,7 +98,7 @@ end;
 
 function TSwagPath.GenerateParametersJsonObject: TJSONArray;
 var
-  vIndex : Integer;
+  vIndex: Integer;
 begin
   Result := TJSONArray.Create;
   for vIndex := 0 to fParameters.Count - 1 do
@@ -124,7 +124,7 @@ var
   vOperation: TSwagPathOperation;
   vOperationJson: TJSONObject;
   vOperationExternalDocs: TJSONObject;
-  vOperationName : string;
+  vOperationName: string;
 begin
   if not Assigned(pJson) then
     Exit;
@@ -145,7 +145,7 @@ begin
     end;
     if not (pJson.Pairs[vIndex].JsonValue is TJSONObject) then
     begin
-      Beep; // This shouldn't happen - although it may be valid in openapi documents
+      // This shouldn't happen - although it may be valid in openapi documents
       continue;
     end;
 
@@ -169,15 +169,12 @@ begin
     if Assigned(vOperationJson.Values['operationId']) then
       vOperation.OperationId := vOperationJson.Values['operationId'].Value;
 
-    OutputDebugString(PChar(vOperation.OperationId));
-
     if Assigned(vOperationJson.Values['deprecated']) then
       vOperation.Deprecated := (vOperationJson.Values['deprecated'] as TJSONBool).AsBoolean;
 
     LoadTags(vOperation, vOperationJson.Values['tags'] as TJSONArray);
     LoadProduces(vOperation, vOperationJson.Values['produces'] as TJSONArray);
     LoadConsumes(vOperation, vOperationJson.Values['consumes'] as TJSONArray);
-
     LoadOperationScopedParameters(vOperation, vOperationJson.Values['parameters'] as TJSONArray);
     LoadResponse(vOperation, vOperationJson.Values['responses'] as TJSONObject);
 

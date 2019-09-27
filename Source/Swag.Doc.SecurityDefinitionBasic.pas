@@ -34,6 +34,7 @@ type
   /// <summary>
   /// The security scheme object Basic
   /// </summary>
+  [ASecurityDefinition(ssdBasic)]
   TSwagSecurityDefinitionBasic = class(TSwagSecurityDefinition)
   private
     fName: string;
@@ -44,23 +45,18 @@ type
     procedure Load(pJson: TJSONObject); override;
 
     property Name: string read fName write fName;
-
-    constructor Create; override;
   end;
 
 implementation
+
+uses
+  System.Classes;
 
 const
   c_SwagSecurityDefinitionBasicType = 'type';
   c_SwagSecurityDefinitionBasicName = 'name';
 
 { TSwagSecurityDefinitionApiKey }
-
-constructor TSwagSecurityDefinitionBasic.Create;
-begin
-  inherited;
-
-end;
 
 function TSwagSecurityDefinitionBasic.GenerateJsonObject: TJSONObject;
 var
@@ -78,10 +74,11 @@ end;
 
 procedure TSwagSecurityDefinitionBasic.Load(pJson: TJSONObject);
 begin
-  inherited;
+  if Assigned(pJson.Values[c_SwagSecurityDefinitionBasicName]) then
+    fName := pJson.Values[c_SwagSecurityDefinitionBasicName].Value;
 end;
 
 initialization
-  AddSecurityDefinition('basic', TSwagSecurityDefinitionBasic);
+  RegisterClass(TSwagSecurityDefinitionBasic);
 
 end.

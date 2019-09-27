@@ -50,7 +50,6 @@ type
     fOperationId: string;
     fDeprecated: Boolean;
     fSummary: string;
-    fUrl: string;
     function GetOperationToString: string;
   protected
     function GenerateTagsJsonArray(pTagList: TList<string>): TJSONArray;

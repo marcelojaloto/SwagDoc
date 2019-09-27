@@ -147,15 +147,11 @@ type
 
 
     property Parameters: TObjectList<TSwagRequestParameter> read fParameters;
+
+    property Tags: TObjectList<TSwagTag> read fTags;
+
+    property ExternalDocs: TSwagExternalDocs read fExternalDocs;
   end;
-
-implementation
-
-uses
-  System.IOUtils,
-  Json.Common.Helpers,
-  Swag.Common.Consts,
-  Swag.Common.Types.Helpers;
 
 const
   c_Swagger = 'swagger';
@@ -165,13 +161,24 @@ const
   c_SwagTags = 'tags';
   c_SwagSchemes = 'schemes';
   c_SwagSecurityDefinitions = 'securityDefinitions';
+  c_SwagSecurityDefinitionsType = 'type';
   c_SwagConsumes = 'consumes';
   c_SwagProduces = 'produces';
   c_SwagPaths = 'paths';
   c_SwagDefinitions = 'definitions';
   c_SwagExternalDocs = 'externalDocs';
+  c_SwagExternalDocsDescription = 'description';
+  c_SwagExternalDocsUrl = 'url';
   c_SwagParameters = 'parameters';
 
+implementation
+
+uses
+  System.IOUtils,
+  Json.Common.Helpers,
+  Swag.Common.Consts,
+  Swag.Common.Types.Helpers,
+  Swag.Doc.FileLoader;
 
 { TSwagDoc }
 
@@ -353,126 +360,13 @@ end;
 
 procedure TSwagDoc.LoadFromFile(const pFilename: string);
 var
-  vJsonObj: TJSONObject;
-  vPath: TSwagPath;
-  vJsonTagsArray: TJSONArray;
-  vTag : TSwagTag;
-  vJsonSchemesArray: TJSONArray;
-  vJsonProduces: TJSONArray;
-  vJsonConsumes: TJSONArray;
-  vJsonDefinitions : TJSONObject;
-  vDefinition : TSwagDefinition;
-  vJsonParameters : TJSONObject;
-  vParameter : TSwagRequestParameter;
-  vJsonSecurityDefinitions : TJSONObject;
-  vJsonExternalDocs : TJSONObject;
-  vSecurityDefinition : TSwagSecurityDefinition;
-  vIndex: Integer;
-  vSecurityClass : TSwagSecurityDefinitionClass;
+  vFileLoader: TSwagFileLoader;
 begin
-  if not FileExists(pFilename) then
-    raise ESwagErrorLoadSwaggerJsonFile.Create('File doesn''t exist ['+pFilename+']');
-
-  fSwaggerJson := TJSONObject.ParseJSONValue(TFile.ReadAllText(pFilename)) as TJSONObject;
-  if not Assigned(fSwaggerJson) then
-    raise ESwagErrorLoadSwaggerJsonFile.Create('File could not be loaded ['+pFilename+']');
-
-  fInfo.Load((fSwaggerJson as TJSONObject).Values[c_SwagInfo] as TJSONObject);
-
-  vJsonTagsArray := (fSwaggerJson as TJSONObject).Values[c_SwagTags] as TJSONArray;
-
-  if Assigned(vJsonTagsArray) then
-  begin
-    for vIndex := 0 to vJsonTagsArray.Count - 1 do
-    begin
-      vTag := TSwagTag.Create;
-      vTag.Load(vJsonTagsArray.Items[vIndex] as TJSONObject);
-      fTags.Add(vTag);
-    end;
-  end;
-
-  vJsonObj := (fSwaggerJson as TJSONObject).Values[c_SwagPaths] as TJSONObject;
-  vJsonSchemesArray := (fSwaggerJson as TJSONObject).Values[c_SwagSchemes] as TJSONArray;
-
-  if Assigned(vJsonSchemesArray) then
-  begin
-    for vIndex := 0 to vJsonSchemesArray.Count - 1 do
-    begin
-      fSchemes.Add(vJsonSchemesArray.Items[vIndex].Value);
-    end;
-  end;
-
-  if Assigned((fSwaggerJson as TJSONObject).Values[c_SwagHost]) then
-    fHost := (fSwaggerJson as TJSONObject).Values[c_SwagHost].Value
-  else
-    fHost := '';
-
-  if Assigned((fSwaggerJson as TJSONObject).Values[c_SwagBasePath]) then
-    fBasePath := (fSwaggerJson as TJSONObject).Values[c_SwagBasePath].Value
-  else
-    fBasePath := '';
-
-  for vIndex := 0 to vJsonObj.Count - 1 do
-  begin
-    vPath := TSwagPath.Create;
-    vPath.Uri := vJsonObj.Pairs[vIndex].JSONString.Value;
-    vPath.Load((vJsonObj.Pairs[vIndex].JsonValue) as TJSONObject);
-    fPaths.Add(vPath);
-  end;
-
-  vJsonProduces := (fSwaggerJson as TJSONObject).Values[c_SwagProduces] as TJSONArray;
-  if Assigned(vJsonProduces) then
-    for vIndex := 0 to vJsonProduces.Count - 1 do
-    begin
-      Produces.Add(vJsonProduces.Items[vIndex].Value);
-    end;
-
-  vJsonConsumes := (fSwaggerJson as TJSONObject).Values[c_SwagConsumes] as TJSONArray;
-  if Assigned(vJsonConsumes) then
-    for vIndex := 0 to vJsonConsumes.count - 1 do
-    begin
-      Consumes.Add(vJsonConsumes.Items[vIndex].Value);
-    end;
-
-  vJsonDefinitions := (fSwaggerJson as TJSONObject).Values[c_SwagDefinitions] as TJSONObject;
-  if Assigned(vJsonDefinitions) then
-    for vIndex := 0 to vJsonDefinitions.Count - 1 do
-    begin
-      vDefinition := TSwagDefinition.Create;
-      vDefinition.Name := (vJsonDefinitions.Pairs[vIndex] as TJSONPair).JsonString.Value;
-      vDefinition.JsonSchema := ((vJsonDefinitions.Pairs[vIndex] as TJSONPair).JsonValue as TJSONObject);
-      Definitions.Add(vDefinition);
-    end;
-  vJsonParameters := (fSwaggerJson as TJSONObject).Values[c_SwagParameters] as TJSONObject;
-  if Assigned(vJsonParameters) then
-    for vIndex := 0 to vJsonParameters.Count - 1 do
-    begin
-      vParameter := TSwagRequestParameter.Create;
-      vParameter.Name := (vJsonParameters.Pairs[vIndex] as TJSONPair).JsonString.Value;
-      vParameter.Load((vJsonParameters.Pairs[vIndex] as TJSONPair).JsonValue as TJSONObject);
-      Parameters.Add(vParameter);
-    end;
-
-  vJsonSecurityDefinitions := (fSwaggerJson as TJSONObject).Values[c_SwagSecurityDefinitions] as TJSONObject;
-  if Assigned(vJsonSecurityDefinitions) then
-    for vIndex := 0 to vJsonSecurityDefinitions.Count - 1 do
-    begin
-      vSecurityClass := TSwagSecurityDefinition.GetSecurityDefinitionClass(vJsonSecurityDefinitions.Pairs[vIndex].JsonValue as TJSONObject);
-      if Assigned(vSecurityClass) then
-      begin
-        vSecurityDefinition := vSecurityClass.Create;
-        vSecurityDefinition.SchemeName := (vJsonSecurityDefinitions.Pairs[vIndex] as TJSONPair).JsonString.Value;
-        vSecurityDefinition.Load((vJsonSecurityDefinitions.Pairs[vIndex] as TJSONPair).JsonValue as TJSONObject);
-        SecurityDefinitions.Add(vSecurityDefinition);
-      end;
-    end;
-  vJsonExternalDocs := (fSwaggerJson as TJSONObject).Values[c_SwagExternalDocs] as TJSONObject;
-  if Assigned(vJsonExternalDocs) then
-  begin
-    if Assigned(vJsonExternalDocs.Values['url']) then
-      fExternalDocs.url := vJsonExternalDocs.Values['url'].Value;
-    if Assigned(vJsonExternalDocs.Values['description']) then
-      fExternalDocs.description := vJsonExternalDocs.Values['description'].Value;
+  vFileLoader := TSwagFileLoader.Create(Self);
+  try
+    vFileLoader.Load(pFilename);
+  finally
+    vFileLoader.Free;
   end;
 end;
 

@@ -27,7 +27,7 @@ interface
 uses
   System.JSON,
   System.SysUtils,
-  Generics.Collections,
+  System.Generics.Collections,
   Swag.Common.Types,
   Swag.Doc.SecurityDefinition;
 
@@ -36,20 +36,19 @@ type
   private
     fScopeName: string;
     fDescription: string;
-
   public
-    property ScopeName: string read fScopeName write fScopeName;
-    property Description: string read fDescription write fDescription;
-
     function GenerateJsonObject: TJSONObject;
     procedure Load(pJson: TJSONPair);
 
+    property ScopeName: string read fScopeName write fScopeName;
+    property Description: string read fDescription write fDescription;
   end;
 
 
   /// <summary>
-  /// The security scheme object for OAuth2 
+  /// The security scheme object for OAuth2
   /// </summary>
+  [ASecurityDefinition(ssdOAuth2)]
   TSwagSecurityDefinitionOAuth2 = class(TSwagSecurityDefinition)
   private
     fName: string;
@@ -73,6 +72,9 @@ type
 
 implementation
 
+uses
+  Classes;
+
 const
   c_SwagSecurityDefinitionOAuth2Type = 'type';
   c_SwagSecurityDefinitionOAuth2Description = 'description';
@@ -81,6 +83,19 @@ const
   c_SwagSecurityDefinitionOAuth2Flow = 'flow';
   c_SwagSecurityDefinitionOAuth2Scopes = 'scopes';
 
+{ TSwagSecurityDefinitionOAuth2Scopes }
+
+function TSwagSecurityDefinitionOAuth2Scope.GenerateJsonObject: TJSONObject;
+begin
+  Result := TJSONObject.Create;
+  Result.AddPair(fScopeName, fDescription);
+end;
+
+procedure TSwagSecurityDefinitionOAuth2Scope.Load(pJson: TJSONPair);
+begin
+  fScopeName := pJson.JsonString.Value;
+  fDescription := pJson.JsonValue.Value;
+end;
 
 { TSwagSecurityDefinitionOAuth2 }
 
@@ -99,8 +114,8 @@ end;
 function TSwagSecurityDefinitionOAuth2.GenerateJsonObject: TJSONObject;
 var
   vJsonItem: TJsonObject;
-  vJsonScopes : TJsonObject;
-  i: Integer;
+  vJsonScopes: TJsonObject;
+  vScopeIndex: Integer;
 begin
   vJsonItem := TJsonObject.Create;
   vJsonItem.AddPair(c_SwagSecurityDefinitionOAuth2Type, ReturnTypeSecurityToString);
@@ -109,14 +124,14 @@ begin
   vJsonItem.AddPair(c_SwagSecurityDefinitionOAuth2AuthorizationUrl, fAuthorizationUrl);
   vJsonItem.AddPair(c_SwagSecurityDefinitionOAuth2Flow, fFlow);
 
-  if FScopes.Count > 0 then
+  if fScopes.Count > 0 then
   begin
     vJsonScopes := TJSONObject.Create;
-    for i := 0 to FScopes.Count - 1 do
+    for vScopeIndex := 0 to fScopes.Count - 1 do
     begin
-      vJsonScopes.AddPair(FScopes[i].ScopeName, fScopes[i].fDescription);
+      vJsonScopes.AddPair(FScopes[vScopeIndex].ScopeName, fScopes[vScopeIndex].fDescription);
     end;
-    vJsonItem.AddPair('scopes', vJsonScopes);
+    vJsonItem.AddPair(c_SwagSecurityDefinitionOAuth2Scopes, vJsonScopes);
   end;
 
   Result := vJsonItem;
@@ -129,9 +144,9 @@ end;
 
 procedure TSwagSecurityDefinitionOAuth2.Load(pJson: TJSONObject);
 var
-  i: Integer;
-  vJsonScope : TJSONObject;
-  vScope : TSwagSecurityDefinitionOAuth2Scope;
+  vScopeIndex: Integer;
+  vJsonScope: TJSONObject;
+  vScope: TSwagSecurityDefinitionOAuth2Scope;
 begin
   inherited;
   if Assigned(pJson.Values[c_SwagSecurityDefinitionOAuth2Description]) then
@@ -143,33 +158,16 @@ begin
   if Assigned(pJson.Values[c_SwagSecurityDefinitionOAuth2Scopes]) then
   begin
     vJsonScope := pJson.Values[c_SwagSecurityDefinitionOAuth2Scopes] as TJSONObject;
-    for i := 0 to vJsonScope.Count - 1 do
+    for vScopeIndex := 0 to vJsonScope.Count - 1 do
     begin
       vScope := TSwagSecurityDefinitionOAuth2Scope.Create;
-      vScope.Load(vJsonScope.Pairs[i]);
+      vScope.Load(vJsonScope.Pairs[vScopeIndex]);
       fScopes.Add(vScope);
     end;
   end;
 end;
 
-{ TSwagSecurityDefinitionOAuth2Scopes }
-
-function TSwagSecurityDefinitionOAuth2Scope.GenerateJsonObject: TJSONObject;
-begin
-  Result := TJSONObject.Create;
-  Result.AddPair(fScopeName, fDescription);
-end;
-
-procedure TSwagSecurityDefinitionOAuth2Scope.Load(pJson: TJSONPair);
-var
-  i: Integer;
-  vScope : TSwagSecurityDefinitionOAuth2Scope;
-begin
-  inherited;
-  fScopeName := pJson.JsonString.Value;
-  fDescription := pJson.JsonValue.Value;
-end;
-
 initialization
-  AddSecurityDefinition('oauth2', TSwagSecurityDefinitionOAuth2);
+  RegisterClass(TSwagSecurityDefinitionOAuth2);
+
 end.

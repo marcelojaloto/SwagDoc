@@ -79,6 +79,33 @@ type
   /// </summary>
   TSwagTypeParameter = (stpNotDefined, stpString, stpNumber, stpInteger, stpBoolean, stpArray, stpFile);
 
+  ASecurityDefinition = class(TCustomAttribute)
+  strict private
+    fDefinition: TSwagSecurityDefinitionType;
+    function GetName: string;
+  public
+    constructor Create(const pDefinition: TSwagSecurityDefinitionType);
+
+    property Definition: TSwagSecurityDefinitionType read fDefinition;
+    property Name: string read GetName;
+  end;
+
 implementation
+
+uses
+  Swag.Common.Consts;
+
+{ ASecurityDefinition }
+
+constructor ASecurityDefinition.Create(const pDefinition: TSwagSecurityDefinitionType);
+begin
+  inherited Create;
+  fDefinition := pDefinition;
+end;
+
+function ASecurityDefinition.GetName: string;
+begin
+  Result := c_SwagSecurityDefinitionType[fDefinition];
+end;
 
 end.

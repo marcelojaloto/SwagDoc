@@ -33,16 +33,17 @@ uses
 type
   TSwagSecurityDefinitionApiKeyInLocation = (kilNotDefined, kilQuery, kilHeader);
 
+type
   /// <summary>
   /// The security scheme object API key (either as a header or as a query parameter)
   /// </summary>
+  [ASecurityDefinition(ssdApiKey)]
   TSwagSecurityDefinitionApiKey = class(TSwagSecurityDefinition)
   private
     fName: string;
     fInLocation: TSwagSecurityDefinitionApiKeyInLocation;
   protected
     function GetTypeSecurity: TSwagSecurityDefinitionType; override;
-    function ReturnInLocationToString: string;
   public
     function GenerateJsonObject: TJSONObject; override;
     procedure Load(pJson: TJSONObject); override;
@@ -55,11 +56,12 @@ type
     /// Required. The name of the header or query parameter to be used.
     /// </summary>
     property Name: string read fName write fName;
-
-    constructor Create; override;
   end;
 
 implementation
+
+uses
+  System.Classes;
 
 const
   c_SwagSecurityDefinitionApiKeyType = 'type';
@@ -67,13 +69,10 @@ const
   c_SwagSecurityDefinitionApiKeyIn = 'in';
   c_SwagSecurityDefinitionApiKeyName = 'name';
 
+  c_SwagSecurityDefinitionApiKeyInLocation: array[TSwagSecurityDefinitionApiKeyInLocation] of string =
+    ('', 'query', 'header');
+
 { TSwagSecurityDefinitionApiKey }
-
-constructor TSwagSecurityDefinitionApiKey.Create;
-begin
-  inherited;
-
-end;
 
 function TSwagSecurityDefinitionApiKey.GenerateJsonObject: TJSONObject;
 var
@@ -83,20 +82,10 @@ begin
   vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyType, ReturnTypeSecurityToString);
   if fDescription.Length > 0 then
     vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyDescription, fDescription);
-  vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyIn, ReturnInLocationToString);
+  vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyIn, c_SwagSecurityDefinitionApiKeyInLocation[fInLocation]);
   vJsonItem.AddPair(c_SwagSecurityDefinitionApiKeyName, fName);
 
   Result := vJsonItem;
-end;
-
-function TSwagSecurityDefinitionApiKey.ReturnInLocationToString: string;
-begin
-  case fInLocation of
-    kilQuery: Result := 'query';
-    kilHeader: Result := 'header';
-  else
-    Result := '';
-  end;
 end;
 
 function TSwagSecurityDefinitionApiKey.GetTypeSecurity: TSwagSecurityDefinitionType;
@@ -106,9 +95,8 @@ end;
 
 procedure TSwagSecurityDefinitionApiKey.Load(pJson: TJSONObject);
 var
-  vIn : string;
+  vIn: string;
 begin
-  inherited;
   if Assigned(pJson.Values[c_SwagSecurityDefinitionApiKeyDescription]) then
     fDescription := pJson.Values[c_SwagSecurityDefinitionApiKeyDescription].Value;
   if Assigned(pJson.Values[c_SwagSecurityDefinitionApiKeyName]) then
@@ -116,9 +104,9 @@ begin
   if Assigned(pJson.Values[c_SwagSecurityDefinitionApiKeyIn]) then
   begin
     vIn := pJson.Values[c_SwagSecurityDefinitionApiKeyIn].Value;
-    if vIn.ToLower = 'query' then
+    if vIn.ToLower = c_SwagSecurityDefinitionApiKeyInLocation[kilQuery] then
       fInLocation := kilQuery
-    else if vIn.ToLower = 'header' then
+    else if vIn.ToLower = c_SwagSecurityDefinitionApiKeyInLocation[kilHeader] then
       fInLocation := kilHeader
     else
       fInLocation := kilNotDefined;
@@ -126,6 +114,6 @@ begin
 end;
 
 initialization
-  AddSecurityDefinition('apiKey', TSwagSecurityDefinitionApiKey);
+  RegisterClass(TSwagSecurityDefinitionApiKey);
 
 end.

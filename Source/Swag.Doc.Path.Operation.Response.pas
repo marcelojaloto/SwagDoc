@@ -141,11 +141,10 @@ begin
   vJsonObject := TJsonObject.Create;
   vJsonObject.AddPair(c_SwagResponseDescription, fDescription);
 
-
   if (not fSchema.Name.IsEmpty) then
     vJsonObject.AddPair(c_SwagResponseSchema, fSchema.GenerateJsonRefDefinition)
   else if Assigned(fSchema.JsonSchema) then
-    vJsonObject.AddPair(c_SwagResponseSchema, fSchema.JsonSchema.Clone as TJSONObject);
+    vJsonObject.AddPair(c_SwagResponseSchema, fSchema.JsonSchema as TJSONObject);
 
   if (fExamples.Count > 0) then
     vJsonObject.AddPair(c_SwagResponseExamples, GenerateExamplesJsonObject);
@@ -166,7 +165,6 @@ end;
 procedure TSwagResponse.Load(pJson: TJSONObject);
 var
   vJSONHeaders: TJSONObject;
-  vJSONSchema: TJSONObject;
   vIndex: Integer;
   vHeader: TSwagHeaders;
 begin
@@ -188,11 +186,7 @@ begin
   end;
 
   if Assigned(pJson.Values[c_SwagResponseSchema]) then
-  begin
-    vJSONSchema := pJson.Values[c_SwagResponseSchema] as TJSONObject;
-    fSchema := TSwagDefinition.Create;
-    fSchema.Load(vJSONSchema);
-  end;
+    fSchema.JsonSchema := pJson.Values[c_SwagResponseSchema].Clone as TJSONObject
 end;
 
 end.

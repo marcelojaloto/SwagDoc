@@ -264,7 +264,7 @@ begin
   FreeAndNil(fInterfaceVar);
   FreeAndNil(fImplementationConstant);
   FreeAndNil(fTypeDefinitions);
-  inherited;
+  inherited Destroy;
 end;
 
 function TDelphiUnit.GenerateImplementationConstants: string;
@@ -290,8 +290,8 @@ end;
 
 function TDelphiUnit.GenerateInterfaceVar: string;
 var
-  vVarList : TStringList;
-  vImpIndex : Integer;
+  vVarList: TStringList;
+  vImpIndex: Integer;
 begin
   vVarList := TStringList.Create;
   try
@@ -332,7 +332,7 @@ begin
   vUsesList := TStringList.Create;
   try
     if fUnitHasResourceFile then
-    vUsesList.Add('{$R *.dfm}');
+      vUsesList.Add('{$R *.dfm}');
     vUsesList.Add('');
     if fImplementationUses.Count > 0 then
     begin
@@ -502,7 +502,7 @@ begin
   FreeAndNil(fAttributes);
   FreeAndNil(fFields);
   FreeAndNil(fMethods);
-  inherited;
+  inherited Destroy;
 end;
 
 procedure TUnitTypeDefinition.AddAttribute(const pAttribute: string);
@@ -835,6 +835,7 @@ end;
 destructor TUnitParameter.Destroy;
 begin
   FreeAndNil(fAttributes);
+  FreeAndNil(fType);
   inherited Destroy;
 end;
 
