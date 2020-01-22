@@ -110,7 +110,7 @@ var
   vItemIndex: Integer;
 begin
   for vItemIndex := 0 to Length(pItemsDescriptions) -1 do
-    Self.AddItem(vItemIndex + Self.GetCount, pItemsDescriptions[vItemIndex]);
+    Self.AddItem(vItemIndex, pItemsDescriptions[vItemIndex]);
 end;
 
 function TJsonFieldEnum.Clone: TJsonField;
