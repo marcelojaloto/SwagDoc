@@ -169,7 +169,11 @@ begin
       vOperation.OperationId := vOperationJson.Values['operationId'].Value;
 
     if Assigned(vOperationJson.Values['deprecated']) then
+      {$IF COMPILERVERSION <= 27}
+      vOperation.Deprecated := True;
+      {$ELSE}
       vOperation.Deprecated := (vOperationJson.Values['deprecated'] as TJSONBool).AsBoolean;
+      {$ENDIF}
 
     LoadTags(vOperation, vOperationJson.Values['tags'] as TJSONArray);
     LoadProduces(vOperation, vOperationJson.Values['produces'] as TJSONArray);

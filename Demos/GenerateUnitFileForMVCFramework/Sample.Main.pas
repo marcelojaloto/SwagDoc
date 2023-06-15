@@ -37,11 +37,14 @@ uses
   FMX.Forms,
   FMX.Graphics,
   FMX.Dialogs,
+  {$IF COMPILERVERSION >= 28}
   FMX.Controls.Presentation,
-  FMX.StdCtrls,
   FMX.ScrollBox,
+  {$ENDIF}
+  FMX.StdCtrls,
   FMX.Memo,
-  FMX.TabControl;
+  FMX.TabControl,
+  FMX.Layouts;
 
 type
   TForm1 = class(TForm)

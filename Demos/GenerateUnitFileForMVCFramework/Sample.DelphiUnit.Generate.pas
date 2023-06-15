@@ -204,7 +204,11 @@ end;
 
 procedure TDelphiUnit.AddImplementationConstant(const pName, pValue: string);
 begin
+  {$IF COMPILERVERSION <= 27}
+  fImplementationConstant.Add(pName + ' : ' + pValue);
+  {$ELSE}
   fImplementationConstant.AddPair(pName, pValue);
+  {$ENDIF}
 end;
 
 procedure TDelphiUnit.AddImplementationUnit(const pFilename: string);
@@ -221,12 +225,20 @@ end;
 
 procedure TDelphiUnit.AddInterfaceVar(const pName: string; pTypeInfo: TUnitTypeDefinition);
 begin
+  {$IF COMPILERVERSION <= 27}
+  fInterfaceVar.Add(pName + ':' + pTypeInfo.TypeName);
+  {$ELSE}
   fInterfaceVar.AddPair(pName, pTypeInfo.TypeName);
+  {$ENDIF}
 end;
 
 procedure TDelphiUnit.AddInterfaceConstant(const pName, pValue: string);
 begin
+  {$IF COMPILERVERSION <= 27}
+  fInterfaceConstant.Add(pName + ':' + pValue);
+  {$ELSE}
   fInterfaceConstant.AddPair(pName, pValue);
+  {$ENDIF}
 end;
 
 procedure TDelphiUnit.AddInterfaceUnit(const pFilename: string);
