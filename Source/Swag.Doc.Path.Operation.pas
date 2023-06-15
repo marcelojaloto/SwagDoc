@@ -256,7 +256,11 @@ begin
     vJsonObject.AddPair(c_SwagPathOperationExternalDocs, fExternalDocs.GenerateJsonObject);
   
   if fDeprecated then
+    {$IF COMPILERVERSION <= 27}
+    vJsonObject.AddPair(c_SwagPathOperationDeprecated, TJSONTrue.Create);
+    {$ELSE}
     vJsonObject.AddPair(c_SwagPathOperationDeprecated, TJSONBool.Create(fDeprecated));
+    {$ENDIF}
   if not fOperationId.IsEmpty then
     vJsonObject.AddPair(c_SwagPathOperationOperationId, fOperationId);
   if (fConsumes.Count > 0) then

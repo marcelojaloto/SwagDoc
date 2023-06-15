@@ -195,10 +195,18 @@ begin
     vJsonObject.AddPair(c_SwagRequestParameterDefault, fDefault);
 
   if fRequired or (fInLocation = rpiPath) then
+  {$IF COMPILERVERSION <= 27}
+    vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONTrue.Create);
+  {$ELSE}
     vJsonObject.AddPair(c_SwagRequestParameterRequired, TJSONBool.Create(True));
+  {$ENDIF}
 
   if fAllowEmptyValue and (fInLocation = rpiQuery) or (fInLocation = rpiFormData) then
+  {$IF COMPILERVERSION <= 27}
+    vJsonObject.AddPair(c_SwagRequestParameterAllowEmptyValue, TJSONTrue.Create);
+  {$ELSE}
     vJsonObject.AddPair(c_SwagRequestParameterAllowEmptyValue, TJSONBool.Create(True));
+  {$ENDIF}
 
   if fInLocation = rpiBody then // schema only allow in body parameters
   begin
@@ -242,10 +250,18 @@ begin
 
   if Assigned(pJson.Values[c_SwagRequestParameterAllowEmptyValue]) and
     ((fInLocation = rpiQuery) or (fInLocation = rpiFormData)) then
+  {$IF COMPILERVERSION <= 27}
+    fAllowEmptyValue := True;
+  {$ELSE}
     fAllowEmptyValue := (pJson.Values[c_SwagRequestParameterAllowEmptyValue] as TJSONBool).AsBoolean;
+  {$ENDIF}
 
   if Assigned(pJson.Values[c_SwagRequestParameterRequired]) then
+  {$IF COMPILERVERSION <= 27}
+    fRequired := True
+  {$ELSE}
     fRequired := (pJson.Values[c_SwagRequestParameterRequired] as TJSONBool).AsBoolean
+  {$ENDIF}
   else
     fRequired := False;
 

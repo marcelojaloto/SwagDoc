@@ -247,9 +247,9 @@ begin
   end
   else
   begin
-    OutputDebugString(PChar(pJson.ToJSON));
+    OutputDebugString(PChar(pJson.ToString));
     vJsonVal := (pJson.JsonValue as TJSONObject).Values['items'] as TJSONObject;
-    OutputDebugString(PChar(vJsonVal.ToJSON));
+    OutputDebugString(PChar(vJsonVal.ToString));
     vJsonObj := vJsonVal as TJSONObject;
     vJsonVal := vJsonObj.Values['$ref'];
     OutputDebugString(PChar(vJsonVal.Value));
@@ -267,14 +267,14 @@ var
   vJsonPropIndex: Integer;
   vValue : string;
 begin
-  OutputDebugString(PChar('Child: ' + pJson.ToJSON));
+  OutputDebugString(PChar('Child: ' + pJson.ToString));
   vTypeInfo := TUnitTypeDefinition.Create;
   vTypeInfo.TypeName := 'T' + CapitalizeFirstLetter(pJson.JSONString.Value);
 
   vJsonProps := (pJson.JSONValue as TJSONObject).Values['properties'] as TJSONObject;
   for vJsonPropIndex := 0 to vJsonProps.Count - 1 do
   begin
-    OutputDebugString(PChar(vJsonProps.Pairs[vJsonPropIndex].ToJSON));
+    OutputDebugString(PChar(vJsonProps.Pairs[vJsonPropIndex].ToString));
     vFieldInfo := TUnitFieldDefinition.Create;
     vFieldInfo.FieldName := vJsonProps.Pairs[vJsonPropIndex].JsonString.Value;
     vTypeObj := vJsonProps.Pairs[vJsonPropIndex].JsonValue as TJSONObject;
@@ -319,7 +319,7 @@ begin
     vJsonProps := fSwagDoc.Definitions[DefinitionIndex].JsonSchema.Values['properties'] as TJSONObject;
     for vJsonPropIndex := 0 to vJsonProps.Count - 1 do
     begin
-      OutputDebugString(PChar(vJsonProps.Pairs[vJsonPropIndex].ToJSON));
+      OutputDebugString(PChar(vJsonProps.Pairs[vJsonPropIndex].ToString));
       vFieldInfo := TUnitFieldDefinition.Create;
       vFieldInfo.FieldName := vJsonProps.Pairs[vJsonPropIndex].JsonString.Value;
       vTypeObj := vJsonProps.Pairs[vJsonPropIndex].JsonValue as TJSONObject;
@@ -394,7 +394,7 @@ begin
       vJson := pSwaggerType.Schema.JsonSchema;
       if Assigned(vJson) then
       begin
-        OutputDebugString(PChar('TYPE: ' + vJson.ToJson));
+        OutputDebugString(PChar('TYPE: ' + vJson.ToString));
         Result.TypeName := 'array of ' + pSwaggerType.Schema.JsonSchema.Values['type'].Value;
       end
       else

@@ -7,25 +7,28 @@ object Form1: TForm1
   FormFactor.Width = 320
   FormFactor.Height = 480
   FormFactor.Devices = [Desktop]
-  DesignerMasterStyle = 0
+  DesignerMobile = False
+  DesignerWidth = 0
+  DesignerHeight = 0
+  DesignerDeviceName = ''
+  DesignerOrientation = 0
+  DesignerOSVersion = ''
   object Button1: TButton
+    Height = 22.000000000000000000
     Position.X = 16.000000000000000000
     Position.Y = 8.000000000000000000
     TabOrder = 1
     Text = 'Generate'
+    Width = 80.000000000000000000
     OnClick = Button1Click
   end
   object Memo1: TMemo
     Touch.InteractiveGestures = [Pan, LongTap, DoubleTap]
-    DataDetectorTypes = []
     Anchors = [akLeft, akTop, akRight, akBottom]
+    Height = 633.000000000000000000
     Position.X = 16.000000000000000000
     Position.Y = 40.000000000000000000
-    Size.Width = 574.000000000000000000
-    Size.Height = 630.000000000000000000
-    Size.PlatformDefault = False
     TabOrder = 2
-    Viewport.Width = 570.000000000000000000
-    Viewport.Height = 626.000000000000000000
+    Width = 577.000000000000000000
   end
 end

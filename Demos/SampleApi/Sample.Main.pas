@@ -35,8 +35,13 @@ uses
   FMX.Forms,
   FMX.Graphics,
   FMX.Dialogs,
+  {$IF COMPILERVERSION >= 28}
   FMX.Controls.Presentation,
-  FMX.StdCtrls, FMX.ScrollBox, FMX.Memo;
+  FMX.ScrollBox,
+  {$ENDIF}
+  FMX.StdCtrls,
+  FMX.Memo,
+  FMX.Layouts;
 
 type
   TForm1 = class(TForm)

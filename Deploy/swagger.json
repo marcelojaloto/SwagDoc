@@ -5,23 +5,23 @@
     "version":"v1",
     "title":"Sample API",
     "description":"Sample API Description",
-    "termsOfService":"http:\/\/www.apache.org\/licenses\/LICENSE-2.0.txt",
+    "termsOfService":"http://www.apache.org/licenses/LICENSE-2.0.txt",
     "contact":
     {
       "name":"Marcelo Jaloto",
       "email":"marcelojaloto@gmail.com",
-      "url":"https:\/\/github.com\/marcelojaloto\/SwagDoc"
+      "url":"https://github.com/marcelojaloto/SwagDoc"
     }
 ,
     "license":
     {
       "name":"Apache License - Version 2.0, January 2004",
-      "url":"http:\/\/www.apache.org\/licenses\/LICENSE-2.0"
+      "url":"http://www.apache.org/licenses/LICENSE-2.0"
     }
   }
 ,
   "host":"localhost",
-  "basePath":"\/api",
+  "basePath":"/api",
   "schemes":
   [
     "http"
@@ -29,17 +29,17 @@
 ,
   "consumes":
   [
-    "application\/json"
+    "application/json"
   ]
 ,
   "produces":
   [
-    "application\/json"
+    "application/json"
   ]
 ,
   "paths":
   {
-    "\/employees":
+    "/employees":
     {
       "get":
       {
@@ -190,7 +190,7 @@
             "required":true,
             "schema":
             {
-              "$ref":"#\/definitions\/employee"
+              "$ref":"#/definitions/employee"
             }
           }
         ]
@@ -307,7 +307,7 @@
       }
     }
 ,
-    "\/employees\/{id}":
+    "/employees/{id}":
     {
       "get":
       {
@@ -464,7 +464,7 @@
             "required":true,
             "schema":
             {
-              "$ref":"#\/definitions\/employee"
+              "$ref":"#/definitions/employee"
             }
           }
         ]
