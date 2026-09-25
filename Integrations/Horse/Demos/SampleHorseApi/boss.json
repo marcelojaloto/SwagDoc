@@ -1,0 +1,13 @@
+{
+  "name": "samplehorseapi",
+  "description": "Sample API documented with SwagDoc in an application written with Horse",
+  "version": "1.0.0",
+  "homepage": "https://github.com/marcelojaloto/SwagDoc",
+  "mainsrc": ".",
+  "projects": [
+    "SampleHorseApi.dproj"
+  ],
+  "dependencies": {
+    "github.com/hashload/horse": "^3.3.7"
+  }
+}
