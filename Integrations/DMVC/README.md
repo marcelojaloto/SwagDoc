@@ -1,8 +1,8 @@
 # SwagDoc and DelphiMVCFramework
 
 [DelphiMVCFramework](https://github.com/danieleteti/delphimvcframework) documents an API with SwagDoc, and the
-integration between them is written on the framework side, not here. This folder only describes how the two
-work together, what the coupling means for an application and what is needed to publish an OpenAPI 3 document.
+integration between them is written on the framework side, not here. This folder describes how the two work
+together, what the coupling means for an application and how to publish an OpenAPI 3 document.
 
 ## The coupling is a copy inside the framework
 
@@ -20,7 +20,7 @@ delphimvcframework/
     swagdoc/Source/                       the copy of SwagDoc used by the middleware
 ```
 
-Three consequences follow from that, and they are the reason this page exists:
+Three consequences follow from that:
 
 - An application does not install SwagDoc. It adds `lib/swagdoc/Source` to the search path of the project,
   together with the other folders of the framework, and the units are compiled into the executable.
@@ -67,6 +67,9 @@ into the objects of SwagDoc — a `TSwagPath` for each path, a `TSwagPathOperati
 ```delphi
 LSwagDoc := TSwagDoc.Create;
 try
+  if fSpecVersion = ssvOpenAPI3 then
+    LSwagDoc.SpecVersion := svOpenApi3;
+
   DocumentApiInfo(LSwagDoc);
   DocumentApiSettings(AContext, LSwagDoc);
   DocumentApiAuthentication(LSwagDoc);
@@ -79,37 +82,26 @@ finally
 end;
 ```
 
-The information of the API is given by the application as a record, and the middleware copies it into the
-document:
-
-```delphi
-Result.Title := 'Server REST API';
-Result.Version := pVersion;
-Result.Description := 'Server API Documentation';
-Result.ContactName := 'Marcelo Jaloto';
-Result.LicenseName := 'Apache License - Version 2.0, January 2004';
-```
-
 ## Publishing an OpenAPI 3 document
 
-The middleware writes a Swagger 2.0 document, because that is what the `TSwagDoc` class does when the
-specification version is not defined. Two things are needed to publish an OpenAPI 3 document.
-
-**The bundled SwagDoc must be a release that supports it**, that is, one whose `Swag.Common.Types` unit
-declares `TSwagVersion`. The release bundled with the framework is replaced by the content of the `Source`
-folder of this repository.
-
-**The middleware must define the version**, right after creating the document:
+DelphiMVCFramework 3.5 chooses the family of the specification with the last parameter of the middleware, which
+defaults to Swagger 2.0, so the document of an application that does not touch it does not change:
 
 ```delphi
-LSwagDoc := TSwagDoc.Create;
-try
-  LSwagDoc.SpecVersion := svOpenApi3;
-  ...
+FMVC.AddMiddleware(TMVCSwaggerMiddleware.Create(FMVC,
+  LSwaggerInfo,
+  '/api/help/swagger.json',
+  'Authentication JWT',
+  False,
+  ssvOpenAPI3));
 ```
 
-Nothing else changes in the application. The attributes stay as they are, and SwagDoc translates what the
-middleware writes in the style of Swagger 2.0:
+`TMVCSwaggerSpecVersion` is declared in `MVCFramework.Swagger.Commons` and has the values `ssvSwagger2` and
+`ssvOpenAPI3`. The same parameter is accepted by the `Swagger` filter of `MVCFramework.Filters`, for
+applications that configure the engine with filters instead of middlewares.
+
+The attributes of the controllers do not change, and SwagDoc translates what the middleware writes in the style
+of Swagger 2.0:
 
 | Written by the middleware | Written in the document |
 | --- | --- |
@@ -119,17 +111,57 @@ middleware writes in the style of Swagger 2.0:
 | Security definitions | `components/securitySchemes` |
 | `#/definitions/<name>` references | `#/components/schemas/<name>` references |
 
-The page that renders the document also needs to understand it. The Swagger UI files published by an
+The authentication is the one place where the middleware itself writes something different. Swagger 2.0 has no
+bearer scheme, so the token is declared as an API key sent in the `Authorization` header and the value typed in
+the Authorize dialog has to include `Bearer `. In OpenAPI 3 the same token is declared as an HTTP bearer
+scheme, and the dialog takes the raw token:
+
+```json
+"securitySchemes": {
+  "bearer": { "type": "http", "scheme": "bearer", "bearerFormat": "JWT" }
+}
+```
+
+The page that renders the document also needs to understand the family. The Swagger UI files published by an
 application written years ago do not know the recent releases of the specification, and are replaced by a
-current distribution.
+current distribution, like the one in the `Deploy\OpenApi3` folder of this repository.
 
-## Status
+## Two ways to write OpenAPI 3 in DelphiMVCFramework 3.5
 
-The [fork of the framework](https://github.com/marcelojaloto/delphimvcframework) already bundles the release of
-SwagDoc that supports OpenAPI 3, in the `feat(swagdoc): update bundled SwagDoc with OpenAPI 3 support` commit.
-The line that defines the specification version in the middleware is still missing, so the document published
-by the framework is written as Swagger 2.0.
+The framework also ships `TMVCOpenAPI3Middleware`, in `MVCFramework.Middleware.OpenAPI3`, an emitter written
+from scratch over `JsonDataObjects` that writes OpenAPI 3.1 and **does not use SwagDoc**. The two middlewares
+can be registered side by side, publishing the same controllers at two routes, which is what the
+`swagger_primer` sample does.
 
-The [server-api-rest-dmvc](https://github.com/marcelojaloto/Delphi/tree/master/samples/server-api-rest-dmvc)
-sample publishes an OpenAPI 3.2.1 document with the change described above applied to its copy of the
-framework.
+| | `TMVCSwaggerMiddleware` | `TMVCOpenAPI3Middleware` |
+| --- | --- | --- |
+| Writes | Swagger 2.0 or OpenAPI 3.2.1, by the `ASpecVersion` parameter | OpenAPI 3.1 |
+| Document built by | SwagDoc, bundled in `lib/swagdoc` | The framework itself |
+| Coverage | Every attribute of the framework, JWT discovery and the CRUD documentation of `TMVCActiveRecordController` | The newer helper does not cover all of them yet |
+
+The source of the framework states the difference plainly: the `Swagger` filter is a "full parity wrapper
+around `TMVCSwaggerMiddleware`", with "features the newer OpenAPI 3 helper does not yet cover".
+
+## Applications on an older release of the framework
+
+An application that keeps the copy of the framework it was written for reaches OpenAPI 3 by backporting two
+things into that copy: the release of SwagDoc that supports it, replacing `lib/swagdoc/Source`, and the
+`ASpecVersion` parameter of the middleware. The `server-api-rest-dmvc` sample below does exactly that, over
+version 3.2.0.
+
+## Samples
+
+Published with the framework, in https://github.com/danieleteti/delphimvcframework/tree/master/samples:
+
+- `swagger_primer`: the smallest setup, and the one that registers the two middlewares side by side, the
+  SwagDoc one at `/api/swagger.json` and the native emitter at `/api/openapi.json`.
+- `swagger_doc_extended`: chooses the family at startup, with authentication, custom host and base path, and
+  the attributes of the framework used in full.
+- `swagger_doc`, `swagger_ui` and `swagger_api_versioning_primer`: the documentation of an API, the interface
+  that renders it and the documentation of an API that publishes more than one version.
+
+Published with SwagDoc:
+
+- [server-api-rest-dmvc](https://github.com/marcelojaloto/Delphi/tree/master/samples/server-api-rest-dmvc): a
+  customers API with JWT authentication and a PostgreSQL database, publishing an OpenAPI 3.2.1 document from a
+  copy of the framework where the parameter was backported.

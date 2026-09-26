@@ -21,9 +21,24 @@ Files
 - LICENSE, NOTICE and the *.LICENSE.txt files: the Apache License 2.0 of Swagger UI.
 
 Swagger UI renders OpenAPI 3.0, 3.1 and 3.2 documents starting from the 5.x releases. When you update the
-distribution files, keep a release that supports the OpenAPI version written by SwagDoc. Swagger UI 5.32.15
-only displays the webhooks section for OpenAPI 3.1 documents, so the webhooks of the generated 3.2 document
-are not listed on the page, although they are present in openapi.json.
+distribution files, keep a release that supports the OpenAPI version written by SwagDoc.
+
+Swagger UI 5.32.15 does not draw every object of the OpenAPI 3.2 document, although all of them are present
+in openapi.json:
+
+- The webhooks section is only displayed for OpenAPI 3.1 documents, so the webhooks of the generated 3.2
+  document are not listed. The tag that groups them, Notifications, appears on the page without operations.
+- The operations declared under additionalOperations, like the LINK of the employee documents, are not
+  listed either.
+- The tags are drawn as sibling sections: the Employee documents tag declares Employees as its parent, and
+  the page shows the two at the same level.
+
+The QUERY method, the querystring parameter, the reusable media types, the callbacks, the response links and
+the streaming media types of the document are displayed.
+
+Scalar (https://scalar.com) is an alternative interface that draws the webhooks and the hierarchy of the tags,
+and in exchange it does not show the QUERY operation nor the links of the responses. Neither interface covers
+the whole specification yet.
 
 Theme
 -----
