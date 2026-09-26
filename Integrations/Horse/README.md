@@ -7,7 +7,10 @@ The document is described with the objects of SwagDoc, so the same API can be pu
 Swagger 2.0 document by changing the `SpecVersion` property.
 
 Applications that document their API with GBSwagger are migrated by the
-[migration guide](Migration-gbswagger-to-SwagDoc.md).
+migration guide: [Migration-gbswagger-to-SwagDoc.md](Migration-gbswagger-to-SwagDoc.md)
+([PDF](Migration-gbswagger-to-SwagDoc.pdf)). The guide is also available in Portuguese
+([Markdown](Migration-gbswagger-to-SwagDoc.pt-BR.md), [PDF](Migration-gbswagger-to-SwagDoc.pt-BR.pdf)) and in
+Spanish ([Markdown](Migration-gbswagger-to-SwagDoc.es.md), [PDF](Migration-gbswagger-to-SwagDoc.es.pdf)).
 
 ## Requirements
 

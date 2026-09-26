@@ -24,7 +24,7 @@ In the `boss.json` file, replace the dependency:
 
 ```diff
 -    "github.com/gabrielbaltazar/gbswagger": "^3.0.7",
-+    "github.com/marcelojaloto/SwagDoc": "^1.0.0",
++    "github.com/marcelojaloto/SwagDoc": "^2.0.0",
 ```
 
 In the search path of the project, replace the three folders of GBSwagger by the two of SwagDoc:

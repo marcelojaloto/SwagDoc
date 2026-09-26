@@ -138,7 +138,7 @@ SwagDocApi.Route('/pets/:id').AddOperation(ohvGet).Summary := 'Returns a pet';
 
 The routes registered in Horse that are not documented yet are written in the document with a single response, which shows what is still missing. The document is written as OpenAPI 3 and `SwagDocApi.SpecVersion := svSwagger2` publishes the Swagger 2.0 one instead. The interface is selected at runtime, between Swagger UI and Scalar, and its files are loaded from a CDN or embedded in the executable by a conditional define.
 
-The [page of the integration](Integrations/Horse/README.md) describes the settings, and applications that document their API with GBSwagger are moved by the [migration guide](Integrations/Horse/Migration-gbswagger-to-SwagDoc.md).
+The [page of the integration](Integrations/Horse/README.md) describes the settings, and applications that document their API with GBSwagger are moved by the migration guide: [Integrations/Horse/Migration-gbswagger-to-SwagDoc.md](Integrations/Horse/Migration-gbswagger-to-SwagDoc.md) ([PDF](Integrations/Horse/Migration-gbswagger-to-SwagDoc.pdf)). The guide is also available in Portuguese ([Markdown](Integrations/Horse/Migration-gbswagger-to-SwagDoc.pt-BR.md), [PDF](Integrations/Horse/Migration-gbswagger-to-SwagDoc.pt-BR.pdf)) and in Spanish ([Markdown](Integrations/Horse/Migration-gbswagger-to-SwagDoc.es.md), [PDF](Integrations/Horse/Migration-gbswagger-to-SwagDoc.es.pdf)).
 
 ### DelphiMVCFramework
 
