@@ -819,8 +819,9 @@ Neither interface covers the whole OpenAPI 3.2 specification yet, and they do no
 
 | Object of the document | Swagger UI 5.32.15 | Scalar 1.72.1 |
 |------------------------|--------------------|---------------|
-| QUERY method, querystring parameters, response links | Rendered | Not rendered |
-| Reusable media types, callbacks, streaming media types | Rendered | Rendered |
+| QUERY method, querystring and cookie parameters | Rendered | Rendered |
+| Reusable media types, streaming media types | Rendered | Rendered |
+| Callbacks, response links | Rendered | Not rendered |
 | Webhooks | Only for 3.1 documents | Rendered |
 | Operations under `additionalOperations` | Not rendered | Not rendered |
 | Hierarchy of the tags | Sibling sections | Nested |

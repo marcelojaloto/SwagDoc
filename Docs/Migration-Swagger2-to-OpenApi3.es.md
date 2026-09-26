@@ -819,8 +819,9 @@ Ninguna de las dos interfaces cubre toda la especificación OpenAPI 3.2 todavía
 
 | Objeto del documento | Swagger UI 5.32.15 | Scalar 1.72.1 |
 |------------------------|--------------------|---------------|
-| Método QUERY, parámetros querystring, links de las respuestas | Muestra | No muestra |
-| Media types reutilizables, callbacks, media types de streaming | Muestra | Muestra |
+| Método QUERY, parámetros querystring y cookie | Muestra | Muestra |
+| Media types reutilizables, media types de streaming | Muestra | Muestra |
+| Callbacks, links de las respuestas | Muestra | No muestra |
 | Webhooks | Solo en documentos 3.1 | Muestra |
 | Operaciones bajo `additionalOperations` | No muestra | No muestra |
 | Jerarquía de las tags | Secciones hermanas | Anidadas |

@@ -36,9 +36,11 @@ in openapi.json:
 The QUERY method, the querystring parameter, the reusable media types, the callbacks, the response links and
 the streaming media types of the document are displayed.
 
-Scalar (https://scalar.com) is an alternative interface that draws the webhooks and the hierarchy of the tags,
-and in exchange it does not show the QUERY operation nor the links of the responses. Neither interface covers
-the whole specification yet.
+Scalar (https://scalar.com) is an alternative interface, in the OpenApi3-Scalar folder. Scalar 1.72.1 draws the
+webhooks and the hierarchy of the tags, which Swagger UI does not, and it also draws the QUERY method, the
+querystring parameter (under the query parameters of the operation), the cookie parameters and the deprecated
+ones. It does not draw the callbacks nor the links of the responses, which Swagger UI does. Neither interface
+draws the operations declared under additionalOperations, and neither covers the whole specification yet.
 
 Theme
 -----

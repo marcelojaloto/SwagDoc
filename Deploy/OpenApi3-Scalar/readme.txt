@@ -34,9 +34,10 @@ What Scalar renders
 Neither Scalar nor Swagger UI covers the whole OpenAPI 3.2 specification yet, and they do not cover the same
 part of it. All the objects are present in openapi.json.
 
-Scalar 1.72.1 renders the webhooks and the hierarchy of the tags, which Swagger UI 5.32.15 does not, and in
-exchange it does not show the QUERY operation nor the links of the responses, which Swagger UI does. Neither
-of them renders the operations declared under additionalOperations.
+Scalar 1.72.1 renders the webhooks and the hierarchy of the tags, which Swagger UI 5.32.15 does not. It also
+renders the QUERY method, the querystring parameter (under the query parameters of the operation), the cookie
+parameters and the deprecated ones. In exchange it does not render the callbacks nor the links of the
+responses, which Swagger UI does. Neither of them renders the operations declared under additionalOperations.
 
 Scalar also reads Swagger 2.0 documents, which it converts to OpenAPI 3.1 while it loads. The Swagger2-Scalar
 folder has the same files pointing to the swagger.json of the Swagger2 folder.

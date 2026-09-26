@@ -819,8 +819,9 @@ Nenhuma das duas interfaces cobre toda a especificação OpenAPI 3.2 ainda, e el
 
 | Objeto do documento | Swagger UI 5.32.15 | Scalar 1.72.1 |
 |------------------------|--------------------|---------------|
-| Método QUERY, parâmetros querystring, links das respostas | Renderiza | Não renderiza |
-| Media types reutilizáveis, callbacks, media types de streaming | Renderiza | Renderiza |
+| Método QUERY, parâmetros querystring e cookie | Renderiza | Renderiza |
+| Media types reutilizáveis, media types de streaming | Renderiza | Renderiza |
+| Callbacks, links das respostas | Renderiza | Não renderiza |
 | Webhooks | Só em documentos 3.1 | Renderiza |
 | Operações sob `additionalOperations` | Não renderiza | Não renderiza |
 | Hierarquia das tags | Seções irmãs | Aninhadas |
