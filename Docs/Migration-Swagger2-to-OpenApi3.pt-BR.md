@@ -800,11 +800,34 @@ A página também carrega fontes de `fonts.googleapis.com`. Sem acesso à intern
 | `openapi.json` | Sim | Gerado pelo SwagDoc com `svOpenApi3` |
 | `readme.txt` | Não | Instruções |
 
-> O Swagger UI 3.x não consegue renderizar documentos OpenAPI 3.1 ou 3.2. Publique o `openapi.json` com o Swagger UI 5 (os arquivos de `Deploy\OpenApi3`, ou uma versão 5.x mais recente). O Swagger UI 5 também renderiza documentos Swagger 2.0.
+> O Swagger UI 3.x não consegue renderizar documentos OpenAPI 3.1 ou 3.2. Publique o `openapi.json` com o Swagger UI 5 (os arquivos de `Deploy\OpenApi3`, ou uma versão 5.x mais recente) ou com o Scalar. O Swagger UI 5 também renderiza documentos Swagger 2.0.
+
+**Deploy\Swagger2-Scalar e Deploy\OpenApi3-Scalar - Scalar 1.72.1**
+
+O Scalar é uma interface alternativa, distribuída em dois arquivos, com uma pasta por família. Cada página lê o documento da pasta da sua família, `../Swagger2/swagger.json` ou `../OpenApi3/openapi.json`.
+
+| Arquivo | Obrigatório | Função |
+|------|----------|------|
+| `index.html` | Sim | Página e configuração. A opção `url` do `Scalar.createApiReference` aponta para o documento |
+| `standalone.js` | Sim | A interface inteira, em um arquivo |
+| `scalar.LICENSE.txt` | Ao redistribuir | Licença MIT do Scalar |
+| `readme.txt` | Não | Instruções |
+
+O Scalar lê documentos Swagger 2.0 convertendo-os para OpenAPI 3.1 durante o carregamento, e a página mostra o selo "OpenAPI 2.0" ao lado do título.
+
+Nenhuma das duas interfaces cobre toda a especificação OpenAPI 3.2 ainda, e elas não cobrem a mesma parte dela:
+
+| Objeto do documento | Swagger UI 5.32.15 | Scalar 1.72.1 |
+|------------------------|--------------------|---------------|
+| Método QUERY, parâmetros querystring, links das respostas | Renderiza | Não renderiza |
+| Media types reutilizáveis, callbacks, media types de streaming | Renderiza | Renderiza |
+| Webhooks | Só em documentos 3.1 | Renderiza |
+| Operações sob `additionalOperations` | Não renderiza | Não renderiza |
+| Hierarquia das tags | Seções irmãs | Aninhadas |
 
 ### 8.3 Configurando a página
 
-`swagger-initializer.js` de `Deploy\OpenApi3`:
+`swagger-initializer.js` de `Deploy\OpenApi3\SwaggerUI`:
 
 ```javascript
 window.onload = function() {
@@ -856,6 +879,7 @@ Mantenha as duas até que os consumidores (geradores de clientes, API gateways, 
 | A demo `SampleApi` grava o seu executável e o `swagger.json` em `Deploy` | Grava-os em `Deploy\Swagger2` |
 | nenhuma | `Deploy\OpenApi3` com Swagger UI 5.32.15 e `openapi.json` |
 | nenhuma | `Demos\SampleOpenApi3`: a versão OpenAPI 3.2.1 da `SampleApi`, gravando em `Deploy\OpenApi3` |
+| nenhuma | `Deploy\Swagger2-Scalar` e `Deploy\OpenApi3-Scalar`, com a interface Scalar lendo o documento da pasta da sua família |
 
 ### 8.7 Publicando o documento pela própria aplicação
 
