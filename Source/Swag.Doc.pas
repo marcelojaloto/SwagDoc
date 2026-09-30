@@ -80,6 +80,7 @@ type
     fDisableSecurity: Boolean;
     fGlobalSecurityFromDefinitions: Boolean;
     fWriteNullableExtension: Boolean;
+    fOmitEmptyBasePath: Boolean;
     fResponses: TObjectList<TSwagResponse>;
     fHeaders: TObjectList<TSwagHeaders>;
     fExamples: TObjectList<TSwagExample>;
@@ -264,6 +265,13 @@ type
     /// extension read from a Swagger 2.0 document is always kept, and OpenAPI 3 always writes the nullable type.
     /// </summary>
     property WriteNullableExtension: Boolean read fWriteNullableExtension write fWriteNullableExtension;
+
+    /// <summary>
+    /// When True, the basePath field is left out of a Swagger 2.0 document when the BasePath property is empty,
+    /// since the specification requires the value to start with a slash and the API is then served directly under
+    /// the host. The default value is False, which keeps writing an empty basePath, as the previous releases did.
+    /// </summary>
+    property OmitEmptyBasePath: Boolean read fOmitEmptyBasePath write fOmitEmptyBasePath;
 
     /// <summary>
     /// An object to hold parameters that can be used across operations. This property does not define global
@@ -603,7 +611,8 @@ begin
 
   if not fHost.IsEmpty then
     vJsonObject.AddPair(c_SwagHost, fHost);
-  vJsonObject.AddPair(c_SwagBasePath, fBasePath);
+  if not (fOmitEmptyBasePath and fBasePath.IsEmpty) then
+    vJsonObject.AddPair(c_SwagBasePath, fBasePath);
 
   if (fTags.Count > 0) then
     vJsonObject.AddPair(c_SwagTags, GenerateTagsJsonArray);

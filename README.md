@@ -157,7 +157,7 @@ The classes and properties used to describe a Swagger 2.0 document keep working 
 
 | Object model | Swagger 2.0 | OpenAPI 3 |
 |--------------|-------------|-----------|
-| `Host`, `BasePath`, `Schemes` | `host`, `basePath`, `schemes` | One server per scheme in `servers`, used only when the `Servers` list is empty |
+| `Host`, `BasePath`, `Schemes` | `host`, `basePath`, `schemes` (an empty `basePath` is left out when `OmitEmptyBasePath` is True) | One server per scheme in `servers`, used only when the `Servers` list is empty |
 | `Consumes` (document and operation) | `consumes` | Media types of the `requestBody` created from the body and formData parameters |
 | `Produces` (document and operation) | `produces` | Media types of the `content` of every response that does not define its own `Content` |
 | Parameter with `InLocation = rpiBody` | Body parameter with `schema` | `requestBody` with one media type per consumed MIME type |
@@ -174,6 +174,8 @@ The classes and properties used to describe a Swagger 2.0 document keep working 
 | `type: file` in schemas and parameters | Kept | `type: string` with `format: binary` |
 | Basic security definition | `type: basic` | `type: http` with `scheme: basic` |
 | OAuth2 flow names | `implicit`, `password`, `application`, `accessCode` | `implicit`, `password`, `clientCredentials`, `authorizationCode` |
+
+A Swagger 2.0 document always receives the `basePath` field, even when the `BasePath` property is empty, as in the previous releases. The specification requires the value to start with a slash, so an empty one is rejected by the validators; setting `OmitEmptyBasePath := True` leaves the field out while it is empty, which means the API is served directly under the host.
 
 The conversion also works in the other direction: an OpenAPI 3 document loaded with `LoadFromFile` can be written as Swagger 2.0. The properties that exist only in OpenAPI 3 are translated when possible (a request body becomes a body parameter or formData parameters, an HTTP bearer scheme becomes an API key sent in the `Authorization` header, a schema `examples` array becomes `example`) or are not written when there is no equivalent (cookie and querystring parameters, the QUERY operation and the additional operations, webhooks, callbacks, links, reusable examples, headers, media types and path items, the mutual TLS scheme and the OAuth2 device authorization flow).
 
