@@ -1,0 +1,3 @@
+DEXT_SWAGDOC_SWAGGER_UI_CSS       RCDATA "swagger-ui.css.gz"
+DEXT_SWAGDOC_SWAGGER_UI_BUNDLE_JS RCDATA "swagger-ui-bundle.js.gz"
+DEXT_SWAGDOC_SWAGGER_UI_PRESET_JS RCDATA "swagger-ui-standalone-preset.js.gz"

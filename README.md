@@ -1,7 +1,7 @@
 # SwagDoc
 SwagDoc is a Delphi library to generate the swagger.json (Swagger 2.0) or the openapi.json (OpenAPI 3) file of a REST API. Create a public documentation of your REST API using Swagger 2.0 or OpenAPI 3.2.1 for Delphi Language. SwagDoc's only responsibility is to generate the JSON document. The document is responsible for containing all the documentation for your REST API. This file must be attached to the Swagger UI (User Interface) files.
 
-An API written with [Horse](https://github.com/HashLoad/horse) publishes that document without writing a single route: the `Integrations\Horse` folder has a middleware that serves it and renders it with Swagger UI or Scalar. APIs written with [DelphiMVCFramework](https://github.com/danieleteti/delphimvcframework) already use SwagDoc, which the framework bundles in its own tree.
+An API written with [Horse](https://github.com/HashLoad/horse) publishes that document without writing a single route: the `Integrations\Horse` folder has a middleware that serves it and renders it with Swagger UI or Scalar. The `Integrations\Dext` folder does the same for [Dext](https://github.com/dotpas/dext), reading what the application already tells Dext about its endpoints. APIs written with [DelphiMVCFramework](https://github.com/danieleteti/delphimvcframework) already use SwagDoc, which the framework bundles in its own tree.
 
 [![PayPal donate button](https://user-images.githubusercontent.com/26885358/62580349-60bd8780-b87c-11e9-901e-425cf2a83671.png)](https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=AW8TZ2QTDA7K8)
 
@@ -139,6 +139,36 @@ SwagDocApi.Route('/pets/:id').AddOperation(ohvGet).Summary := 'Returns a pet';
 The routes registered in Horse that are not documented yet are written in the document with a single response, which shows what is still missing. The document is written as OpenAPI 3 and `SwagDocApi.SpecVersion := svSwagger2` publishes the Swagger 2.0 one instead. The interface is selected at runtime, between Swagger UI and Scalar, and its files are loaded from a CDN or embedded in the executable by a conditional define.
 
 The [page of the integration](Integrations/Horse/README.md) describes the settings, and applications that document their API with GBSwagger are moved by the migration guide: [Integrations/Horse/Migration-gbswagger-to-SwagDoc.md](Integrations/Horse/Migration-gbswagger-to-SwagDoc.md) ([PDF](Integrations/Horse/Migration-gbswagger-to-SwagDoc.pdf)). The guide is also available in Portuguese ([Markdown](Integrations/Horse/Migration-gbswagger-to-SwagDoc.pt-BR.md), [PDF](Integrations/Horse/Migration-gbswagger-to-SwagDoc.pt-BR.pdf)) and in Spanish ([Markdown](Integrations/Horse/Migration-gbswagger-to-SwagDoc.es.md), [PDF](Integrations/Horse/Migration-gbswagger-to-SwagDoc.es.pdf)).
+
+### Dext
+
+`Integrations\Dext` is a middleware that publishes the document and the page that renders it. Add the two folders to the search path of the project, with Dext in the library path of the IDE:
+
+```
+SwagDoc\Source
+SwagDoc\Integrations\Dext\Source
+```
+
+One line publishes the documentation, before or after the endpoints are registered, because the document is generated on the first request:
+
+```delphi
+uses
+  Dext.Web, Dext.SwagDoc;
+
+begin
+  App := TDextApplication.Create;
+  SwagDocApi.Info.Title := 'Pet Store';
+  TDextSwagDoc.Use(App.Builder);
+
+  App.Builder.MapGet('/pets/{id}', GetPet);
+  App.MapControllers;
+  App.Run(9000);
+end.
+```
+
+Every endpoint registered in Dext, from the Minimal API or from a controller, is written with what the application gave to Dext: the summary, the tags, the request and response types, the documented responses and the security schemes. The schemas of the types follow the serializer of Dext (names, enumerations and dates) and honor its Swagger attributes, so an application that already uses the Swagger support of Dext keeps its code and gets an OpenAPI 3.2.1 or a Swagger 2.0 document, with the required properties, the HEAD and QUERY methods and the whole object model of SwagDoc through `SwagDocApi`. The page is published at `/docs`, so it can run next to the `/swagger` page of Dext while both are compared.
+
+The [page of the integration](Integrations/Dext/README.md) compares both documents and describes the settings.
 
 ### DelphiMVCFramework
 
@@ -460,6 +490,7 @@ When an OpenAPI 3 document is loaded, the `Host`, `BasePath` and `Schemes` prope
 - `Demos\LoadSwaggerJsonToObject`: loads a swagger.json file into the object model and writes it again (VCL).
 - `Demos\GenerateUnitFileForMVCFramework`: reads a swagger.json file and generates a Delphi client unit for DelphiMVCFramework (FMX).
 - `Integrations\Horse\Demos\SampleHorseApi`: a pet store API written with Horse and documented with the middleware (console). It shows the documentation of a tag, a schema of the components, a request body, responses with media types and a path parameter declared by the route, and it selects the user interface with the `-scalar` parameter and the specification version with the `-swagger2` one.
+- `Integrations\Dext\Demos\SampleDextApi`: a pet store API written with Dext, with Minimal API endpoints and a controller described with the fluent API and the attributes of Dext, documented by the middleware (console). The Swagger support of Dext is published next to it, at `/swagger`, for comparison, and the `-scalar`, `-swagger2` and `-www` parameters select the interface, the specification version and where the files of the interface come from.
 
 
 ## Sample applications
