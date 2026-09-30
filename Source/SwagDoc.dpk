@@ -76,6 +76,8 @@ contains
   Swag.Doc in 'Swag.Doc.pas',
   Swag.Doc.OpenApi.Generator in 'Swag.Doc.OpenApi.Generator.pas',
   Swag.Doc.OpenApi.Loader in 'Swag.Doc.OpenApi.Loader.pas',
-  Swag.Doc.FileLoader in 'Swag.Doc.FileLoader.pas';
+  Swag.Doc.FileLoader in 'Swag.Doc.FileLoader.pas',
+  Swag.Doc.Schema.Attributes in 'Swag.Doc.Schema.Attributes.pas',
+  Swag.Doc.Schema.Builder in 'Swag.Doc.Schema.Builder.pas';
 
 end.

@@ -21,6 +21,9 @@
         <Projects Include="Demos\SampleOpenApi3\SampleOpenApi3.dproj">
             <Dependencies/>
         </Projects>
+        <Projects Include="Demos\SampleSchemaFromTypes\SampleSchemaFromTypes.dproj">
+            <Dependencies/>
+        </Projects>
     </ItemGroup>
     <ProjectExtensions>
         <Borland.Personality>Default.Personality.12</Borland.Personality>
@@ -83,14 +86,23 @@
     <Target Name="SampleOpenApi3:Make">
         <MSBuild Projects="Demos\SampleOpenApi3\SampleOpenApi3.dproj" Targets="Make"/>
     </Target>
+    <Target Name="SampleSchemaFromTypes">
+        <MSBuild Projects="Demos\SampleSchemaFromTypes\SampleSchemaFromTypes.dproj"/>
+    </Target>
+    <Target Name="SampleSchemaFromTypes:Clean">
+        <MSBuild Projects="Demos\SampleSchemaFromTypes\SampleSchemaFromTypes.dproj" Targets="Clean"/>
+    </Target>
+    <Target Name="SampleSchemaFromTypes:Make">
+        <MSBuild Projects="Demos\SampleSchemaFromTypes\SampleSchemaFromTypes.dproj" Targets="Make"/>
+    </Target>
     <Target Name="Build">
-        <CallTarget Targets="SwagDoc;GenerateSwagger;LoadSwaggerJsonToObject;SampleApi;GenerateUnitFileForMVCFramework;SampleOpenApi3"/>
+        <CallTarget Targets="SwagDoc;GenerateSwagger;LoadSwaggerJsonToObject;SampleApi;GenerateUnitFileForMVCFramework;SampleOpenApi3;SampleSchemaFromTypes"/>
     </Target>
     <Target Name="Clean">
-        <CallTarget Targets="SwagDoc:Clean;GenerateSwagger:Clean;LoadSwaggerJsonToObject:Clean;SampleApi:Clean;GenerateUnitFileForMVCFramework:Clean;SampleOpenApi3:Clean"/>
+        <CallTarget Targets="SwagDoc:Clean;GenerateSwagger:Clean;LoadSwaggerJsonToObject:Clean;SampleApi:Clean;GenerateUnitFileForMVCFramework:Clean;SampleOpenApi3:Clean;SampleSchemaFromTypes:Clean"/>
     </Target>
     <Target Name="Make">
-        <CallTarget Targets="SwagDoc:Make;GenerateSwagger:Make;LoadSwaggerJsonToObject:Make;SampleApi:Make;GenerateUnitFileForMVCFramework:Make;SampleOpenApi3:Make"/>
+        <CallTarget Targets="SwagDoc:Make;GenerateSwagger:Make;LoadSwaggerJsonToObject:Make;SampleApi:Make;GenerateUnitFileForMVCFramework:Make;SampleOpenApi3:Make;SampleSchemaFromTypes:Make"/>
     </Target>
     <Import Project="$(BDS)\Bin\CodeGear.Group.Targets" Condition="Exists('$(BDS)\Bin\CodeGear.Group.Targets')"/>
 </Project>

@@ -158,6 +158,8 @@
         <DCCReference Include="Swag.Doc.OpenApi.Generator.pas"/>
         <DCCReference Include="Swag.Doc.OpenApi.Loader.pas"/>
         <DCCReference Include="Swag.Doc.FileLoader.pas"/>
+        <DCCReference Include="Swag.Doc.Schema.Attributes.pas"/>
+        <DCCReference Include="Swag.Doc.Schema.Builder.pas"/>
         <BuildConfiguration Include="Base">
             <Key>Base</Key>
         </BuildConfiguration>
