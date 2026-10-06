@@ -124,14 +124,21 @@ THorse.Use(HorseSwagDoc('/api-docs', '/api-docs/openapi.json'));
 ## Swagger 2.0
 
 The document created by the middleware is written as an OpenAPI 3 document. Applications that publish a
-Swagger 2.0 document define the specification version and usually change the route of the document:
+Swagger 2.0 document define the specification version, the address of the API, which Swagger 2.0 does not take
+from the servers, and usually the route of the document:
 
 ```delphi
 SwagDocConfig.DocumentRoute := '/docs/swagger.json';
 THorse.Use(HorseSwagDoc);
 
 SwagDocApi.SpecVersion := svSwagger2;
+SwagDocApi.Host := 'localhost:9000';
+SwagDocApi.OmitEmptyBasePath := True;
 ```
+
+A Swagger 2.0 document always receives the `basePath` field, even when it is empty, which the specification does
+not accept. `OmitEmptyBasePath` leaves it out while the `BasePath` property is empty; setting `BasePath` to `/`
+also makes the document valid.
 
 ## User interface
 

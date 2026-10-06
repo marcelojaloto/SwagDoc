@@ -47,8 +47,14 @@ begin
 
   THorse.Use(HorseSwagDoc);
 
+  // A Swagger 2.0 document has no servers list, so the address of the API is given by the host. The basePath
+  // is left out while it is empty.
   if FindCmdLineSwitch('swagger2') then
+  begin
     SwagDocApi.SpecVersion := svSwagger2;
+    SwagDocApi.Host := Format('localhost:%d', [c_Port]);
+    SwagDocApi.OmitEmptyBasePath := True;
+  end;
 
   SwagDocApi.Info.Title := 'Pet Store';
   SwagDocApi.Info.Version := '1.0.0';
